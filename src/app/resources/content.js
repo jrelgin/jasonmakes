@@ -1,4 +1,3 @@
-import { Logo } from "@/once-ui/components";
 
 const person = {
   firstName: "Jason",
