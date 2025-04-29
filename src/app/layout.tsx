@@ -7,17 +7,28 @@ import { Footer, Header, RouteGuard } from "@/components";
 import { baseURL, effects, style, font, home } from "@/app/resources";
 
 import { Background, Column, Flex, ThemeProvider, ToastProvider } from "@/once-ui/components";
-import { opacity, SpacingToken } from "@/once-ui/types";
+import type { opacity, SpacingToken } from "@/once-ui/types";
 import { Meta } from "@/once-ui/modules";
 
 export async function generateMetadata() {
-  return Meta.generate({
+  const metadata = Meta.generate({
     title: home.title,
     description: home.description,
     baseURL: baseURL,
     path: home.path,
     image: home.image,
   });
+
+  // Add the manifest and icon references
+  return {
+    ...metadata,
+    manifest: '/manifest',
+    icons: {
+      icon: '/icons/favicon.ico',
+      apple: '/icons/apple-touch-icon.png',
+      shortcut: '/icons/favicon.svg'
+    }
+  };
 }
 
 interface RootLayoutProps {
