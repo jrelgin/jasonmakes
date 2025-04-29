@@ -48,6 +48,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
     >
       <head>
         <script
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
@@ -112,7 +113,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
                 color: effects.lines.color,
               }}
             />
-            <Flex fillWidth minHeight="16" hide="s"></Flex>
+            <Flex fillWidth minHeight="16" hide="s" />
             <Header />
             <Flex
               zIndex={0}
