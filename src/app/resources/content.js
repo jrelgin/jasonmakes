@@ -8,8 +8,9 @@ const person = {
   role: "Product Design",
   avatar: "/images/avatar.jpg",
   email: "example@gmail.com",
-  location: "America/New_York", // IANA time zone identifier for Atlanta, Georgia
-  languages: [""], // optional: Leave the array empty if you don't want to display languages
+  location: "America/New_York", // IANA time zone identifier for timezone functionality
+  displayLocation: "Atlanta, Georgia", // Human-readable location for display purposes
+  languages: [], // Empty array to hide language tags
 };
 
 const newsletter = {
@@ -57,7 +58,7 @@ const home = {
   headline: <>Designing and prototyping with AI</>,
   featured: {
     display: true,
-    title: <>Recent project: <strong className="ml-4">Once UI</strong></>,
+    title: <>Recent Article: <strong className="ml-4">AI for design</strong></>,
     href: "/work/building-once-ui-a-customizable-design-system",
   },
   subline: (
@@ -89,9 +90,7 @@ const about = {
     title: "Introduction",
     description: (
       <>
-        Selene is a Jakarta-based design engineer with a passion for transforming complex challenges
-        into simple, elegant design solutions. Her work spans digital interfaces, interactive
-        experiences, and the convergence of design and technology.
+        I bring the mindset of a growth designer to every project. My background in product-led growth means I prioritize uncovering friction points, analyzing user data, and iterating quickly. This translates into design solutions that directly boost engagement, conversion, and long-term growth for your product.
       </>
     ),
   },

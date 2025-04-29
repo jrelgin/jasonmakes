@@ -91,8 +91,8 @@ export default function About() {
           >
             <Avatar src={person.avatar} size="xl" />
             <Flex gap="8" vertical="center">
-              <Icon onBackground="accent-weak" name="globe" />
-              {person.location}
+              <Icon onBackground="brand-strong" name="globe" />
+              {person.displayLocation}
             </Flex>
             {person.languages.length > 0 && (
               <Flex wrap gap="8">
@@ -113,31 +113,7 @@ export default function About() {
             vertical="center"
             marginBottom="32"
           >
-            {about.calendar.display && (
-              <Flex
-                fitWidth
-                border="brand-alpha-medium"
-                className={styles.blockAlign}
-                style={{
-                  backdropFilter: "blur(var(--static-space-1))",
-                }}
-                background="brand-alpha-weak"
-                radius="full"
-                padding="4"
-                gap="8"
-                marginBottom="m"
-                vertical="center"
-              >
-                <Icon paddingLeft="12" name="calendar" onBackground="brand-weak" />
-                <Flex paddingX="8">Schedule a call</Flex>
-                <IconButton
-                  href={about.calendar.link}
-                  data-border="rounded"
-                  variant="secondary"
-                  icon="chevronRight"
-                />
-              </Flex>
-            )}
+            
             <Heading className={styles.textAlign} variant="display-strong-xl">
               {person.name}
             </Heading>
@@ -179,9 +155,35 @@ export default function About() {
           </Column>
 
           {about.intro.display && (
-            <Column textVariant="body-default-l" fillWidth gap="m" marginBottom="xl">
+            <Column textVariant="body-default-l" fillWidth gap="m" marginBottom="m">
               {about.intro.description}
             </Column>
+          )}
+
+          {about.calendar.display && (
+            <Flex
+              fitWidth
+              border="brand-alpha-medium"
+              className={styles.blockAlign}
+              style={{
+                backdropFilter: "blur(var(--static-space-1))",
+              }}
+              background="brand-alpha-weak"
+              radius="full"
+              padding="4"
+              gap="8"
+              marginBottom="xl"
+              vertical="center"
+            >
+              <Icon paddingLeft="12" name="calendar" onBackground="brand-weak" />
+              <Flex paddingX="8">Schedule a call</Flex>
+              <IconButton
+                href={about.calendar.link}
+                data-border="rounded"
+                variant="secondary"
+                icon="chevronRight"
+              />
+            </Flex>
           )}
 
           {about.work.display && (

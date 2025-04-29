@@ -26,11 +26,11 @@ export const Footer = () => {
           <Text onBackground="neutral-weak">© {currentYear} /</Text>
           <Text paddingX="4">{person.name}</Text>
           <Text onBackground="neutral-weak">
-            {/* CC BY-NC 4.0 Attribution requirement */}
-            / <SmartLink
+
+            / Built on<SmartLink
               href="https://once-ui.com/templates/magic-portfolio"
             >
-              Built on Once UI
+              Once UI
             </SmartLink>
           </Text>
         </Text>
