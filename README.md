@@ -1,6 +1,6 @@
-# **Magic Portfolio by Once UI**
+# **Jason Elgin's Portfolio**
 
-View the [demo here](https://demo.magic-portfolio.com).
+Personal portfolio site based on the Magic Portfolio template by Once UI.
 
 ![Magic Portfolio](https://demo.magic-portfolio.com/images/og/home.jpg)
 
