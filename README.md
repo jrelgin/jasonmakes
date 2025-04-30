@@ -1,27 +1,128 @@
 # **Jason Elgin's Portfolio**
 
-Personal portfolio site based on the Magic Portfolio template by Once UI.
+Personal portfolio site 
 
-![Magic Portfolio](https://demo.magic-portfolio.com/images/og/home.jpg)
+# **Styling System Documentation**
 
+## **Overview**
 
-# **Getting started**
+This portfolio uses the Once UI styling system, which is built on a combination of SCSS, CSS variables, and data attributes. This document explains how styles are structured and how to customize them.
 
-Magic Portfolio was built with [Once UI](https://once-ui.com) for [Next.js](https://nextjs.org). It requires Node.js v18.17+.
+## **Key Components of the Styling System**
 
-**1. Clone the repository**
+### **1. Directory Structure**
+
 ```
-git clone https://github.com/once-ui-system/magic-portfolio.git
+src/
+  ├── once-ui/
+  │   ├── styles/            # Utility classes and style behaviors
+  │   │   ├── index.scss     # Main import file
+  │   │   ├── global.scss    # Global element styles
+  │   │   ├── spacing.scss   # Margin and padding utilities
+  │   │   ├── typography.scss # Text styling utilities
+  │   │   └── ...
+  │   │
+  │   └── tokens/            # Design tokens and variables
+  │       ├── index.scss     # Main import file
+  │       ├── theme.scss     # Theme variables (dark/light modes)
+  │       ├── scheme.scss    # Color schemes
+  │       └── ...
+  │
+  └── app/
+      └── resources/         # Site configuration
+          └── config/        # Site-specific config including styles
 ```
 
-**2. Install dependencies**
-```
-npm install
-```
+### **2. Core Styling Technologies**
 
-**3. Run dev server**
-```
-npm run dev
+- **SCSS**: Used for styling with nested selectors and mixins
+- **CSS Variables**: For theming and responsive design
+- **Data Attributes**: For theme switching and style customization
+- **PostCSS**: For processing styles with plugins (custom media queries, etc.)
+
+### **3. Theming System**
+
+The site uses a robust theming system with:
+
+- **Light/Dark Modes**: Controlled via the `data-theme` attribute
+- **Color Schemes**: Customizable brand, accent, and neutral colors 
+- **Design Tokens**: CSS variables for consistent spacing, typography, colors
+
+### **4. How Styles Are Applied**
+
+1. Root styles are imported in `src/app/layout.tsx`
+2. Theme tokens are set via data attributes:
+   ```tsx
+   <html
+     data-neutral={style.neutral}
+     data-brand={style.brand}
+     data-accent={style.accent}
+     data-solid={style.solid}
+   >
+   ```
+3. Components use utility classes or inline style props:
+   ```tsx
+   <Flex 
+     paddingY="l"
+     backgroundColor="surface"
+   >
+   ```
+
+### **5. Customization Options**
+
+#### **Theme Customization**
+
+Edit theme values in `src/app/resources/config/style.ts` to change:
+- Color schemes (brand, accent, neutral)
+- Border styles
+- Surface appearances
+- Transition effects
+
+#### **Component Styling**
+
+Once UI components accept style props directly:
+- Spacing: `margin`, `padding`, `gap`
+- Layout: `width`, `height`, `position`
+- Visual: `background`, `color`, `border`
+
+#### **Global Style Modifications**
+
+To modify global styles:
+1. Create a custom SCSS file in your project
+2. Import it in `src/app/layout.tsx` after Once UI styles
+3. Override CSS variables or add custom styles
+
+#### **Responsive Design**
+
+The system uses custom media queries defined in `breakpoints.scss`:
+- Uses `@media` queries processed by PostCSS
+- Components like `<Hide>` or `<Show>` for responsive visibility
+- Responsive props (e.g., `paddingX={{ base: 's', md: 'l' }}`)
+
+## **Example: Style Customization**
+
+```tsx
+// Modify theme values
+// src/app/resources/config/style.ts
+export const style = {
+  neutral: "slate",    // Change neutral color scheme
+  brand: "indigo",     // Change brand color
+  accent: "orange",    // Change accent color
+  border: "round",     // Change border radius style
+  surface: "frosted",  // Change surface appearance
+  // ...
+};
+
+// Add custom global styles
+// src/app/custom-styles.scss
+:root {
+  --font-family-body: 'Your Custom Font', sans-serif;
+  --page-background: #f9f9f9;
+}
+
+[data-theme="dark"] {
+  --page-background: #121212;
+}
 ```
 
 **4. Edit config**
@@ -65,30 +166,6 @@ Docs available at: [docs.once-ui.com](https://docs.once-ui.com/docs/magic-portfo
 
 ## **Localization**
 - A localized version of Magic Portfolio is available with the next-intl library
-- To use localization, switch to the 'i18n' branch
-
-# **Authors**
-
-Connect with us on Threads or LinkedIn.
-
-Lorant Toth: [Threads](https://www.threads.net/@lorant.one), [LinkedIn](https://www.linkedin.com/in/tothlorant/)  
-Zsofia Komaromi: [Threads](https://www.threads.net/@zsofia_kom), [LinkedIn](https://www.linkedin.com/in/zsofiakomaromi/)
-
-Localization added by [François Hernandez](https://github.com/francoishernandez)
-
-# **Get involved**
-
-- Join the [Design Engineers Club on Discord](https://discord.com/invite/5EyAQ4eNdS) and share your portfolio with us!
-- Report a [bug](https://github.com/once-ui-system/magic-portfolio/issues/new?labels=bug&template=bug_report.md).
-
-# **License**
-
-Distributed under the CC BY-NC 4.0 License.
-- Commercial usage is not allowed.
-- Attribution is required.
-- You can extend the license to commercial use by purchasing a [Once UI Pro](https://once-ui.com/pricing) license.
+- To use localization, switch to the 'i18n' branch.
 
 See `LICENSE.txt` for more information.
-
-# **Deploy with Vercel**
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fonce-ui-system%2Fmagic-portfolio&project-name=portfolio&repository-name=portfolio&redirect-url=https%3A%2F%2Fgithub.com%2Fonce-ui-system%2Fmagic-portfolio&demo-title=Magic%20Portfolio&demo-description=Showcase%20your%20designers%20or%20developer%20portfolio&demo-url=https%3A%2F%2Fdemo.magic-portfolio.com&demo-image=%2F%2Fraw.githubusercontent.com%2Fonce-ui-system%2Fmagic-portfolio%2Fmain%2Fpublic%2Fimages%2Fog%2Fhome.jpg)
