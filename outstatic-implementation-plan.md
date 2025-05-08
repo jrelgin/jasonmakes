@@ -26,6 +26,12 @@ This document outlines our plan to integrate Outstatic CMS with our Next.js proj
    - Add OAuth credentials to environment variables
    - Test GitHub authentication is working
 
+4. **Environment Variables Management**
+   - Create `.env.local` file for development
+   - Add GitHub OAuth credentials to `.env.local`
+   - Document required environment variables for production
+   - Ensure environment variables are properly loaded in the app
+
 ### Phase 2: Outstatic File Structure
 4. **Create CMS route group**
    - Add `(cms)` route group in app directory
@@ -42,65 +48,73 @@ This document outlines our plan to integrate Outstatic CMS with our Next.js proj
    - Implement OutstaticApi handlers
    - Test API endpoints respond correctly
 
-### Phase 3: Content Structure Definition
-7. **Define Content Collections**
-   - Create Pages collection
-   - Create Blog collection
-   - Create Case Studies collection
-   - Test collections are created properly
+### Phase 3: Blog Collection Implementation
+7. **Define Blog Collection**
+   - Create Blog collection in Outstatic
+   - Configure custom fields for blog posts
+   - Test collection is created properly
 
-8. **Configure Custom Fields**
-   - Define fields for Pages
-   - Define fields for Blog posts
-   - Define fields for Case Studies
-   - Test fields save and retrieve data correctly
-
-### Phase 4: Content Creation
-9. **Create Initial Content**
-   - Create homepage content
-   - Create sample blog posts
-   - Create sample case studies
+8. **Create Sample Blog Content**
+   - Create several sample blog posts
    - Test content is saved as markdown files
+   - Verify GitHub storage is working correctly
 
-### Phase 5: Content Fetching and Display
-10. **Implement Data Fetching**
-    - Create utility functions for fetching content
-    - Test data retrieval functions
+### Phase 4: Blog Functionality
+9. **Implement Blog Data Fetching**
+   - Create utility functions for fetching blog content
+   - Implement sorting, filtering, and pagination
+   - Test data retrieval functions
 
-11. **Build Homepage**
-    - Create homepage layout using Outstatic content
-    - Test homepage renders content correctly
-
-12. **Implement Blog Pages**
+10. **Create Blog Pages**
     - Create blog listing page
-    - Create individual blog post pages
-    - Test blog navigation and content display
+    - Create individual blog post template
+    - Implement blog navigation
+    - Test blog content display and routing
 
-13. **Implement Case Studies**
-    - Create case studies listing page
-    - Create individual case study pages
-    - Test case studies navigation and content display
+### Phase 5: Homepage Integration
+11. **Update Static Homepage**
+    - Optionally add latest blog posts to homepage
+    - Create navigation to blog section
+    - Keep homepage content static (not managed by Outstatic)
+    - Test homepage to blog navigation
 
-14. **Add Additional Page**
-    - Create the additional page
-    - Test page renders content correctly
+### Phase 6: Additional Collections (After Blog is Working)
+12. **Implement Case Studies Collection**
+    - Create Case Studies collection
+    - Configure custom fields for case studies
+    - Create sample case studies
+    - Implement case studies listing and detail pages
+    - Test case studies functionality
 
-### Phase 6: Styling and Refinement
-15. **Apply Styling**
-    - Style homepage
-    - Style blog section
-    - Style case studies section
-    - Style additional page
+13. **Implement Pages Collection (if needed)**
+    - Create Pages collection
+    - Configure custom fields for pages
+    - Create additional pages as needed
+    - Test additional pages
+
+### Phase 7: Styling and Refinement
+14. **Apply Styling**
+    - Style blog section first
+    - Style homepage integration points
+    - Style any additional collections implemented
     - Test responsive design
 
-16. **Optimize Performance**
+15. **Optimize Performance**
     - Implement image optimization
-    - Add metadata
     - Test performance metrics
 
-### Phase 7: Testing and Deployment
+16. **SEO Implementation**
+    - Add proper metadata to blog pages
+    - Implement structured data for blog posts
+    - Create a sitemap
+    - Ensure proper handling of canonical URLs
+    - Implement OpenGraph and Twitter card metadata
+
+### Phase 8: Testing and Deployment
 17. **Comprehensive Testing**
-    - Test all pages and functionality
+    - Test all implemented functionality
+    - Validate SEO implementations
+    - Test on multiple devices and browsers
     - Fix any issues
 
 18. **Merge and Deploy**
@@ -108,6 +122,7 @@ This document outlines our plan to integrate Outstatic CMS with our Next.js proj
     - Review code
     - Merge to `main`
     - Deploy to production
+    - Configure production environment variables
 
 ## Git Workflow
 Following our established Git workflow:
