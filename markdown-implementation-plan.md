@@ -19,7 +19,7 @@ This document outlines our plan to remove Outstatic CMS from our Next.js project
 
 ## Current Progress (May 9, 2025)
 - ✅ Phase 1: Removal of Outstatic (Steps 1-4 completed)
-- ⬜ Phase 2: Setup Markdown Structure (Not started)
+- 🔄 Phase 2: Setup Markdown Structure (Steps 1-2 completed)
 - ⬜ Phase 3: Implement Content Pages (Not started)
 - ⬜ Phase 4: Testing and Finalization (Not started)
 
@@ -42,18 +42,18 @@ This document outlines our plan to remove Outstatic CMS from our Next.js project
    - ✅ Skipped as content was dummy/sample content
 
 ### Phase 2: Set Up Markdown-Based Content Structure
-1. **Create content directory**
-   - Create a single `/content` directory for all markdown files
-   - Use frontmatter to distinguish between content types (e.g., `type: "article"` or `type: "case-study"`)
+1. **Create content directory** ✅
+   - ✅ Created a single `/content` directory for all markdown files
+   - ✅ Added sample files demonstrating frontmatter for different content types
 
-2. **Define frontmatter structure**
-   - Title: Post title
-   - Date: Publication date
-   - Type: "article" or "case-study" to distinguish content types
-   - Excerpt: Brief summary
-   - CoverImage: Featured image path
-   - Tags: Array of relevant tags
-   - Slug: URL-friendly identifier (optional, can be generated from filename)
+2. **Define frontmatter structure** ✅
+   - ✅ Title: Post title
+   - ✅ Date: Publication date
+   - ✅ Type: "article" or "case-study" to distinguish content types
+   - ✅ Excerpt: Brief summary
+   - ✅ CoverImage: Featured image path
+   - ✅ Tags: Array of relevant tags
+   - ✅ Slug: URL-friendly identifier (demonstrated in sample files)
 
 3. **Install minimal dependencies**
    - `pnpm install gray-matter remark remark-html`
