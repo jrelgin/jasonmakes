@@ -1,0 +1,30 @@
+{
+  "commit": "",
+  "generated": "2025-05-09T00:55:47.366Z",
+  "metadata": [
+    {
+      "__outstatic": {
+        "commit": "",
+        "hash": "852905496",
+        "path": "outstatic/content/articles/prototyping-at-the-speed-of-thought-using-ai-to-explore-product-ideas-faster.mdx"
+      },
+      "author": {
+        "name": "Jason Elgin",
+        "picture": "https://avatars.githubusercontent.com/u/916673?v=4"
+      },
+      "collection": "articles",
+      "excerpt": "In the early stages of product design, speed and exploration are everything. But too often, we get bogged down in tooling, stakeholder expectations, or the trap of perfect fidelity. AI has opened up a new lane—one where designers can prototype ideas not just faster, but smarter.",
+      "featureImage": "/images/test-UwND.jpg",
+      "publishedAt": "2025-05-09T00:12:49.695Z",
+      "slug": "prototyping-at-the-speed-of-thought-using-ai-to-explore-product-ideas-faster",
+      "status": "draft",
+      "tags": [
+        {
+          "label": "AI prototyping",
+          "value": "aiPrototyping"
+        }
+      ],
+      "title": "Prototyping at the Speed of Thought: Using AI to Explore Product Ideas Faster"
+    }
+  ]
+}

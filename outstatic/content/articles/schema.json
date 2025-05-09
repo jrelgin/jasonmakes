@@ -21,7 +21,12 @@
       "fieldType": "Tags",
       "dataType": "array",
       "title": "Tags",
-      "values": []
+      "values": [
+        {
+          "value": "aiPrototyping",
+          "label": "AI prototyping"
+        }
+      ]
     }
   }
 }
