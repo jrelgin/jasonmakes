@@ -15,6 +15,13 @@
       "fieldType": "Text",
       "dataType": "string",
       "title": "Excerpt"
+    },
+    "tags": {
+      "required": false,
+      "fieldType": "Tags",
+      "dataType": "array",
+      "title": "Tags",
+      "values": []
     }
   }
 }
