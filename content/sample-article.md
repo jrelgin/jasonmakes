@@ -3,7 +3,7 @@ title: "Sample Article"
 date: "2025-05-09"
 type: "article"
 excerpt: "This is a sample article to demonstrate the frontmatter structure."
-coverImage: "/images/sample-cover.jpg"
+coverImage: "/images/article-1.png"
 tags: ["sample", "markdown", "nextjs"]
 slug: "sample-article"
 ---
