@@ -1,6 +1,6 @@
 {
-  "commit": "",
-  "generated": "2025-05-09T00:55:47.366Z",
+  "commit": "fa250427177adbbe997a449227ca55dc4d4b2162",
+  "generated": "2025-05-09T11:02:39.122Z",
   "metadata": [
     {
       "__outstatic": {
@@ -25,6 +25,26 @@
         }
       ],
       "title": "Prototyping at the Speed of Thought: Using AI to Explore Product Ideas Faster"
+    },
+    {
+      "__outstatic": {
+        "commit": "fa250427177adbbe997a449227ca55dc4d4b2162",
+        "hash": "2256458522",
+        "path": "outstatic/content/articles/jason-s-new-test.mdx"
+      },
+      "author": {
+        "name": "Jason Elgin",
+        "picture": "https://avatars.githubusercontent.com/u/916673?v=4"
+      },
+      "collection": "articles",
+      "excerpt": "The first thing I did was get the new phone and the old one and I had a bunch of new stuff that I needed. ",
+      "featureImage": "/images/img_2670-kxMz.jpeg",
+      "publishedAt": "2025-05-09T10:35:47.057Z",
+      "slug": "jason-s-new-test",
+      "status": "draft",
+      "tags": [
+      ],
+      "title": "Jason’s new test"
     }
   ]
 }
