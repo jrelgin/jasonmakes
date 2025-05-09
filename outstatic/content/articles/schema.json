@@ -1,0 +1,32 @@
+{
+  "title": "articles",
+  "type": "object",
+  "properties": {
+    "featureImage": {
+      "description": "Article feature image",
+      "required": true,
+      "fieldType": "Image",
+      "dataType": "image",
+      "title": "Feature Image"
+    },
+    "excerpt": {
+      "description": "Shows on the article rollup page",
+      "required": true,
+      "fieldType": "Text",
+      "dataType": "string",
+      "title": "Excerpt"
+    },
+    "tags": {
+      "required": false,
+      "fieldType": "Tags",
+      "dataType": "array",
+      "title": "Tags",
+      "values": [
+        {
+          "value": "aiPrototyping",
+          "label": "AI prototyping"
+        }
+      ]
+    }
+  }
+}

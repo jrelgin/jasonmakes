@@ -1,0 +1,50 @@
+{
+  "commit": "fa250427177adbbe997a449227ca55dc4d4b2162",
+  "generated": "2025-05-09T11:02:39.122Z",
+  "metadata": [
+    {
+      "__outstatic": {
+        "commit": "",
+        "hash": "852905496",
+        "path": "outstatic/content/articles/prototyping-at-the-speed-of-thought-using-ai-to-explore-product-ideas-faster.mdx"
+      },
+      "author": {
+        "name": "Jason Elgin",
+        "picture": "https://avatars.githubusercontent.com/u/916673?v=4"
+      },
+      "collection": "articles",
+      "excerpt": "In the early stages of product design, speed and exploration are everything. But too often, we get bogged down in tooling, stakeholder expectations, or the trap of perfect fidelity. AI has opened up a new lane—one where designers can prototype ideas not just faster, but smarter.",
+      "featureImage": "/images/test-UwND.jpg",
+      "publishedAt": "2025-05-09T00:12:49.695Z",
+      "slug": "prototyping-at-the-speed-of-thought-using-ai-to-explore-product-ideas-faster",
+      "status": "draft",
+      "tags": [
+        {
+          "label": "AI prototyping",
+          "value": "aiPrototyping"
+        }
+      ],
+      "title": "Prototyping at the Speed of Thought: Using AI to Explore Product Ideas Faster"
+    },
+    {
+      "__outstatic": {
+        "commit": "fa250427177adbbe997a449227ca55dc4d4b2162",
+        "hash": "2256458522",
+        "path": "outstatic/content/articles/jason-s-new-test.mdx"
+      },
+      "author": {
+        "name": "Jason Elgin",
+        "picture": "https://avatars.githubusercontent.com/u/916673?v=4"
+      },
+      "collection": "articles",
+      "excerpt": "The first thing I did was get the new phone and the old one and I had a bunch of new stuff that I needed. ",
+      "featureImage": "/images/img_2670-kxMz.jpeg",
+      "publishedAt": "2025-05-09T10:35:47.057Z",
+      "slug": "jason-s-new-test",
+      "status": "draft",
+      "tags": [
+      ],
+      "title": "Jason’s new test"
+    }
+  ]
+}

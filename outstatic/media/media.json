@@ -1,0 +1,61 @@
+{
+  "commit": "4f0f3c60e46eb2ac2d792fa38ee7ebb4a23bb187",
+  "generated": "2025-05-09T11:01:22.135Z",
+  "media": [
+    {
+      "__outstatic": {
+        "commit": "",
+        "hash": "0",
+        "path": "public/file.svg"
+      },
+      "alt": "",
+      "filename": "file.svg",
+      "publishedAt": "2025-05-09T00:56:04.279Z",
+      "type": "image"
+    },
+    {
+      "__outstatic": {
+        "commit": "4f0f3c60e46eb2ac2d792fa38ee7ebb4a23bb187",
+        "hash": "1383379687",
+        "path": "public/img_2670-kxMz.jpeg"
+      },
+      "alt": "",
+      "filename": "img_2670-kxMz.jpeg",
+      "publishedAt": "2025-05-09T11:01:22.135Z",
+      "type": "image"
+    },
+    {
+      "__outstatic": {
+        "commit": "",
+        "hash": "0",
+        "path": "public/test-UwND.jpg"
+      },
+      "alt": "",
+      "filename": "test-UwND.jpg",
+      "publishedAt": "2025-05-09T00:56:04.279Z",
+      "type": "image"
+    },
+    {
+      "__outstatic": {
+        "commit": "",
+        "hash": "0",
+        "path": "public/vercel.svg"
+      },
+      "alt": "",
+      "filename": "vercel.svg",
+      "publishedAt": "2025-05-09T00:56:04.279Z",
+      "type": "image"
+    },
+    {
+      "__outstatic": {
+        "commit": "",
+        "hash": "0",
+        "path": "public/window.svg"
+      },
+      "alt": "",
+      "filename": "window.svg",
+      "publishedAt": "2025-05-09T00:56:04.279Z",
+      "type": "image"
+    }
+  ]
+}
