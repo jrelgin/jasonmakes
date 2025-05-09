@@ -15,14 +15,13 @@ type Article = {
   content?: string;
 };
 
-type ArticlePageProps = {
-  params: {
-    slug: string;
-  };
+// Define params interface for this page component
+type Params = {
+  slug: string;
 };
 
 // Generate metadata for SEO
-export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const article = getContentBySlug(params.slug) as Article | null;
   
   if (!article || article.type !== 'article') {
@@ -50,7 +49,7 @@ export async function generateStaticParams() {
   }));
 }
 
-export default async function ArticlePage({ params }: ArticlePageProps) {
+export default async function ArticlePage({ params }: { params: Params }) {
   const article = getContentBySlug(params.slug) as Article | null;
   
   // If the article doesn't exist or is not of type 'article', show 404

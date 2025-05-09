@@ -15,14 +15,13 @@ type CaseStudy = {
   content?: string;
 };
 
-type CaseStudyPageProps = {
-  params: {
-    slug: string;
-  };
+// Define params interface for this page component
+type Params = {
+  slug: string;
 };
 
 // Generate metadata for SEO
-export async function generateMetadata({ params }: CaseStudyPageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const caseStudy = getContentBySlug(params.slug) as CaseStudy | null;
   
   if (!caseStudy || caseStudy.type !== 'case-study') {
@@ -50,7 +49,7 @@ export async function generateStaticParams() {
   }));
 }
 
-export default async function CaseStudyPage({ params }: CaseStudyPageProps) {
+export default async function CaseStudyPage({ params }: { params: Params }) {
   const caseStudy = getContentBySlug(params.slug) as CaseStudy | null;
   
   // If the case study doesn't exist or is not of type 'case-study', show 404
