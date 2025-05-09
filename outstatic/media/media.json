@@ -1,6 +1,6 @@
 {
-  "commit": "39ab1bbde202b0fe9845d8cb3a7c04cabd00f780",
-  "generated": "2025-05-09T00:56:43.196Z",
+  "commit": "246f0b328a81191039842bab7f1a1cb4ab6d5d56",
+  "generated": "2025-05-09T00:56:46.279Z",
   "media": [
     {
       "__outstatic": {
@@ -10,17 +10,6 @@
       },
       "alt": "",
       "filename": "file.svg",
-      "publishedAt": "2025-05-09T00:56:04.279Z",
-      "type": "image"
-    },
-    {
-      "__outstatic": {
-        "commit": "",
-        "hash": "0",
-        "path": "public/globe.svg"
-      },
-      "alt": "",
-      "filename": "globe.svg",
       "publishedAt": "2025-05-09T00:56:04.279Z",
       "type": "image"
     },
