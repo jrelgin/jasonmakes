@@ -8,6 +8,13 @@
       "fieldType": "Image",
       "dataType": "image",
       "title": "Feature Image"
+    },
+    "excerpt": {
+      "description": "Shows on the article rollup page",
+      "required": true,
+      "fieldType": "Text",
+      "dataType": "string",
+      "title": "Excerpt"
     }
   }
 }
