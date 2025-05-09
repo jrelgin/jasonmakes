@@ -19,7 +19,7 @@ This document outlines our plan to remove Outstatic CMS from our Next.js project
 
 ## Current Progress (May 9, 2025)
 - ✅ Phase 1: Removal of Outstatic (Steps 1-4 completed)
-- 🔄 Phase 2: Setup Markdown Structure (Steps 1-2 completed)
+- 🔄 Phase 2: Setup Markdown Structure (Steps 1-3 completed)
 - ⬜ Phase 3: Implement Content Pages (Not started)
 - ⬜ Phase 4: Testing and Finalization (Not started)
 
@@ -55,9 +55,10 @@ This document outlines our plan to remove Outstatic CMS from our Next.js project
    - ✅ Tags: Array of relevant tags
    - ✅ Slug: URL-friendly identifier (demonstrated in sample files)
 
-3. **Install minimal dependencies**
-   - `pnpm install gray-matter remark remark-html`
-   - These will handle markdown parsing and frontmatter extraction
+3. **Install minimal dependencies** ✅
+   - ✅ Installed `gray-matter` for parsing frontmatter
+   - ✅ Installed `remark` and `remark-html` for markdown processing
+   - These packages will handle all our markdown parsing and conversion needs
 
 4. **Create utility functions**
    - Create `/lib/content.js` with functions to:
