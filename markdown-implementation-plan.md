@@ -1,155 +1,98 @@
-# Outstatic Integration Implementation Plan
+# Markdown Implementation Plan
 
 ## Overview
-This document outlines our plan to integrate Outstatic CMS with our Next.js project. We will follow a step-by-step approach, testing each phase before moving to the next.
+This document outlines our plan to remove Outstatic CMS from our Next.js project and replace it with a simpler markdown-based content management approach. We will follow a step-by-step approach to ensure a clean transition.
 
-## Current Status (May 8, 2025)
-- Completed Phase 1: Setup and Initial Configuration
-- Completed Phase 2: Outstatic File Structure
-- Completed Phase 3: Article Collection Implementation
-- Currently at Phase 4: Article Functionality
-
-## Next Immediate Steps
-1. **Troubleshoot Errors**: Address the errors encountered during Outstatic setup
-2. Implement Article Index Page
-3. Implement Article Detail Page
+## Current Status (May 9, 2025)
+- We've decided to move away from Outstatic due to integration challenges and complexity
+- We're transitioning to a simpler markdown-based approach
+- We need to remove all Outstatic-related code and dependencies
 
 ## Project Requirements
 - Homepage
-- Article section (formerly blog)
+- Articles section
 - Case studies section
 - One additional page
-- Simple, maintainable content management
+- Simple, maintainable content management using markdown files
 
 ## Implementation Steps
 
-### Phase 1: Setup and Initial Configuration
-1. **Create a feature branch**
-   - Create `feature/outstatic-integration` branch from `main`
-   - Push branch to remote
+### Phase 1: Remove Outstatic Dependencies and Files
+1. **Remove package dependencies**
+   - Run `pnpm uninstall outstatic`
+   - Remove any other Outstatic-related dependencies
 
-2. **Install Outstatic**
-   - Run `npm install outstatic`
-   - Verify package is added to package.json
+2. **Remove Outstatic directories and files**
+   - Delete `/outstatic` directory and all contents
+   - Delete `/src/app/(cms)` directory and all contents
+   - Delete `/src/app/api/outstatic` directory and all contents
 
-3. **Setup GitHub OAuth Application**
-   - Create GitHub OAuth App
-   - Add OAuth credentials to environment variables
-   - Test GitHub authentication is working
+3. **Clean up environment variables**
+   - Remove Outstatic-related environment variables from `.env.local`
+   - Remove references to these variables in the codebase
 
-4. **Environment Variables Management**
-   - Create `.env.local` file for development
-   - Add GitHub OAuth credentials to `.env.local`
-   - Document required environment variables for production
-   - Ensure environment variables are properly loaded in the app
+4. **Extract and save any valuable content**
+   - Move any created content from `/outstatic/content` to be migrated
+   - Save any images or media files for reuse
 
-### Phase 2: Outstatic File Structure
-4. **Create CMS route group**
-   - Add `(cms)` route group in app directory
-   - Create layout.tsx for the CMS area
-   - Test route group isolation works
+### Phase 2: Set Up Markdown-Based Content Structure
+1. **Create content directories**
+   - Create `/content/articles` directory for article markdown files
+   - Create `/content/case-studies` directory for case study markdown files
 
-5. **Setup Outstatic Dashboard**
-   - Create `outstatic/[[...ost]]/page.tsx` in the CMS route group
-   - Implement the Outstatic component
-   - Test dashboard renders properly
+2. **Install minimal dependencies**
+   - `pnpm install gray-matter remark remark-html`
+   - These will handle markdown parsing and frontmatter extraction
 
-6. **Configure API Routes**
-   - Create API route at `app/api/outstatic/[[...ost]]/route.ts`
-   - Implement OutstaticApi handlers
-   - Test API endpoints respond correctly
+3. **Create utility functions**
+   - Create `/lib/content.js` with functions to:
+     - Fetch all articles/case studies
+     - Get individual content by slug
+     - Filter content by tags
+     - Convert markdown to HTML
 
-### Phase 3: Article Collection Implementation
-7. **Define Article Collection**
-   - Create Article collection in Outstatic
-   - Configure custom fields for articles with:
-     - Title
-     - Publication date
-     - Featured image
-     - Content
-     - Excerpt
-     - Tags
-   - Test collection is created properly
+### Phase 3: Implement Content Pages
+1. **Create article listing page**
+   - Implement `/app/articles/page.tsx`
+   - Display grid of articles with images, titles, and excerpts
 
-8. **Create Sample Article Content**
-   - Create several sample articles
-   - Test content is saved as markdown files
-   - Verify GitHub storage is working correctly
+2. **Create case study listing page**
+   - Implement `/app/case-studies/page.tsx`
+   - Display case studies in appropriate format
 
-### Phase 4: Article Functionality
-9. **Implement Article Data Fetching**
-   - Use Outstatic's built-in functions instead of custom utility functions:
-     - `getDocuments` for fetching multiple articles
-     - `getDocumentBySlug` for fetching single articles
-     - `getDocumentSlugs` for generating static paths
-   - Implementation research findings:
-     - Outstatic handles sorting by date automatically
-     - No need for separate utility file - use functions directly in components
+3. **Implement dynamic content pages**
+   - Create `/app/articles/[slug]/page.tsx` for individual articles
+   - Create `/app/case-studies/[slug]/page.tsx` for individual case studies
 
-10. **Create Article Pages**
-    - Create article listing page with card grid layout at `/src/app/article/page.tsx`
-    - Create individual article template at `/src/app/article/[slug]/page.tsx`
-    - Implement article navigation
-    - Test article content display and routing
+4. **Update site navigation**
+   - Ensure navigation includes links to the new content sections
 
-11. **Implement SEO Best Practices**
-    - Add proper meta tags (title, description) to article pages
-    - Implement Open Graph and Twitter card meta tags
-    - Add structured data for articles (Schema.org)
-    - Create canonical URLs
-    - Implement proper heading hierarchy
+### Phase 4: Testing and Finalization
+1. **Create sample content**
+   - Add sample markdown files for testing
+   - Include variety of content formats and metadata
 
-### Phase 5: Homepage Integration
-12. **Update Static Homepage**
-    - Optionally add latest articles to homepage
-    - Create navigation to article section
-    - Keep homepage content static (not managed by Outstatic)
-    - Test homepage to article navigation
+2. **Test all pages and functionality**
+   - Ensure content displays correctly
+   - Verify routing works properly
+   - Check responsive design
 
-### Phase 6: Additional Collections (After Article Section is Working)
-13. **Implement Case Studies Collection**
-    - Create Case Studies collection
-    - Configure custom fields for case studies
-    - Create sample case studies
-    - Implement case studies listing and detail pages
-    - Test case studies functionality
+3. **Final clean-up**
+   - Remove any remaining Outstatic references in code
+   - Ensure clean project structure
 
-14. **Implement Pages Collection (if needed)**
-    - Create Pages collection
-    - Configure custom fields for pages
-    - Create additional pages as needed
-    - Test additional pages
+## Timeline
+- Removal of Outstatic: 15 minutes
+- Setting up markdown structure: 15 minutes
+- Implementing content pages: 30 minutes
+- Testing and finalizing: 15 minutes
 
-### Phase 7: Styling and Refinement
-15. **Apply Styling**
-    - Style article section first
-    - Style homepage integration points
-    - Style any additional collections implemented
-    - Test responsive design
-
-16. **Optimize Performance**
-    - Implement image optimization
-    - Test performance metrics
-
-17. **Additional SEO Enhancements**
-    - Create a sitemap
-    - Implement XML feed if needed
-    - Add meta robots tags where appropriate
-    - Create breadcrumb navigation
-
-### Phase 8: Testing and Deployment
-18. **Comprehensive Testing**
-    - Test all implemented functionality
-    - Validate SEO implementations
-    - Test on multiple devices and browsers
-    - Fix any issues
-
-19. **Merge and Deploy**
-    - Create PR for `feature/outstatic-integration`
-    - Review code
-    - Merge to `main`
-    - Deploy to production
-    - Configure production environment variables
+## Benefits of New Approach
+- Simpler, more maintainable codebase
+- No external CMS dependencies
+- Direct control over content via markdown files
+- Easy workflow: write in Bear, export as markdown, place in content directory
+- Version control for all content through Git
 
 ## Git Workflow
 Following our established Git workflow:
@@ -159,10 +102,3 @@ Following our established Git workflow:
 4. Push regularly to remote
 5. Create PR for review when complete
 6. Delete branch after merging
-
-## Testing Checkpoints
-After each step, we will:
-1. Verify functionality works as expected
-2. Check for any errors or warnings
-3. Confirm changes don't break existing code
-4. Only proceed to next step after successful testing
