@@ -1,0 +1,61 @@
+{
+  "commit": "",
+  "generated": "Fri, 09 May 2025 00:54:44 GMT",
+  "media": [
+    {
+      "__outstatic": {
+        "commit": "",
+        "hash": "0",
+        "path": "public/file.svg"
+      },
+      "alt": "",
+      "filename": "file.svg",
+      "publishedAt": "2025-05-09T00:54:43.937Z",
+      "type": "image"
+    },
+    {
+      "__outstatic": {
+        "commit": "",
+        "hash": "0",
+        "path": "public/globe.svg"
+      },
+      "alt": "",
+      "filename": "globe.svg",
+      "publishedAt": "2025-05-09T00:54:43.937Z",
+      "type": "image"
+    },
+    {
+      "__outstatic": {
+        "commit": "",
+        "hash": "0",
+        "path": "public/next.svg"
+      },
+      "alt": "",
+      "filename": "next.svg",
+      "publishedAt": "2025-05-09T00:54:43.937Z",
+      "type": "image"
+    },
+    {
+      "__outstatic": {
+        "commit": "",
+        "hash": "0",
+        "path": "public/vercel.svg"
+      },
+      "alt": "",
+      "filename": "vercel.svg",
+      "publishedAt": "2025-05-09T00:54:43.937Z",
+      "type": "image"
+    },
+    {
+      "__outstatic": {
+        "commit": "",
+        "hash": "0",
+        "path": "public/window.svg"
+      },
+      "alt": "",
+      "filename": "window.svg",
+      "publishedAt": "2025-05-09T00:54:43.937Z",
+      "type": "image"
+    }
+  ]
+}
