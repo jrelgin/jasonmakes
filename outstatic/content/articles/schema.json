@@ -1,6 +1,13 @@
 {
   "title": "articles",
-  "slug": "articles",
   "type": "object",
-  "properties": {}
+  "properties": {
+    "featureImage": {
+      "description": "Article feature image",
+      "required": true,
+      "fieldType": "Image",
+      "dataType": "image",
+      "title": "Feature Image"
+    }
+  }
 }
