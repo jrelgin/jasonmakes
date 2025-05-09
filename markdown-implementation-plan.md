@@ -19,7 +19,7 @@ This document outlines our plan to remove Outstatic CMS from our Next.js project
 
 ## Current Progress (May 9, 2025)
 - ✅ Phase 1: Removal of Outstatic (Steps 1-4 completed)
-- 🔄 Phase 2: Setup Markdown Structure (Steps 1-3 completed)
+- ✅ Phase 2: Setup Markdown Structure (Steps 1-4 completed)
 - ⬜ Phase 3: Implement Content Pages (Not started)
 - ⬜ Phase 4: Testing and Finalization (Not started)
 
@@ -60,13 +60,13 @@ This document outlines our plan to remove Outstatic CMS from our Next.js project
    - ✅ Installed `remark` and `remark-html` for markdown processing
    - These packages will handle all our markdown parsing and conversion needs
 
-4. **Create utility functions**
-   - Create `/lib/content.js` with functions to:
-     - `getAllContent()`: Fetch all content items
-     - `getContentBySlug()`: Get individual content by slug
-     - `getArticles()`: Filter content where type is "article"
-     - `getCaseStudies()`: Filter content where type is "case-study"
-     - `convertMarkdownToHtml()`: Parse and render markdown content
+4. **Create utility functions** ✅
+   - ✅ Created `/lib/content.js` with the following functions:
+     - ✅ `getAllContent()`: Fetches all content items with frontmatter
+     - ✅ `getContentBySlug()`: Gets individual content by slug
+     - ✅ `getArticles()`: Filters content where type is "article"
+     - ✅ `getCaseStudies()`: Filters content where type is "case-study"
+     - ✅ `convertMarkdownToHtml()`: Parses and renders markdown content
 
 ### Phase 3: Implement Content Pages
 1. **Create article listing page**
