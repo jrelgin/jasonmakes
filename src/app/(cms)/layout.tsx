@@ -1,3 +1,5 @@
+import 'outstatic/outstatic.css';
+
 export default function CmsLayout({
   children,
 }: {
