@@ -15,14 +15,15 @@ type Article = {
   content?: string;
 };
 
-// Define params interface for this page component
+// Define params interface for this page component - in Next.js 15, params is a Promise
 type Params = {
   slug: string;
 };
 
 // Generate metadata for SEO
-export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
-  const article = getContentBySlug(params.slug) as Article | null;
+export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
+  const { slug } = await params;
+  const article = getContentBySlug(slug) as Article | null;
   
   if (!article || article.type !== 'article') {
     return {
@@ -49,8 +50,9 @@ export async function generateStaticParams() {
   }));
 }
 
-export default async function ArticlePage({ params }: { params: Params }) {
-  const article = getContentBySlug(params.slug) as Article | null;
+export default async function ArticlePage({ params }: { params: Promise<Params> }) {
+  const { slug } = await params;
+  const article = getContentBySlug(slug) as Article | null;
   
   // If the article doesn't exist or is not of type 'article', show 404
   if (!article || article.type !== 'article') {

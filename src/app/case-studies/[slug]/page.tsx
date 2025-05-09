@@ -15,14 +15,15 @@ type CaseStudy = {
   content?: string;
 };
 
-// Define params interface for this page component
+// Define params interface for this page component - in Next.js 15, params is a Promise
 type Params = {
   slug: string;
 };
 
 // Generate metadata for SEO
-export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
-  const caseStudy = getContentBySlug(params.slug) as CaseStudy | null;
+export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
+  const { slug } = await params;
+  const caseStudy = getContentBySlug(slug) as CaseStudy | null;
   
   if (!caseStudy || caseStudy.type !== 'case-study') {
     return {
@@ -49,8 +50,9 @@ export async function generateStaticParams() {
   }));
 }
 
-export default async function CaseStudyPage({ params }: { params: Params }) {
-  const caseStudy = getContentBySlug(params.slug) as CaseStudy | null;
+export default async function CaseStudyPage({ params }: { params: Promise<Params> }) {
+  const { slug } = await params;
+  const caseStudy = getContentBySlug(slug) as CaseStudy | null;
   
   // If the case study doesn't exist or is not of type 'case-study', show 404
   if (!caseStudy || caseStudy.type !== 'case-study') {
