@@ -1,6 +1,6 @@
 {
-  "commit": "fa250427177adbbe997a449227ca55dc4d4b2162",
-  "generated": "2025-05-09T11:02:39.122Z",
+  "commit": "f163df2084baf6a88f923376a37ff2aea1e1f99b",
+  "generated": "2025-05-09T15:56:45.072Z",
   "metadata": [
     {
       "__outstatic": {
@@ -28,8 +28,8 @@
     },
     {
       "__outstatic": {
-        "commit": "fa250427177adbbe997a449227ca55dc4d4b2162",
-        "hash": "2256458522",
+        "commit": "f163df2084baf6a88f923376a37ff2aea1e1f99b",
+        "hash": "839411825",
         "path": "outstatic/content/articles/jason-s-new-test.mdx"
       },
       "author": {
@@ -41,7 +41,7 @@
       "featureImage": "/images/img_2670-kxMz.jpeg",
       "publishedAt": "2025-05-09T10:35:47.057Z",
       "slug": "jason-s-new-test",
-      "status": "draft",
+      "status": "published",
       "tags": [
       ],
       "title": "Jason’s new test"
