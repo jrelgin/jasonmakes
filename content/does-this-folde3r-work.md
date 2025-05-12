@@ -4,12 +4,12 @@ date: 2025-05-12
 type: case-study
 excerpt: |
   TODO – one-line summary.
-coverImage: /images/IMG-20250512173639578.png
+coverImage: /images/IMG-20250512174737324.png
 tags: 
 slug: does-this-folde3r-work
 share: true
 ---
-
+![](IMG-20250512174737324.png)
 Start writing post here. This is going to be thest and these asdflk
 asdfasdfasdfasdfasdfasdf
 
