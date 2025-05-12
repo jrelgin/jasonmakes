@@ -1,5 +1,5 @@
 ---
-title: Blog post tadoa
+title: Blog post name
 date: 2025-05-08
 type: case-study
 excerpt: How we transformed an outdated e-commerce platform into a modern shopping experience.
@@ -14,5 +14,5 @@ share: "true"
 
   
 
-# Untitled
+# First draft
 Start writing post here.
