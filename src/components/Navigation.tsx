@@ -7,7 +7,7 @@ export default function Navigation() {
   const pathname = usePathname();
   
   return (
-    <nav className="py-6 mb-8 border-b">
+    <nav className="py-6 mb-8">
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between">
           <div className="mb-4 md:mb-0">

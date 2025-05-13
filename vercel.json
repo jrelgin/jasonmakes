@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/update-profile",
+      "schedule": "0 0 * * *"  // Run at midnight every day (UTC)
+    }
+  ]
+}

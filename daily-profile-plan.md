@@ -67,6 +67,60 @@ The generated blurb should use a **casual tone** (“Jason’s been reading…�
 
 ---
 
+### Phase 1 · Local‑testing checklist
+
+1. **Create `.env.local`** at the repo root:
+   ```bash
+   NODE_ENV=development
+   PORT=3000
+
+   # Weather (Open‑Meteo)
+   WEATHER_LATITUDE=33.749
+   WEATHER_LONGITUDE=-84.388
+   WEATHER_CITY=Atlanta
+
+   # Revalidation token for on‑demand ISR
+   REVALIDATION_TOKEN=dev-secret
+
+   # Toggle in‑memory KV + mock providers
+   DEV_MOCK=1
+   ```
+   *Weather is real; KV/OpenAI are mocked while `DEV_MOCK` is set.*
+
+2. **In‑memory KV shim**  
+   Ensure `lib/kv.ts` exports a simple `Map` store and that files import
+   ```ts
+   import { kv } from '@/lib/kv';   // resolves to mock when DEV_MOCK=1
+   ```
+
+3. **Run the Next.js dev server**
+   ```bash
+   pnpm dev
+   ```
+   (or `npm run dev` / `yarn dev`).
+
+4. **Trigger the cron handler locally**  
+   In a second terminal:
+   ```bash
+   curl -X POST http://localhost:3000/api/cron/update-profile
+   ```
+   You should see `{ "ok": true }` and a log entry in the dev console.
+
+5. **Inspect KV output**  
+   Visit `http://localhost:3000/api/debug/profile` (temporary debug route)  
+   → expect a JSON block with `weather` data.
+
+6. **Check the UI**  
+   Open `http://localhost:3000/`  
+   * WeatherWidget shows “Atlanta 22 °C Clear” (mock).  
+   * AboutBlurb shows the placeholder sentence.
+
+7. **Iterate**  
+   Each time you change UI code, hot‑reload will re‑render using the
+   already‑mocked KV data until `DEV_MOCK` is removed.
+
+_Remove the checklist or switch `DEV_MOCK` off when you’re ready to point to the real Vercel KV cluster._
+
 ## 3 · Provider interface
 
 `lib/providers/feedly.ts`
