@@ -1,4 +1,4 @@
-# Daily Profile Builder (Feedly + Spotify + …​)  
+<file name=0 path=/Users/jasonelgin/projects/jasonmakes/daily-profile-plan.md># Daily Profile Builder (Feedly + Spotify + …​)  
 *Next 14 / Vercel‑native architecture*
 
 > **Goal:** surface a few up‑to‑date data points (latest Feedly saves, last‑played Spotify track, etc.) **and** a one‑sentence “About Jason” paragraph generated daily by an LLM—without triggering full site redeploys or leaking tokens.
@@ -10,7 +10,7 @@
 ```
 Vercel Cron  ──▶  /api/cron/update-profile   ──▶  Vercel KV
                    ├─ fetchFeedly()
-                   ├─ fetchSpotify()
+                   ├─ fetchSpotify()  // returns { trackTitle }
                    ├─ …otherProviders()
                    ├─ buildProfileJSON()
                    ├─ callOpenAI()  → "aboutParagraph"
@@ -47,7 +47,23 @@ vercel.json             # cron schedule
 
 ---
 
-## 2 · Provider modules
+## 2 · Implementation roadmap
+
+| Phase | Description                                                                                   |
+|-------|----------------------------------------------------------------------------------------------|
+| P1    | Feedly provider + KV write (first live test)                                                |
+| P2    | Experiment with Feedly widget & refine blurb prompt                                         |
+| P3    | GitHub provider (all public activity) + Spotify provider (track title only)                 |
+| P4    | Add OpenAI integration for blurb generation                                                 |
+| P5    | Build Next 14 components for profile and blurb display                                     |
+| P6    | Set up Vercel cron schedule for daily updates                                              |
+| P7    | Add error handling, logging, and monitoring                                                |
+
+The generated blurb should use a **casual tone** (“Jason’s been reading…”) and will be placed in the hero section of the home page alongside the widgets.
+
+---
+
+## 3 · Provider interface
 
 `lib/providers/feedly.ts`
 
@@ -82,9 +98,11 @@ export async function fetchSpotify() {
 
 Add new providers the same way—module just returns a plain JS object ready for JSON.stringify.
 
+For now, Spotify’s payload will include just the track title (more fields can be added later).
+
 ---
 
-## 3 · Profile builder
+## 4 · Profile builder
 
 `lib/profile.ts`
 
@@ -109,7 +127,7 @@ export async function buildProfile(): Promise<Profile> {
 
 ---
 
-## 4 · Cron orchestrator
+## 5 · Cron orchestrator
 
 `/api/cron/update-profile.ts`
 
@@ -147,23 +165,6 @@ export default async (_req: Request, res: any) => {
 
   return res.json({ ok: true });
 };
-```
-
----
-
-## 5 · Cron schedule
-
-`vercel.json`
-
-```json
-{
-  "cron": [
-    {
-      "path": "/api/cron/update-profile",
-      "schedule": "0 5 * * *"   // every day at 05:00 UTC
-    }
-  ]
-}
 ```
 
 ---
@@ -212,7 +213,11 @@ export default async function LatestArticles() {
 }
 ```
 
-Each component ships **zero client‑side JS** (static HTML after ISR) and automatically updates after the next cron run.
+---
+
+## 6 · Nice-to-haves
+
+* **Mock data file** – commit `mock-profile.json` for local dev without API calls.
 
 ---
 
@@ -228,12 +233,36 @@ Each component ships **zero client‑side JS** (static HTML after ISR) and autom
 
 ---
 
-### Next TODOs
+## 7 · Security & cost pointers
 
-1. Create the Feedly and Spotify env vars in Vercel.  
-2. `npm i @vercel/kv openai`  
-3. Commit the scaffolding above, deploy, then set up the cron job.  
-4. Expand the prompt & frontend styling once real data flows.
+- Store tokens only in environment variables, never in KV or frontend code.  
+  • Mock data should never include personal tokens.  
+- Use `cache: 'no-store'` for upstream fetches to avoid stale data.  
+- Limit OpenAI usage to scheduled jobs to control costs.
 
-*That’s it—one tidy loop for all the “Jason daily profile” goodness, future‑proofed for more sources and the bleeding‑edge Next.js you’re on.*  
-``` 
+---
+
+## Notes & niceties
+
+### KV schema
+
+```json
+{
+  "profile": {
+    "feedly": [
+      {
+        "title": "...",
+        "url": "...",
+        "date": "..."
+      }
+    ],
+    "spotify": {
+      "trackTitle": "...",
+      "playedAt": "..."
+    }
+  },
+  "blurb": "Jason is a software developer who loves reading and music."
+}
+```
+
+---
