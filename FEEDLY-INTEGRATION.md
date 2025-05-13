@@ -52,6 +52,7 @@ vercel.json             # cron schedule
 `lib/providers/feedly.ts`
 
 ```ts
+// Example Feedly JSON feed URL: https://cloud.feedly.com/v3/streams/contents?streamId=feed%2Fhttps%3A%2F%2Ffeedly.com%2Ff%2FM9S3L7zFWuvPeZ5sQw90yiiq&count=5&format=json
 const FEED_URL = `${process.env.FEEDLY_FEED_URL}&count=5&format=json`;
 
 export async function fetchFeedly() {
