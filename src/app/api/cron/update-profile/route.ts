@@ -58,7 +58,7 @@ class Logger {
  * Creates a resilient profile by fetching provider data and falling back to previous data when needed
  * @param timeoutMs Optional timeout in milliseconds (default: 5000ms)
  */
-export async function createResilientProfile(timeoutMs = 5000) {
+async function createResilientProfile(timeoutMs = 5000) {
   // Create a logger instance for this run
   const logger = new Logger();
   
