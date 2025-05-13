@@ -1,4 +1,4 @@
-import type { NextRequest } from 'next/server';
+// No Next.js imports needed
 import type { Profile } from '../../../../../lib/profile';
 import type { Weather } from '../../../../../lib/providers/weather';
 import { kv } from '../../../../../lib/kv';
@@ -111,14 +111,14 @@ export async function createResilientProfile(timeoutMs = 5000) {
 /**
  * POST handler for the cron job - fetches data from providers and updates KV
  */
-export async function POST(request: NextRequest) {
+export async function POST() {
   const logger = new Logger();
   
   try {
     logger.info('Profile update started');
     
     // Build a resilient profile that handles individual provider failures
-    const { weather, logger: profileLogger } = await createResilientProfile();
+    const { weather } = await createResilientProfile();
     const profile = { weather };
     
     // Calculate expiration time in seconds (48 hours)
