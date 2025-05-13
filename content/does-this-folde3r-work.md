@@ -2,8 +2,7 @@
 title: Does this folde3r work?
 date: 2025-05-12
 type: case-study
-excerpt: |
-  TODO – one-line summary.
+excerpt: I've updated this and it looks good now!
 coverImage: /images/IMG-20250512174737324.png
 tags: 
 slug: does-this-folde3r-work
