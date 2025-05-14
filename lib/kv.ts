@@ -37,7 +37,14 @@ function seedMockData() {
       const sampleWeather = {
         temperature: 75.5, 
         condition: 'Partly Cloudy',
-        city: process.env.WEATHER_CITY || 'Atlanta'
+        city: process.env.WEATHER_CITY || 'Atlanta',
+        
+        // Enhanced data fields
+        temperature_high: 84.2,
+        temperature_low: 62.8,
+        mean_humidity: 68,
+        precipitation_prob: 30,
+        humidity_classification: 'Somewhat Humid'
       };
       
       // Sample profile

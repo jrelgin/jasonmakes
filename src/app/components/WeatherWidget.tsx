@@ -33,15 +33,31 @@ export default async function WeatherWidget() {
     return '🌡️'; // Default icon
   };
   
+  // Helper to format temperature range
+  const formatTempRange = () => {
+    return `${Math.round(weatherData?.temperature_low || 0)}° - ${Math.round(weatherData?.temperature_high || 0)}°F`;
+  };
+  
   return (
     <div className="weather-widget p-4 bg-gray-100 rounded-lg">
-      <h3 className="text-lg font-semibold">Current Weather</h3>
+      <h3 className="text-lg font-semibold">Weather in {weatherData.city}</h3>
       <div className="flex items-center mt-2">
-        <span className="text-2xl mr-2">{getWeatherIcon(weatherData.condition)}</span>
-        <div>
-          <p className="font-medium">{weatherData.city}</p>
-          <p>{weatherData.temperature}°F • {weatherData.condition}</p>
+        <span className="text-3xl mr-3">{getWeatherIcon(weatherData.condition)}</span>
+        <div className="flex-1">
+          <p className="font-medium text-lg">{Math.round(weatherData.temperature)}°F • {weatherData.condition}</p>
+          <p className="text-sm mt-1">Today: {formatTempRange()}</p>
         </div>
+      </div>
+      
+      <div className="mt-3 text-sm">
+        <p className="flex justify-between">
+          <span>Humidity:</span> 
+          <span className="font-medium">{weatherData.mean_humidity}% ({weatherData.humidity_classification})</span>
+        </p>
+        <p className="flex justify-between">
+          <span>Precipitation:</span> 
+          <span className="font-medium">{weatherData.precipitation_prob}%</span>
+        </p>
       </div>
     </div>
   );

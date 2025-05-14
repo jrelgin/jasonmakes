@@ -5,9 +5,16 @@
  * Interface defining the shape of weather data
  */
 export interface Weather {
-  temperature: number;
-  condition: string;
-  city: string;
+  temperature: number;         // Current temperature
+  condition: string;           // Weather condition description
+  city: string;                // City name from environment variables
+  
+  // Enhanced data points
+  temperature_high: number;    // Daily high temperature
+  temperature_low: number;     // Daily low temperature
+  mean_humidity: number;       // Mean relative humidity for the day (percentage)
+  precipitation_prob: number;  // Probability of precipitation (percentage)
+  humidity_classification: string; // Classification based on humidity (Dry, Comfortable, etc.)
 }
 
 /**
@@ -51,7 +58,9 @@ export async function fetchWeather(): Promise<Weather> {
   
   // Ensure longitude is properly formatted with negative sign (Atlanta is in Western hemisphere)
   const formattedLongitude = longitude.startsWith('-') ? longitude : `-${longitude}`;
-  const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${formattedLongitude}&current=temperature_2m,weather_code&timezone=auto&temperature_unit=fahrenheit`;
+  
+  // Enhanced URL with additional data points
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${formattedLongitude}&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min,relative_humidity_2m_mean,precipitation_probability_max&timezone=auto&temperature_unit=fahrenheit`;
   
   try {
     const response = await fetch(url, { cache: 'no-store' });
@@ -69,10 +78,21 @@ export async function fetchWeather(): Promise<Weather> {
     const weatherCode = data.current.weather_code;
     const condition = mapWeatherCodeToCondition(weatherCode);
     
+    // Get mean humidity and classify it
+    const meanHumidity = data.daily.relative_humidity_2m_mean[0];
+    const humidityClassification = classifyHumidity(meanHumidity);
+    
     const weatherData: Weather = {
       temperature: data.current.temperature_2m,
       condition,
-      city: cityName
+      city: cityName,
+      
+      // Enhanced data points
+      temperature_high: data.daily.temperature_2m_max[0],
+      temperature_low: data.daily.temperature_2m_min[0],
+      mean_humidity: meanHumidity,
+      precipitation_prob: data.daily.precipitation_probability_max[0],
+      humidity_classification: humidityClassification
     };
     
     // Cache the result in development mode
@@ -98,9 +118,29 @@ export async function fetchWeather(): Promise<Weather> {
     return {
       temperature: 75.5, // Fahrenheit fallback value
       condition: 'Unknown',
-      city: cityName
+      city: cityName,
+      
+      // Enhanced fallback data
+      temperature_high: 80,
+      temperature_low: 65,
+      mean_humidity: 50,
+      precipitation_prob: 0,
+      humidity_classification: 'Comfortable'
     };
   }
+}
+
+/**
+ * Classifies humidity level into a human-readable category
+ * @param humidity The mean relative humidity percentage (0-100)
+ * @returns A string classification of the humidity level
+ */
+export function classifyHumidity(humidity: number): string {
+  if (humidity <= 30) return 'Dry';
+  if (humidity <= 50) return 'Comfortable';
+  if (humidity <= 70) return 'Somewhat Humid';
+  if (humidity <= 80) return 'Humid';
+  return 'Muggy';
 }
 
 /**
