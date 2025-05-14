@@ -49,7 +49,9 @@ export async function fetchWeather(): Promise<Weather> {
     }
   }
   
-  const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,weather_code&timezone=auto&temperature_unit=fahrenheit`;
+  // Ensure longitude is properly formatted with negative sign (Atlanta is in Western hemisphere)
+  const formattedLongitude = longitude.startsWith('-') ? longitude : `-${longitude}`;
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${formattedLongitude}&current=temperature_2m,weather_code&timezone=auto&temperature_unit=fahrenheit`;
   
   try {
     const response = await fetch(url, { cache: 'no-store' });
@@ -59,6 +61,8 @@ export async function fetchWeather(): Promise<Weather> {
     }
     
     const data = await response.json();
+    
+    // Process API response
     
     // Map weather code to condition string
     // Based on Open-Meteo documentation: https://open-meteo.com/en/docs

@@ -1,3 +1,14 @@
+import { createClient } from '@vercel/kv';
+
+// Edge compatible KV client that uses direct property access to avoid Edge runtime issues
+const edgeKVClient = process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN
+  ? createClient({
+      url: process.env.KV_REST_API_URL,
+      token: process.env.KV_REST_API_TOKEN,
+    })
+  : null;
+
+// Fallback to direct import for non-Edge environments or development
 import { kv as vercelKV } from '@vercel/kv';
 
 /**
@@ -71,7 +82,8 @@ const mockKV = {
 };
 
 // Export the appropriate KV implementation based on environment
-export const kv = (!isDevelopment || useRealServices) ? vercelKV : mockKV;
+// Priority: 1. Edge client (for production Edge runtimes), 2. Vercel KV (for other environments), 3. Mock KV (for development)
+export const kv = edgeKVClient || ((!isDevelopment || useRealServices) ? vercelKV : mockKV);
 
 // For debugging purposes - only available in development
 export const getMockStore = () => {
