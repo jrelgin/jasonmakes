@@ -37,7 +37,7 @@ export default async function WeatherWidget() {
   const formatTempRange = () => {
     return `${Math.round(weatherData?.temperature_low || 0)}° - ${Math.round(weatherData?.temperature_high || 0)}°F`;
   };
-
+  
   return (
     <div className="weather-widget p-4 bg-gray-100 rounded-lg">
       <h3 className="text-lg font-semibold">Weather in {weatherData.city}</h3>

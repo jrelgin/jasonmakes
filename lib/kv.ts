@@ -39,7 +39,7 @@ function seedMockData() {
         condition: 'Partly Cloudy',
         city: process.env.WEATHER_CITY || 'Atlanta',
         
-        // New enhanced data fields
+        // Enhanced data fields
         temperature_high: 84.2,
         temperature_low: 62.8,
         mean_humidity: 68,
