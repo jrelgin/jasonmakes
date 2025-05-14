@@ -12,8 +12,8 @@ export async function GET() {
     // Ensure longitude is properly formatted with negative sign (Atlanta is in Western hemisphere)
     const formattedLongitude = longitude.startsWith('-') ? longitude : `-${longitude}`;
     
-    // Build the URL with the properly formatted longitude
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${formattedLongitude}&current=temperature_2m,weather_code&timezone=auto&temperature_unit=fahrenheit`;
+    // Build the URL with the properly formatted longitude and enhanced data points
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${formattedLongitude}&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min,relative_humidity_2m_mean,precipitation_probability_max&timezone=auto&temperature_unit=fahrenheit`;
     
     // Use properly formatted longitude for API call
     
