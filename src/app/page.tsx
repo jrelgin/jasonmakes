@@ -1,5 +1,6 @@
 import WeatherWidget from './components/WeatherWidget';
 import AboutBlurb from './components/AboutBlurb';
+import FeedlyArticlesWidget from './components/FeedlyArticlesWidget';
 
 export default function Home() {
   return (
@@ -16,8 +17,13 @@ export default function Home() {
           </div>
           
           {/* Weather Widget */}
-          <div className="">
+          <div className="mb-6">
             <WeatherWidget />
+          </div>
+          
+          {/* Feedly Articles Widget */}
+          <div className="mt-6">
+            <FeedlyArticlesWidget />
           </div>
         </section>
       </main>

@@ -1,14 +1,16 @@
 import { fetchWeather } from './providers/weather';
 import type { Weather } from './providers/weather';
-// These will be implemented in later phases
-// import { fetchFeedly } from './providers/feedly';
+// Phase 2: Feedly implementation
+import { fetchFeedly } from './providers/feedly';
+import type { FeedlyData } from './providers/feedly';
+// This will be implemented in a later phase
 // import { fetchSpotify } from './providers/spotify';
 
-// Define the Profile type with partial implementations for future providers
+// Define the Profile type with implementations for current providers
 export type Profile = {
   weather: Weather;
-  // These will be uncommented in later phases
-  // feedly:  Awaited<ReturnType<typeof fetchFeedly>>;
+  feedly: FeedlyData;
+  // This will be uncommented in a later phase
   // spotify: Awaited<ReturnType<typeof fetchSpotify>>;
 };
 
@@ -20,12 +22,12 @@ interface CacheEntry<T> {
 
 const memoryCache: Record<string, CacheEntry<Profile>> = {};
 
-// Cache duration in milliseconds (5 minutes by default)
-const CACHE_DURATION_MS = 5 * 60 * 1000;
+// Cache duration in milliseconds (5 minutes by default, configurable via DEV_CACHE_MS env var)
+const CACHE_DURATION_MS = process.env.DEV_CACHE_MS ? Number.parseInt(process.env.DEV_CACHE_MS, 10) : 5 * 60 * 1000;
 
 /**
  * Builds a complete profile by fetching data from all providers
- * Currently only implements weather (Phase 1)
+ * Currently implements weather and Feedly (Phase 2)
  * Includes in-memory caching for development mode
  */
 export async function buildProfile(): Promise<Profile> {
@@ -44,10 +46,53 @@ export async function buildProfile(): Promise<Profile> {
     }
   }
   
-  // For Phase 1, we only implement weather
-  const weather = await fetchWeather();
+  // For Phase 2, we implement weather and feedly with individual error handling
+  // This ensures one failing provider won't cause the entire profile to fail
   
-  // Later phases will use Promise.all with all providers
+  // Fetch weather with error handling
+  let weather: Weather;
+  try {
+    const startTime = Date.now();
+    weather = await fetchWeather();
+    console.log(`[DEV] Weather fetched in ${Date.now() - startTime}ms`);
+  } catch (error) {
+    console.error('[DEV] Weather fetch failed:', error);
+    // Return minimal fallback weather data
+    weather = {
+      temperature: 75.5, // Fahrenheit fallback value
+      condition: 'Unknown',
+      city: process.env.WEATHER_CITY || 'Atlanta',
+      temperature_high: 80,
+      temperature_low: 65,
+      mean_humidity: 50,
+      precipitation_prob: 0,
+      humidity_classification: 'Comfortable'
+    };
+  }
+  
+  // Fetch Feedly with error handling
+  let feedly: FeedlyData;
+  try {
+    const startTime = Date.now();
+    feedly = await fetchFeedly();
+    console.log(`[DEV] Feedly fetched in ${Date.now() - startTime}ms`);
+  } catch (error) {
+    console.error('[DEV] Feedly fetch failed:', error);
+    // Return minimal fallback Feedly data
+    feedly = {
+      articles: [
+        {
+          title: 'Fallback Article',
+          url: 'https://example.com/article',
+          date: Date.now() - 86400000, // Yesterday
+          source: 'Example Source'
+        }
+      ],
+      lastUpdated: new Date().toISOString()
+    };
+  }
+  
+  // Later phase will add spotify to the Promise.all
   // const [weather, feedly, spotify] = await Promise.all([
   //   fetchWeather(),
   //   fetchFeedly(),
@@ -56,8 +101,8 @@ export async function buildProfile(): Promise<Profile> {
   
   const profileData: Profile = { 
     weather,
-    // These will be uncommented in later phases
-    // feedly, 
+    feedly,
+    // This will be uncommented in a later phase
     // spotify,
   };
   
