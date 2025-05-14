@@ -1,6 +1,7 @@
 // No Next.js imports needed
 import type { Profile } from '../../../../../lib/profile';
 import type { Weather } from '../../../../../lib/providers/weather';
+import type { FeedlyData } from '../../../../../lib/providers/feedly';
 import { kv } from '../../../../../lib/kv';
 
 // Mark this as compatible with Edge Runtime
@@ -64,7 +65,7 @@ async function createResilientProfile(timeoutMs = 5000) {
   
   try {
     // First, try to get the previous profile from KV for fallback purposes
-    const previousProfile = await kv.get('profile') as Profile | null || { weather: null };
+    const previousProfile = await kv.get('profile') as Profile | null || { weather: null, feedly: null };
     
     // Individually try to fetch each provider with proper error handling
     let weather: Weather | undefined;
@@ -101,13 +102,52 @@ async function createResilientProfile(timeoutMs = 5000) {
       logger.info('Using fallback weather data');
     }
     
-    // Future phases will add similar try/catch blocks for Feedly, Spotify, etc.
+    // Feedly integration (Phase 2)
+    let feedly: FeedlyData | undefined;
+    try {
+      const feedlyPromise = import('../../../../../lib/providers/feedly')
+        .then(module => module.fetchFeedly());
+      
+      // Set a timeout to prevent hanging if the API is slow
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Feedly API timeout')), timeoutMs);
+      });
+      
+      feedly = await Promise.race([feedlyPromise, timeoutPromise]) as FeedlyData;
+      logger.providerSuccess('feedly');
+    } catch (error) {
+      logger.providerFailure('feedly', error);
+      // Fall back to previous data if available
+      // Use fallback data if previous feedly data isn't available
+      const fallbackFeedly: FeedlyData = {
+        articles: [
+          {
+            title: 'Fallback Article 1',
+            url: 'https://example.com/article1',
+            date: Date.now() - 86400000,
+            source: 'Example Source'
+          },
+          {
+            title: 'Fallback Article 2',
+            url: 'https://example.com/article2',
+            date: Date.now() - 172800000,
+            source: 'Example Source'
+          }
+        ],
+        lastUpdated: new Date().toISOString()
+      };
+      
+      feedly = previousProfile.feedly || fallbackFeedly;
+      logger.info('Using fallback Feedly data');
+    }
+    
+    // Future phases will add similar try/catch blocks for Spotify, etc.
     
     // Log summary of provider results
     logger.summary();
     
-    // Combine all provider data (currently just weather)
-    return { weather, logger };
+    // Combine all provider data (weather and feedly)
+    return { weather, feedly, logger };
   } catch (error) {
     const logger = new Logger();
     logger.error('Failed to create resilient profile', error);
@@ -125,8 +165,8 @@ export async function POST() {
     logger.info('Profile update started');
     
     // Build a resilient profile that handles individual provider failures
-    const { weather } = await createResilientProfile();
-    const profile = { weather };
+    const { weather, feedly } = await createResilientProfile();
+    const profile = { weather, feedly };
     
     // Calculate expiration time in seconds (48 hours)
     const EXPIRATION_SECONDS = 60 * 60 * 48; // 48 hours in seconds
@@ -135,16 +175,24 @@ export async function POST() {
     await kv.set('profile', profile, { ex: EXPIRATION_SECONDS });
     logger.info('Profile stored in KV with 48h expiration');
     
-    // Later phases will add blurb generation with OpenAI
-    // for now, use a placeholder with optional chaining for safety
+    // Later phases will enhance blurb generation with OpenAI
+    // for now, use a placeholder with both weather and feedly data
     const w = profile.weather;
-    await kv.set(
-      'blurb', 
-      w
-        ? `Jason is currently in ${w.city} where it's ${w.temperature}°F and ${w.condition.toLowerCase()}.`
-        : 'Jason is currently vibing somewhere on Earth.',
-      { ex: EXPIRATION_SECONDS }
-    );
+    const latestArticle = profile.feedly?.articles?.[0];
+    
+    let blurb = 'Jason is currently vibing somewhere on Earth.';
+    
+    if (w) {
+      blurb = `Jason is currently in ${w.city} where it's ${w.temperature}°F and ${w.condition.toLowerCase()}`;
+      
+      if (latestArticle) {
+        blurb += `, reading about "${latestArticle.title}"`;
+      }
+      
+      blurb += '.';
+    }
+    
+    await kv.set('blurb', blurb, { ex: EXPIRATION_SECONDS });
     logger.info('Blurb stored in KV with 48h expiration');
     
     // Trigger a revalidation of the homepage to show the new data immediately
