@@ -87,7 +87,14 @@ async function createResilientProfile(timeoutMs = 5000) {
       const fallbackWeather: Weather = {
         temperature: 75.5, // Fahrenheit fallback value
         condition: 'Unknown',
-        city: process.env.WEATHER_CITY || 'Atlanta'
+        city: process.env.WEATHER_CITY || 'Atlanta',
+        
+        // Enhanced fallback data
+        temperature_high: 80,
+        temperature_low: 65,
+        mean_humidity: 50,
+        precipitation_prob: 0,
+        humidity_classification: 'Comfortable'
       };
       
       weather = previousProfile.weather || fallbackWeather;
