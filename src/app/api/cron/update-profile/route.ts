@@ -156,6 +156,14 @@ async function createResilientProfile(timeoutMs = 5000) {
 }
 
 /**
+ * GET handler for the cron job - redirects to POST
+ * Vercel's cron jobs use GET by default, so we need to support this method
+ */
+export async function GET() {
+  return POST();
+}
+
+/**
  * POST handler for the cron job - fetches data from providers and updates KV
  */
 export async function POST() {
