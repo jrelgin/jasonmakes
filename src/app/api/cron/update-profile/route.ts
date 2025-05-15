@@ -1,4 +1,4 @@
-// No Next.js imports needed
+// Import NextResponse for proper response formatting
 import type { Profile } from '../../../../../lib/profile';
 import type { Weather } from '../../../../../lib/providers/weather';
 import type { FeedlyData } from '../../../../../lib/providers/feedly';
@@ -6,6 +6,9 @@ import { kv } from '../../../../../lib/kv';
 
 // Mark this as compatible with Edge Runtime
 export const runtime = 'edge';
+
+// Secret token check for secure cron execution
+const TOKEN = process.env.CRON_SECRET;
 
 /**
  * Simple logger utility with provider failure counting
@@ -156,17 +159,35 @@ async function createResilientProfile(timeoutMs = 5000) {
 }
 
 /**
- * GET handler for the cron job - redirects to POST
- * Vercel's cron jobs use GET by default, so we need to support this method
+ * GET handler for the cron job - blocks accidental GET requests
+ * Returns 405 Method Not Allowed to prevent unnecessary API calls
  */
-export async function GET() {
-  return POST();
+export function GET() {
+  return new Response(JSON.stringify({ 
+    ok: false, 
+    error: 'Method Not Allowed' 
+  }), {
+    status: 405,
+    headers: { 'Content-Type': 'application/json' }
+  });
 }
 
 /**
  * POST handler for the cron job - fetches data from providers and updates KV
+ * Protected by a secret token to prevent unauthorized access
  */
-export async function POST() {
+export async function POST(req: Request) {
+  // Verify the secret token
+  const url = new URL(req.url);
+  if (url.searchParams.get('secret') !== TOKEN) {
+    return new Response(JSON.stringify({ 
+      ok: false, 
+      error: 'Unauthorized' 
+    }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
   const logger = new Logger();
   
   try {
