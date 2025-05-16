@@ -3,6 +3,7 @@ import type { Profile } from '../../../../../lib/profile';
 import type { Weather } from '../../../../../lib/providers/weather';
 import type { FeedlyData } from '../../../../../lib/providers/feedly';
 import { kv } from '../../../../../lib/kv';
+import { revalidatePath } from 'next/cache';
 
 // Mark this as compatible with Edge Runtime
 export const runtime = 'edge';
@@ -197,40 +198,14 @@ export async function GET(req: Request) {
     await kv.set('blurb', blurb, { ex: EXPIRATION_SECONDS });
     logger.info('Blurb stored in KV with 48h expiration');
     
-    // Trigger a revalidation of the homepage to show the new data immediately
+    // Directly revalidate the homepage using Next.js built-in function
     try {
-      // Use fetch against the revalidate API with POST method
-      // In local dev, use port 3001 since that's where the server is running
-      const baseUrl = process.env.VERCEL_URL 
-        ? `https://${process.env.VERCEL_URL}` 
-        : 'http://localhost:3001';
-      
-      logger.info(`Attempting revalidation using base URL: ${baseUrl}`);
-      
-      // Properly encode the token for URL use
-      const token = process.env.REVALIDATION_TOKEN || 'default-dev-token';
-      const encodedToken = encodeURIComponent(token);
-      
-      logger.info(`Using encoded revalidation token (length: ${token.length})`);
-      
-      const revalidateResponse = await fetch(
-        `${baseUrl}/api/revalidate?path=/&secret=${encodedToken}`,
-        { 
-          method: 'POST',
-          headers: {
-            'x-internal-cron': 'true' // Add internal marker to identify cron requests
-          }
-        }
-      );
-      
-      if (!revalidateResponse.ok) {
-        const errorText = await revalidateResponse.text();
-        logger.error(`Homepage revalidation failed with status ${revalidateResponse.status}`, errorText);
-      } else {
-        logger.info('Homepage revalidated successfully');
-      }
+      // Call revalidatePath directly instead of making a separate API call
+      logger.info('Directly revalidating homepage path');
+      revalidatePath('/');
+      logger.info('Homepage revalidated successfully');
     } catch (revalidateError) {
-      logger.error('Error during revalidation', revalidateError instanceof Error ? revalidateError.message : String(revalidateError));
+      logger.error('Error during direct revalidation', revalidateError instanceof Error ? revalidateError.message : String(revalidateError));
       // Continue execution even if revalidation fails
     }
     
