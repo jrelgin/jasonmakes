@@ -16,7 +16,7 @@ export default async function WeatherWidget() {
   }
   
   if (!weatherData) {
-    return <div className="weather-widget p-4 bg-gray-100 rounded-lg">Weather data unavailable</div>;
+    return <div className="weather-widget p-4 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-300 rounded-lg">Weather data unavailable</div>;
   }
   
   // Choose icon based on weather condition
@@ -39,17 +39,17 @@ export default async function WeatherWidget() {
   };
   
   return (
-    <div className="weather-widget p-4 bg-gray-100 rounded-lg">
-      <h3 className="text-lg font-semibold">Weather in {weatherData.city}</h3>
+    <div className="weather-widget p-4 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Weather in {weatherData.city}</h3>
       <div className="flex items-center mt-2">
         <span className="text-3xl mr-3">{getWeatherIcon(weatherData.condition)}</span>
         <div className="flex-1">
-          <p className="font-medium text-lg">{Math.round(weatherData.temperature)}°F • {weatherData.condition}</p>
-          <p className="text-sm mt-1">Today: {formatTempRange()}</p>
+          <p className="font-medium text-lg text-gray-900 dark:text-white">{Math.round(weatherData.temperature)}°F • {weatherData.condition}</p>
+          <p className="text-sm mt-1 text-gray-600 dark:text-gray-300">Today: {formatTempRange()}</p>
         </div>
       </div>
       
-      <div className="mt-3 text-sm">
+      <div className="mt-3 text-sm text-gray-700 dark:text-gray-300">
         <p className="flex justify-between">
           <span>Humidity:</span> 
           <span className="font-medium">{weatherData.mean_humidity}% ({weatherData.humidity_classification})</span>

@@ -18,7 +18,7 @@ export default async function FeedlyArticlesWidget() {
   }
   
   if (!feedlyData || !feedlyData.articles || feedlyData.articles.length === 0) {
-    return <div className="feedly-widget p-4 bg-gray-100 rounded-lg">No articles available</div>;
+    return <div className="feedly-widget p-4 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg border border-gray-200 dark:border-gray-700">No articles available</div>;
   }
   
   // Get the latest 3 articles
@@ -27,7 +27,7 @@ export default async function FeedlyArticlesWidget() {
   // Use regular HTML with no framework-specific components for maximum compatibility
   return (
     <div className="feedly-widget mb-4">
-      <h3 className="text-lg font-semibold mb-3">Latest Reads</h3>
+      <h3 className="text-lg font-semibold mb-3 text-gray-900 dark:text-white">Latest Reads</h3>
       
       <div className="grid gap-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1">
         {latestArticles.map((article) => (
@@ -36,7 +36,7 @@ export default async function FeedlyArticlesWidget() {
             href={article.url} 
             target="_blank" 
             rel="noopener noreferrer"
-            className="article-card flex flex-col overflow-hidden rounded-lg border border-gray-200 transition-all hover:shadow-md"
+            className="article-card flex flex-col overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 transition-all hover:shadow-md"
           >
             {article.imageUrl ? (
               <div className="article-image h-40 overflow-hidden">
@@ -47,19 +47,19 @@ export default async function FeedlyArticlesWidget() {
                 />
               </div>
             ) : (
-              <div className="article-image-placeholder h-40 bg-gray-200 flex items-center justify-center">
-                <span className="text-gray-400">No image</span>
+              <div className="article-image-placeholder h-40 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                <span className="text-gray-400 dark:text-gray-500">No image</span>
               </div>
             )}
             
             <div className="article-content p-4 flex-1 flex flex-col">
-              <h4 className="font-medium text-base line-clamp-2 mb-2">{article.title}</h4>
+              <h4 className="font-medium text-base line-clamp-2 mb-2 text-gray-900 dark:text-white">{article.title}</h4>
               
               {article.excerpt && (
-                <p className="text-sm text-gray-600 line-clamp-3 mb-3">{article.excerpt}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-3 mb-3">{article.excerpt}</p>
               )}
               
-              <div className="article-meta mt-auto text-xs text-gray-500 flex justify-between items-center">
+              <div className="article-meta mt-auto text-xs text-gray-500 dark:text-gray-400 flex justify-between items-center">
                 <span>{new Date(article.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
                 {article.source && <span>{article.source}</span>}
               </div>
