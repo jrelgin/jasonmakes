@@ -15,7 +15,7 @@ export default async function AboutBlurb() {
   
   return (
     <div className="about-blurb my-4">
-      <p className="prose max-w-xl">{blurb ?? 'Loading...'}</p>
+      <p className="prose max-w-xl text-gray-900 dark:text-gray-100">{blurb ?? 'Loading...'}</p>
     </div>
   );
 }
