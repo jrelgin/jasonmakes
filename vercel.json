@@ -1,9 +1,8 @@
 {
   "crons": [
     {
-      "path": "/api/cron/update-profile?secret=$CRON_SECRET",
-      "schedule": "0 * * * *",
-      "method": "POST"
+      "path": "/api/cron/update-profile",
+      "schedule": "0 * * * *"
     }
   ]
 }

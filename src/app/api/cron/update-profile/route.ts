@@ -1,4 +1,4 @@
-// Import NextResponse for proper response formatting
+// Import types and dependencies
 import type { Profile } from '../../../../../lib/profile';
 import type { Weather } from '../../../../../lib/providers/weather';
 import type { FeedlyData } from '../../../../../lib/providers/feedly';
@@ -7,8 +7,8 @@ import { kv } from '../../../../../lib/kv';
 // Mark this as compatible with Edge Runtime
 export const runtime = 'edge';
 
-// Secret token check for secure cron execution
-const TOKEN = process.env.CRON_SECRET;
+// Profile expiration time in seconds
+const EXPIRATION_SECONDS = Number(process.env.PROFILE_TTL ?? 60 * 60 * 48); // default 48h
 
 /**
  * Simple logger utility with provider failure counting
@@ -158,35 +158,11 @@ async function createResilientProfile(timeoutMs = 5000) {
   }
 }
 
-/**
- * GET handler for the cron job - blocks accidental GET requests
- * Returns 405 Method Not Allowed to prevent unnecessary API calls
- */
-export function GET() {
-  return new Response(JSON.stringify({ 
-    ok: false, 
-    error: 'Method Not Allowed' 
-  }), {
-    status: 405,
-    headers: { 'Content-Type': 'application/json' }
-  });
-}
-
-/**
- * POST handler for the cron job - fetches data from providers and updates KV
- * Protected by a secret token to prevent unauthorized access
- */
-export async function POST(req: Request) {
-  // Verify the secret token
-  const url = new URL(req.url);
-  if (url.searchParams.get('secret') !== TOKEN) {
-    return new Response(JSON.stringify({ 
-      ok: false, 
-      error: 'Unauthorized' 
-    }), {
-      status: 401,
-      headers: { 'Content-Type': 'application/json' }
-    });
+// GET does the work (Vercel cron is GET-only)
+export async function GET(req: Request) {
+  // Check for the Authorization header that Vercel automatically attaches
+  if (req.headers.get('authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
+    return new Response('Unauthorized', { status: 401 });
   }
   const logger = new Logger();
   
@@ -197,10 +173,7 @@ export async function POST(req: Request) {
     const { weather, feedly } = await createResilientProfile();
     const profile = { weather, feedly };
     
-    // Calculate expiration time in seconds (48 hours)
-    const EXPIRATION_SECONDS = 60 * 60 * 48; // 48 hours in seconds
-    
-    // Store profile in Vercel KV with 48h expiration
+    // Store profile in Vercel KV with expiration from env var or default 48h
     await kv.set('profile', profile, { ex: EXPIRATION_SECONDS });
     logger.info('Profile stored in KV with 48h expiration');
     
@@ -227,8 +200,15 @@ export async function POST(req: Request) {
     // Trigger a revalidation of the homepage to show the new data immediately
     try {
       // Use fetch against the revalidate API with POST method
+      // Use standard port 3000 for local development
+      const baseUrl = process.env.VERCEL_URL 
+        ? `https://${process.env.VERCEL_URL}` 
+        : 'http://localhost:3000';
+      
+      logger.info(`Attempting revalidation using base URL: ${baseUrl}`);
+      
       const revalidateResponse = await fetch(
-        `${process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'}/api/revalidate?path=/&secret=${process.env.REVALIDATION_TOKEN || 'default-dev-token'}`,
+        `${baseUrl}/api/revalidate?path=/&secret=${process.env.REVALIDATION_TOKEN || 'default-dev-token'}`,
         { 
           method: 'POST',
           headers: {
@@ -238,12 +218,13 @@ export async function POST(req: Request) {
       );
       
       if (!revalidateResponse.ok) {
-        logger.error('Homepage revalidation failed', await revalidateResponse.text());
+        const errorText = await revalidateResponse.text();
+        logger.error(`Homepage revalidation failed with status ${revalidateResponse.status}`, errorText);
       } else {
         logger.info('Homepage revalidated successfully');
       }
     } catch (revalidateError) {
-      logger.error('Error during revalidation', revalidateError);
+      logger.error('Error during revalidation', revalidateError instanceof Error ? revalidateError.message : String(revalidateError));
       // Continue execution even if revalidation fails
     }
     
@@ -268,6 +249,14 @@ export async function POST(req: Request) {
       headers: { 'Content-Type': 'application/json' }
     });
   }
+}
+
+/**
+ * POST handler for the cron job - blocks POST requests
+ * This prevents accidental or malicious POST requests
+ */
+export function POST() {
+  return new Response('Method Not Allowed', { status: 405 });
 }
 
 /**
