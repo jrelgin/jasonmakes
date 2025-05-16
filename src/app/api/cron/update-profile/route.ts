@@ -200,15 +200,21 @@ export async function GET(req: Request) {
     // Trigger a revalidation of the homepage to show the new data immediately
     try {
       // Use fetch against the revalidate API with POST method
-      // Use standard port 3000 for local development
+      // In local dev, use port 3001 since that's where the server is running
       const baseUrl = process.env.VERCEL_URL 
         ? `https://${process.env.VERCEL_URL}` 
-        : 'http://localhost:3000';
+        : 'http://localhost:3001';
       
       logger.info(`Attempting revalidation using base URL: ${baseUrl}`);
       
+      // Properly encode the token for URL use
+      const token = process.env.REVALIDATION_TOKEN || 'default-dev-token';
+      const encodedToken = encodeURIComponent(token);
+      
+      logger.info(`Using encoded revalidation token (length: ${token.length})`);
+      
       const revalidateResponse = await fetch(
-        `${baseUrl}/api/revalidate?path=/&secret=${process.env.REVALIDATION_TOKEN || 'default-dev-token'}`,
+        `${baseUrl}/api/revalidate?path=/&secret=${encodedToken}`,
         { 
           method: 'POST',
           headers: {
