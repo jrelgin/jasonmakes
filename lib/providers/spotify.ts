@@ -74,7 +74,7 @@ async function refreshAccessToken(
  * Get the most recently played track from Spotify
  * @param accessToken Valid Spotify access token with user-scoped permissions
  */
-async function getRecentlyPlayed(accessToken: string): Promise<SpotifyTrack | null> {
+async function getRecentlyPlayed(accessToken: string, signal?: AbortSignal): Promise<SpotifyTrack | null> {
   // No need to check for user ID as we're using the /me endpoint
   // which refers to the user who owns the access token
 
@@ -84,7 +84,8 @@ async function getRecentlyPlayed(accessToken: string): Promise<SpotifyTrack | nu
       'Authorization': `Bearer ${accessToken}`,
       'Content-Type': 'application/json'
     },
-    cache: 'no-store'
+    cache: 'no-store',
+    signal: signal // Pass the AbortController signal
   });
 
   if (!response.ok) {
@@ -141,43 +142,56 @@ export async function fetchSpotify(): Promise<{
   }
   
   try {
-    // Set a timeout to prevent hanging if the API is slow
-    const timeoutMs = 5000; // 5 second timeout
+    // AbortController version of timeout (cleans up timer)
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000); // 5 second timeout
     
-    const spotifyPromise = async () => {
+    try {
+      // Get access token and recently played track
       const accessToken = await refreshAccessToken(
         process.env.SPOTIFY_CLIENT_ID,
         process.env.SPOTIFY_CLIENT_SECRET,
         process.env.SPOTIFY_REFRESH_TOKEN
       );
       
-      const track = await getRecentlyPlayed(accessToken);
+      const track = await getRecentlyPlayed(accessToken, controller.signal);
+      clearTimeout(timeout); // Clean up timeout if successful
       
-      return {
+      const result = {
         track,
         lastUpdated: new Date().toISOString()
       };
-    };
     
-    const timeoutPromise = new Promise<never>((_, reject) => {
-      setTimeout(() => reject(new Error('Spotify API timeout')), timeoutMs);
-    });
-    
-    // Race the Spotify API call against the timeout
-    const result = await Promise.race([spotifyPromise(), timeoutPromise]);
-    
-    // Cache the result in development mode
-    if (isDev) {
-      memoryCache[cacheKey] = {
-        data: result,
-        timestamp: Date.now()
-      };
-      console.log('[DEV] Spotify data cached for 15 minutes');
+      // Cache the result in development mode
+      if (isDev) {
+        memoryCache[cacheKey] = {
+          data: result,
+          timestamp: Date.now()
+        };
+        console.log('[DEV] Spotify data cached for 15 minutes');
+      }
+      
+      return result;
+    } catch (error) {
+      clearTimeout(timeout); // Make sure to clean up timeout on error
+      throw error; // Re-throw to be caught by the outer catch
     }
-    
-    return result;
   } catch (error) {
     console.error('Failed to fetch Spotify data:', error);
+    
+    // First try to get previously successful data from KV
+    try {
+      // Import dynamically to avoid import issues in edge runtime
+      const { kv } = await import('@vercel/kv');
+      const profile = await kv.get('profile') as { spotify?: { track: SpotifyTrack | null; lastUpdated: string } } | null;
+      
+      if (profile?.spotify) {
+        console.log('Using previous Spotify data from KV as fallback');
+        return profile.spotify;
+      }
+    } catch (kvError) {
+      console.error('Failed to fetch Spotify data from KV:', kvError);
+    }
     
     // Return cached data if available, even if expired
     if (isDev && memoryCache[cacheKey]) {

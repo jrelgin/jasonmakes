@@ -63,7 +63,11 @@ export async function fetchWeather(): Promise<Weather> {
   const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${formattedLongitude}&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min,relative_humidity_2m_mean,precipitation_probability_max&timezone=auto&temperature_unit=fahrenheit`;
   
   try {
-    const response = await fetch(url, { cache: 'no-store' });
+    // Add 5-second fetch timeout with AbortController
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    const response = await fetch(url, { cache: 'no-store', signal: controller.signal });
+    clearTimeout(timeout); // Clean up timeout if fetch completes before timeout
     
     if (!response.ok) {
       throw new Error(`Weather API error: ${response.status}`);
