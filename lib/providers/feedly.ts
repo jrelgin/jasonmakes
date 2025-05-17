@@ -84,16 +84,20 @@ export async function fetchFeedly(): Promise<FeedlyData> {
     throw new Error('Missing FEEDLY_FEED_URL environment variable');
   }
   
-  // Add parameters to limit to 5 items and specify JSON format if needed
-  let apiUrl = `${FEED_URL}&count=5`;
-  
-  // Only append format=json if it's not already in the URL
-  if (!FEED_URL.includes('format=json')) {
-    apiUrl += '&format=json';
+  // Safer URL building with URL object
+  const urlObj = new URL(FEED_URL);
+  urlObj.searchParams.set('count', '5');
+  if (!urlObj.searchParams.has('format')) {
+    urlObj.searchParams.set('format', 'json');
   }
+  const apiUrl = urlObj.toString();
   
   try {
-    const response = await fetch(apiUrl, { cache: 'no-store' });
+    // Add 5-second fetch timeout with AbortController
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    const response = await fetch(apiUrl, { cache: 'no-store', signal: controller.signal });
+    clearTimeout(timeout); // Clean up timeout if fetch completes before timeout
     
     if (!response.ok) {
       throw new Error(`Feedly API error: ${response.status}`);
@@ -161,13 +165,27 @@ export async function fetchFeedly(): Promise<FeedlyData> {
   } catch (error) {
     console.error('Failed to fetch Feedly data:', error);
     
+    // First try to get previously successful data from KV
+    try {
+      // Import dynamically to avoid import issues in edge runtime
+      const { kv } = await import('@vercel/kv');
+      const profile = await kv.get('profile') as { feedly?: FeedlyData } | null;
+      
+      if (profile?.feedly) {
+        console.log('Using previous Feedly data from KV as fallback');
+        return profile.feedly;
+      }
+    } catch (kvError) {
+      console.error('Failed to fetch Feedly data from KV:', kvError);
+    }
+    
     // Return cached data if available, even if expired
     if (isDev && memoryCache[cacheKey]) {
       console.log('[DEV] Using expired cached Feedly data due to fetch error');
       return memoryCache[cacheKey].data;
     }
     
-    // Return fallback data
+    // Return fallback data as last resort
     return {
       articles: [
         {

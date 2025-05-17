@@ -48,6 +48,10 @@ class Logger {
     console.error(`[PROFILE:${this.runId}] [ERROR] ${message} ${errorDetail}`);
   }
   
+  warn(message: string): void {
+    console.warn(`[PROFILE:${this.runId}] [WARNING] ${message}`);
+  }
+  
   summary(): void {
     const totalFailures = Object.values(this.providerFailures).reduce((sum, count) => sum + count, 0);
     if (totalFailures > 0) {
@@ -69,13 +73,9 @@ class Logger {
 async function createResilientProfile(logger: Logger, timeoutMs = 10000) {
   
   try {
-    // First, try to get the previous profile from KV for fallback purposes
-    const previousProfile = await kv.get('profile') as Profile | null || { weather: null, feedly: null, spotify: null };
-    
-    // Individually try to fetch each provider with proper error handling
-    let weather: Weather | undefined;
+    // Phase 1: Weather integration
+    let weather: Weather;
     try {
-      // In Phase 1, only weather is implemented
       const weatherPromise = import('../../../../../lib/providers/weather')
         .then(module => module.fetchWeather());
       
@@ -88,25 +88,28 @@ async function createResilientProfile(logger: Logger, timeoutMs = 10000) {
       logger.providerSuccess('weather');
     } catch (error) {
       logger.providerFailure('weather', error);
-      // Fall back to previous day's weather data if available
-      // Use minimal fallback data if previous weather data isn't available
-      const fallbackWeather: Weather = {
-        temperature: 0,
-        condition: 'Unknown',
-        city: process.env.WEATHER_CITY || 'Atlanta',
-        temperature_high: 0,
-        temperature_low: 0,
-        mean_humidity: 0,
-        precipitation_prob: 0,
-        humidity_classification: 'Unknown'
-      };
-      
-      weather = previousProfile.weather || fallbackWeather;
-      logger.info('Using fallback weather data');
+      // Try again - the weather provider will handle its own fallbacks
+      try {
+        weather = await import('../../../../../lib/providers/weather').then(module => module.fetchWeather());
+        logger.info('Successfully used fallback weather data from provider');
+      } catch (secondError) {
+        logger.error('Failed even with fallback weather data', secondError);
+        // Last resort fallback if everything else fails
+        weather = {
+          temperature: 72,
+          condition: 'Unknown',
+          city: process.env.WEATHER_CITY || 'Atlanta',
+          temperature_high: 80,
+          temperature_low: 60,
+          precipitation_prob: 0,
+          mean_humidity: 50,
+          humidity_classification: 'Unknown'
+        };
+      }
     }
     
     // Feedly integration (Phase 2)
-    let feedly: FeedlyData | undefined;
+    let feedly: FeedlyData;
     try {
       const feedlyPromise = import('../../../../../lib/providers/feedly')
         .then(module => module.fetchFeedly());
@@ -120,15 +123,18 @@ async function createResilientProfile(logger: Logger, timeoutMs = 10000) {
       logger.providerSuccess('feedly');
     } catch (error) {
       logger.providerFailure('feedly', error);
-      // Fall back to previous data if available
-      // Use minimal fallback data if previous feedly data isn't available
-      const fallbackFeedly: FeedlyData = {
-        articles: [],
-        lastUpdated: new Date().toISOString()
-      };
-      
-      feedly = previousProfile.feedly || fallbackFeedly;
-      logger.info('Using fallback Feedly data');
+      // Try again - the feedly provider will handle its own fallbacks
+      try {
+        feedly = await import('../../../../../lib/providers/feedly').then(module => module.fetchFeedly());
+        logger.info('Successfully used fallback Feedly data from provider');
+      } catch (secondError) {
+        logger.error('Failed even with fallback Feedly data', secondError);
+        // Last resort fallback if everything else fails
+        feedly = {
+          articles: [],
+          lastUpdated: new Date().toISOString()
+        };
+      }
     }
     
     // Phase 3: Spotify integration
@@ -146,14 +152,18 @@ async function createResilientProfile(logger: Logger, timeoutMs = 10000) {
       logger.providerSuccess('spotify');
     } catch (error) {
       logger.providerFailure('spotify', error);
-      // Fall back to previous data if available
-      const fallbackSpotify = {
-        track: null,
-        lastUpdated: new Date().toISOString()
-      };
-      
-      spotify = previousProfile.spotify || fallbackSpotify;
-      logger.info('Using fallback Spotify data');
+      // Try again - the spotify provider will handle its own fallbacks
+      try {
+        spotify = await import('../../../../../lib/providers/spotify').then(module => module.fetchSpotify());
+        logger.info('Successfully used fallback Spotify data from provider');
+      } catch (secondError) {
+        logger.error('Failed even with fallback Spotify data', secondError);
+        // Last resort fallback if everything else fails
+        spotify = {
+          track: null,
+          lastUpdated: new Date().toISOString()
+        };
+      }
     }
     
     // Log summary of provider results
@@ -186,6 +196,24 @@ export async function GET(req: Request) {
     const timeoutMs = 10000; // Increase timeout to 10 seconds
     const { weather, feedly, spotify } = await createResilientProfile(logger, timeoutMs);
     const profile: Profile = { weather, feedly, spotify };
+    
+    // If Feedly returned zero articles, try to preserve the last good data
+    if (feedly.articles.length === 0) {
+      try {
+        // Get the current profile to check if there's existing Feedly data
+        const currentProfile = await kv.get('profile') as Profile | null;
+        
+        if (currentProfile?.feedly?.articles?.length) {
+          // Keep the previous Feedly data that had articles
+          logger.info(`Preserving previous Feedly data with ${currentProfile.feedly.articles.length} articles`); 
+          profile.feedly = currentProfile.feedly;
+        } else {
+          logger.warn('Feedly returned 0 articles, no previous data to preserve');
+        }
+      } catch (error) {
+        logger.error('Error checking previous Feedly data', error);
+      }
+    }
     
     // Store profile in Vercel KV with expiration from env var or default 48h
     await kv.set('profile', profile, { ex: EXPIRATION_SECONDS });
