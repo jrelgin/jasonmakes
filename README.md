@@ -2,7 +2,7 @@
 
 ## Jason Elgin's Personal Portfolio Site
 
-Welcome to the repository for my personal portfolio site at [jasonmakes.com](https://jasonmakes.co). This project showcases my work, articles, and case studies in design and development.
+Welcome to the repository for my personal portfolio site at [jasonmakes.co](https://jasonmakes.co). This project showcases my work, articles, and case studies in design and development.
 
 I'm a designer and developer with over 15 years of experience creating beautiful, usable, and accessible web applications. This site serves as both my portfolio and a platform to share my thoughts on design, development, and technology.
 
@@ -29,15 +29,18 @@ This site is built on:
 ## Project Structure
 
 ```
-/content         # Markdown files for articles and case studies
-/lib            # Utility functions for content processing
-/public         # Static assets
+/content               # Markdown files for articles and case studies
+/lib
+  profile.ts           # builds the daily profile
+  kv.ts                # Vercel KV wrapper (mocked locally)
+  /providers           # External data providers
+/public                # Static assets
 /src
-  /app          # Next.js App Router structure
-    /articles   # Article pages with dynamic routing
-    /case-studies # Case study pages with dynamic routing
-  /components   # Reusable React components
-  /lib          # Client-side utility functions
+  /app
+    api/               # API routes (cron, debug, revalidate)
+    articles/          # Article pages
+    case-studies/      # Case study pages
+    components/        # Server components reading from KV
 ```
 
 ## Development
@@ -67,6 +70,14 @@ Content is managed through Markdown files in the `/content` directory:
 - Case studies have `type: case-study` in frontmatter
 - Add images to `/public/images` and reference them in content
 
+## Daily Profile System
+
+The homepage shows a daily profile built from external data sources. A Vercel Cron job calls `/api/cron/update-profile` hourly (see `vercel.json`). This endpoint:
+1. Fetches weather and Feedly data via modules in `lib/providers`.
+2. Stores the profile and a short blurb in Vercel KV using `lib/kv.ts`.
+3. Revalidates the homepage so new data appears quickly.
+
+Server components like `WeatherWidget`, `FeedlyArticlesWidget`, and `AboutBlurb` read from KV on every request (with Next.js revalidation). Development mode offers `/api/debug/*` routes for inspecting raw provider output.
 ## Future Improvements
 
 The following improvements are planned for future development:
@@ -87,6 +98,12 @@ The following improvements are planned for future development:
 - **Advanced Tag System**: Add filtering and navigation by content tags
 - **Search Functionality**: Add site-wide search for content
 
+## Environment Setup
+
+See `env-instructions.md` for the required variables. In development the KV client falls back to an in-memory store seeded with sample data. Use `pnpm trigger-cron` (or the provided curl command) to run the cron endpoint locally.
+## Testing
+
+Run `pnpm test` to execute the Vitest unit tests. The suite validates provider logic (such as weather code mapping) and the cron profile builder.
 ## Git Workflow
 
 This project follows a structured Git workflow:
@@ -95,6 +112,9 @@ This project follows a structured Git workflow:
 - `feature/*`: New features (e.g., `feature/add-dashboard`)
 - `fix/*`: Bug fixes (e.g., `fix/navbar-styling`)
 
+## Next Steps
+
+The roadmap in `daily-profile-plan.md` outlines future phases including Spotify integration and OpenAI blurb generation. Adding a new data provider simply means creating a module in `lib/providers` and wiring it into `buildProfile()`.
 ## Contact
 
 If you have any questions or would like to get in touch, feel free to reach out to me here on [GitHub](https://github.com/jrelgin).
