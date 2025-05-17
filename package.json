@@ -12,9 +12,11 @@
     "test:ui": "vitest --ui"
   },
   "dependencies": {
+    "@vercel/edge-config": "^1.4.0",
     "@vercel/kv": "^3.0.0",
     "gray-matter": "^4.0.3",
     "next": "15.3.2",
+    "openai": "^4.100.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "remark": "^15.0.1",

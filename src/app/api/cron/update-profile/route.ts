@@ -6,6 +6,8 @@ import type { FeedlyData } from '../../../../../lib/providers/feedly';
 import type { SpotifyTrack } from '../../../../../lib/providers/spotify';
 import { kv } from '../../../../../lib/kv';
 import { revalidatePath } from 'next/cache';
+// Import OpenAI provider
+import { generateBlurb } from '../../../../../lib/providers/openai';
 
 // Mark this as compatible with Edge Runtime
 export const runtime = 'edge';
@@ -219,32 +221,44 @@ export async function GET(req: Request) {
     await kv.set('profile', profile, { ex: EXPIRATION_SECONDS });
     logger.info(`Profile stored in KV with ${EXPIRATION_SECONDS}s expiration (${Math.round(EXPIRATION_SECONDS/3600)}h)`);
     
-    // Later phases will enhance blurb generation with OpenAI
-    // for now, use a placeholder with weather, feedly, and spotify data
-    const w = profile.weather;
-    const latestArticle = profile.feedly?.articles?.[0];
-    const lastTrack = profile.spotify?.track;
-    
-    let blurb = 'Jason is currently vibing somewhere on Earth.';
-    
-    if (w) {
-      // Guard against null temperature in double fallback scenario
-      const tempDisplay = w.temperature !== null && w.temperature !== undefined ? `${w.temperature}°F` : '';
-      blurb = `Jason is currently in ${w.city}${tempDisplay ? ` where it's ${tempDisplay}` : ''} and ${w.condition.toLowerCase()}`;
+    // Phase 7A: OpenAI-powered blurb generation
+    let blurb: string;
+    try {
+      logger.info('Generating AI blurb with OpenAI');
+      // Call the OpenAI provider with a 12-second timeout
+      blurb = await generateBlurb(profile, 12000);
+      logger.providerSuccess('openai');
+    } catch (error) {
+      logger.providerFailure('openai', error);
       
-      if (latestArticle) {
-        blurb += `, reading about "${latestArticle.title}"`;
+      // Fallback to a manually constructed blurb if OpenAI fails
+      const w = profile.weather;
+      const latestArticle = profile.feedly?.articles?.[0];
+      const lastTrack = profile.spotify?.track;
+      
+      blurb = 'Jason is currently vibing somewhere on Earth.';
+      
+      if (w) {
+        // Guard against null temperature in double fallback scenario
+        const tempDisplay = w.temperature !== null && w.temperature !== undefined ? `${w.temperature}°F` : '';
+        blurb = `Jason is currently in ${w.city}${tempDisplay ? ` where it's ${tempDisplay}` : ''} and ${w.condition.toLowerCase()}`;
+        
+        if (latestArticle) {
+          blurb += `, reading about "${latestArticle.title}"`;
+        }
+        
+        if (lastTrack) {
+          blurb += `, and was recently listening to "${lastTrack.title}" by ${lastTrack.artist}`;
+        }
+        
+        blurb += '.';
       }
       
-      if (lastTrack) {
-        blurb += `, and was recently listening to "${lastTrack.title}" by ${lastTrack.artist}`;
-      }
-      
-      blurb += '.';
+      logger.warn('Using fallback blurb generation');
     }
     
     await kv.set('blurb', blurb, { ex: EXPIRATION_SECONDS });
-    logger.info(`Blurb stored in KV with ${EXPIRATION_SECONDS}s expiration (${Math.round(EXPIRATION_SECONDS/3600)}h)`);
+    logger.info(`Blurb stored in KV with ${EXPIRATION_SECONDS}s expiration (${Math.round(EXPIRATION_SECONDS/3600)}h)`); 
     
     // Directly revalidate the homepage using Next.js built-in function
     try {
