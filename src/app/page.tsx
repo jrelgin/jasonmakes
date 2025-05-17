@@ -1,6 +1,7 @@
 import WeatherWidget from './components/WeatherWidget';
 import AboutBlurb from './components/AboutBlurb';
 import FeedlyArticlesWidget from './components/FeedlyArticlesWidget';
+import SpotifyWidget from './components/SpotifyWidget';
 
 export default function Home() {
   return (
@@ -19,6 +20,11 @@ export default function Home() {
           {/* Weather Widget */}
           <div className="mb-6">
             <WeatherWidget />
+          </div>
+          
+          {/* Spotify Widget */}
+          <div className="mb-6">
+            <SpotifyWidget />
           </div>
           
           {/* Feedly Articles Widget */}

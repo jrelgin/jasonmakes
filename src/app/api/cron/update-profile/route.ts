@@ -2,6 +2,8 @@
 import type { Profile } from '../../../../../lib/profile';
 import type { Weather } from '../../../../../lib/providers/weather';
 import type { FeedlyData } from '../../../../../lib/providers/feedly';
+// Import just the types for Spotify
+import type { SpotifyTrack } from '../../../../../lib/providers/spotify';
 import { kv } from '../../../../../lib/kv';
 import { revalidatePath } from 'next/cache';
 
@@ -61,15 +63,14 @@ class Logger {
 
 /**
  * Creates a resilient profile by fetching provider data and falling back to previous data when needed
- * @param timeoutMs Optional timeout in milliseconds (default: 5000ms)
+ * @param logger Logger instance to use for consistent run IDs
+ * @param timeoutMs Optional timeout in milliseconds (default: 10000ms)
  */
-async function createResilientProfile(timeoutMs = 5000) {
-  // Create a logger instance for this run
-  const logger = new Logger();
+async function createResilientProfile(logger: Logger, timeoutMs = 10000) {
   
   try {
     // First, try to get the previous profile from KV for fallback purposes
-    const previousProfile = await kv.get('profile') as Profile | null || { weather: null, feedly: null };
+    const previousProfile = await kv.get('profile') as Profile | null || { weather: null, feedly: null, spotify: null };
     
     // Individually try to fetch each provider with proper error handling
     let weather: Weather | undefined;
@@ -88,18 +89,16 @@ async function createResilientProfile(timeoutMs = 5000) {
     } catch (error) {
       logger.providerFailure('weather', error);
       // Fall back to previous day's weather data if available
-      // Use the fallback data if previous weather data isn't available
+      // Use minimal fallback data if previous weather data isn't available
       const fallbackWeather: Weather = {
-        temperature: 75.5, // Fahrenheit fallback value
+        temperature: 0,
         condition: 'Unknown',
         city: process.env.WEATHER_CITY || 'Atlanta',
-        
-        // Enhanced fallback data
-        temperature_high: 80,
-        temperature_low: 65,
-        mean_humidity: 50,
+        temperature_high: 0,
+        temperature_low: 0,
+        mean_humidity: 0,
         precipitation_prob: 0,
-        humidity_classification: 'Comfortable'
+        humidity_classification: 'Unknown'
       };
       
       weather = previousProfile.weather || fallbackWeather;
@@ -122,22 +121,9 @@ async function createResilientProfile(timeoutMs = 5000) {
     } catch (error) {
       logger.providerFailure('feedly', error);
       // Fall back to previous data if available
-      // Use fallback data if previous feedly data isn't available
+      // Use minimal fallback data if previous feedly data isn't available
       const fallbackFeedly: FeedlyData = {
-        articles: [
-          {
-            title: 'Fallback Article 1',
-            url: 'https://example.com/article1',
-            date: Date.now() - 86400000,
-            source: 'Example Source'
-          },
-          {
-            title: 'Fallback Article 2',
-            url: 'https://example.com/article2',
-            date: Date.now() - 172800000,
-            source: 'Example Source'
-          }
-        ],
+        articles: [],
         lastUpdated: new Date().toISOString()
       };
       
@@ -145,13 +131,36 @@ async function createResilientProfile(timeoutMs = 5000) {
       logger.info('Using fallback Feedly data');
     }
     
-    // Future phases will add similar try/catch blocks for Spotify, etc.
+    // Phase 3: Spotify integration
+    let spotify: { track: SpotifyTrack | null; lastUpdated: string };
+    try {
+      const spotifyPromise = import('../../../../../lib/providers/spotify')
+        .then(module => module.fetchSpotify());
+      
+      // Set a timeout to prevent hanging if the API is slow
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Spotify API timeout')), timeoutMs);
+      });
+      
+      spotify = await Promise.race([spotifyPromise, timeoutPromise]) as { track: SpotifyTrack | null; lastUpdated: string };
+      logger.providerSuccess('spotify');
+    } catch (error) {
+      logger.providerFailure('spotify', error);
+      // Fall back to previous data if available
+      const fallbackSpotify = {
+        track: null,
+        lastUpdated: new Date().toISOString()
+      };
+      
+      spotify = previousProfile.spotify || fallbackSpotify;
+      logger.info('Using fallback Spotify data');
+    }
     
     // Log summary of provider results
     logger.summary();
     
-    // Combine all provider data (weather and feedly)
-    return { weather, feedly, logger };
+    // Combine all provider data (weather, feedly, and spotify)
+    return { weather, feedly, spotify, logger };
   } catch (error) {
     const logger = new Logger();
     logger.error('Failed to create resilient profile', error);
@@ -161,48 +170,59 @@ async function createResilientProfile(timeoutMs = 5000) {
 
 // GET does the work (Vercel cron is GET-only)
 export async function GET(req: Request) {
-  // Check for the Authorization header that Vercel automatically attaches
-  if (req.headers.get('authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
+  // More defensive check for the Authorization header that Vercel automatically attaches
+  const auth = req.headers.get('authorization');
+  if (!auth || !auth.startsWith('Bearer ') || auth !== `Bearer ${process.env.CRON_SECRET}`) {
     return new Response('Unauthorized', { status: 401 });
   }
+  
   const logger = new Logger();
   
   try {
     logger.info('Profile update started');
     
     // Build a resilient profile that handles individual provider failures
-    const { weather, feedly } = await createResilientProfile();
-    const profile = { weather, feedly };
+    // Pass the logger and custom timeout for consistent run IDs and configurability
+    const timeoutMs = 10000; // Increase timeout to 10 seconds
+    const { weather, feedly, spotify } = await createResilientProfile(logger, timeoutMs);
+    const profile: Profile = { weather, feedly, spotify };
     
     // Store profile in Vercel KV with expiration from env var or default 48h
     await kv.set('profile', profile, { ex: EXPIRATION_SECONDS });
-    logger.info('Profile stored in KV with 48h expiration');
+    logger.info(`Profile stored in KV with ${EXPIRATION_SECONDS}s expiration (${Math.round(EXPIRATION_SECONDS/3600)}h)`);
     
     // Later phases will enhance blurb generation with OpenAI
-    // for now, use a placeholder with both weather and feedly data
+    // for now, use a placeholder with weather, feedly, and spotify data
     const w = profile.weather;
     const latestArticle = profile.feedly?.articles?.[0];
+    const lastTrack = profile.spotify?.track;
     
     let blurb = 'Jason is currently vibing somewhere on Earth.';
     
     if (w) {
-      blurb = `Jason is currently in ${w.city} where it's ${w.temperature}°F and ${w.condition.toLowerCase()}`;
+      // Guard against null temperature in double fallback scenario
+      const tempDisplay = w.temperature !== null && w.temperature !== undefined ? `${w.temperature}°F` : '';
+      blurb = `Jason is currently in ${w.city}${tempDisplay ? ` where it's ${tempDisplay}` : ''} and ${w.condition.toLowerCase()}`;
       
       if (latestArticle) {
         blurb += `, reading about "${latestArticle.title}"`;
+      }
+      
+      if (lastTrack) {
+        blurb += `, and was recently listening to "${lastTrack.title}" by ${lastTrack.artist}`;
       }
       
       blurb += '.';
     }
     
     await kv.set('blurb', blurb, { ex: EXPIRATION_SECONDS });
-    logger.info('Blurb stored in KV with 48h expiration');
+    logger.info(`Blurb stored in KV with ${EXPIRATION_SECONDS}s expiration (${Math.round(EXPIRATION_SECONDS/3600)}h)`);
     
     // Directly revalidate the homepage using Next.js built-in function
     try {
       // Call revalidatePath directly instead of making a separate API call
       logger.info('Directly revalidating homepage path');
-      revalidatePath('/');
+      await revalidatePath('/');
       logger.info('Homepage revalidated successfully');
     } catch (revalidateError) {
       logger.error('Error during direct revalidation', revalidateError instanceof Error ? revalidateError.message : String(revalidateError));
@@ -236,7 +256,11 @@ export async function GET(req: Request) {
  * POST handler for the cron job - blocks POST requests
  * This prevents accidental or malicious POST requests
  */
-export function POST() {
+export function POST(req: Request) {
+  // Same auth check as GET for symmetry
+  if (req.headers.get('authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
+    return new Response('Unauthorized', { status: 401 });
+  }
   return new Response('Method Not Allowed', { status: 405 });
 }
 

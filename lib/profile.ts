@@ -3,15 +3,15 @@ import type { Weather } from './providers/weather';
 // Phase 2: Feedly implementation
 import { fetchFeedly } from './providers/feedly';
 import type { FeedlyData } from './providers/feedly';
-// This will be implemented in a later phase
-// import { fetchSpotify } from './providers/spotify';
+// Phase 3: Spotify implementation
+import { fetchSpotify } from './providers/spotify';
 
 // Define the Profile type with implementations for current providers
 export type Profile = {
   weather: Weather;
   feedly: FeedlyData;
-  // This will be uncommented in a later phase
-  // spotify: Awaited<ReturnType<typeof fetchSpotify>>;
+  // Phase 3: Spotify integration
+  spotify: Awaited<ReturnType<typeof fetchSpotify>>;
 };
 
 // In-memory cache for local development
@@ -92,18 +92,25 @@ export async function buildProfile(): Promise<Profile> {
     };
   }
   
-  // Later phase will add spotify to the Promise.all
-  // const [weather, feedly, spotify] = await Promise.all([
-  //   fetchWeather(),
-  //   fetchFeedly(),
-  //   fetchSpotify(),
-  // ]);
+  // Fetch Spotify with error handling
+  let spotify: Awaited<ReturnType<typeof fetchSpotify>>;
+  try {
+    const startTime = Date.now();
+    spotify = await fetchSpotify();
+    console.log(`[DEV] Spotify fetched in ${Date.now() - startTime}ms`);
+  } catch (error) {
+    console.error('[DEV] Spotify fetch failed:', error);
+    // Return minimal fallback Spotify data
+    spotify = {
+      track: null,
+      lastUpdated: new Date().toISOString()
+    };
+  }
   
   const profileData: Profile = { 
     weather,
     feedly,
-    // This will be uncommented in a later phase
-    // spotify,
+    spotify
   };
   
   // Cache the result in development mode
