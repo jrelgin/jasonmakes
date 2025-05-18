@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist_Mono, Instrument_Sans } from "next/font/google";
 import localFont from "next/font/local";
+import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 import Navigation from "../components/Navigation";
 
@@ -46,6 +47,7 @@ export default function RootLayout({
         <main className="container mx-auto px-4">
           {children}
         </main>
+        <Analytics />
       </body>
     </html>
   );
