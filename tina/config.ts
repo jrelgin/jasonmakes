@@ -1,12 +1,10 @@
 import { defineConfig } from "tinacms";
 import type { TinaField } from "tinacms";
 
-// Your hosting provider likely exposes this as an environment variable
+// Prioritize main branch to ensure consistent TinaCMS connections
 const branch =
-  process.env.GITHUB_BRANCH ||
-  process.env.VERCEL_GIT_COMMIT_REF ||
-  process.env.HEAD ||
-  "main";
+  process.env.NEXT_PUBLIC_TINA_BRANCH ||
+  "main"; // Always default to main for more predictable deployments
 
 // Define shared fields for both collections
 const sharedFields: TinaField[] = [
