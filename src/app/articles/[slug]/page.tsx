@@ -4,10 +4,10 @@ import { getArticleBySlug, getAllSlugs } from '../../../../lib/tina-cms';
 import { TinaMarkdown } from 'tinacms/dist/rich-text';
 import type { TinaMarkdownContent } from 'tinacms/dist/rich-text';
 import type { Metadata } from 'next';
-import type { ArticlesDefault } from '../../../../tina/__generated__/types';
+import type { Articles } from '../../../../tina/__generated__/types';
 
 // Extend the TinaCMS generated types with our additional fields
-interface ArticleContent extends ArticlesDefault {
+interface ArticleContent extends Articles {
   coverImage?: string; // Add the coverImage field that's missing from generated types
 }
 

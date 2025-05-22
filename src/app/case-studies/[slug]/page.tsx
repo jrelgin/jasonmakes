@@ -4,10 +4,10 @@ import { getCaseStudyBySlug, getAllSlugs } from '../../../../lib/tina-cms';
 import { TinaMarkdown } from 'tinacms/dist/rich-text';
 import type { TinaMarkdownContent } from 'tinacms/dist/rich-text';
 import type { Metadata } from 'next';
-import type { CaseStudiesDefault } from '../../../../tina/__generated__/types';
+import type { CaseStudies } from '../../../../tina/__generated__/types';
 
 // Extend the TinaCMS generated types with our additional fields
-interface CaseStudyContent extends CaseStudiesDefault {
+interface CaseStudyContent extends CaseStudies {
   coverImage?: string; // Add the coverImage field that's missing from generated types
 }
 
