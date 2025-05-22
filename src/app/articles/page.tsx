@@ -2,8 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { getArticles } from '../../../lib/tina-cms';
 
-// Use TinaCMS generated types
-import type { ArticlesConnection } from '../../../tina/__generated__/types';
+// No need to import types that aren't directly used
 
 // Define local article type for the component
 type Article = {
@@ -32,9 +31,11 @@ export default async function ArticlesPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {articles.filter(article => article !== null && article !== undefined)
-            .map((article) => (
-              <ArticleCard key={article!.slug} article={article as Article} />
-            ))}
+            .map((article) => {
+              // Safe to use non-null assertion after the filter
+              const validArticle = article as Article;
+              return <ArticleCard key={validArticle.slug} article={validArticle} />;
+            })}
         </div>
       )}
     </main>

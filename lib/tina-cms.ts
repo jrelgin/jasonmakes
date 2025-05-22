@@ -6,7 +6,7 @@ import { client } from '../tina/__generated__/client'
 
 // Now using the actual client from TinaCMS generated files
 // We'll use the generated types from TinaCMS
-import type { ArticlesConnection, ArticlesFilter, CaseStudiesConnection, CaseStudiesFilter } from '../tina/__generated__/types';
+import type { ArticlesFilter, CaseStudiesFilter } from '../tina/__generated__/types';
 
 /**
  * Fetches all articles from TinaCMS

@@ -2,8 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { getCaseStudies } from '../../../lib/tina-cms';
 
-// Use TinaCMS generated types
-import type { CaseStudiesConnection } from '../../../tina/__generated__/types';
+// No need to import types that aren't directly used
 
 // Define local case study type for the component
 type CaseStudy = {
@@ -32,9 +31,11 @@ export default async function CaseStudiesPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {caseStudies.filter(caseStudy => caseStudy !== null && caseStudy !== undefined)
-            .map((caseStudy) => (
-              <CaseStudyCard key={caseStudy!.slug} caseStudy={caseStudy as CaseStudy} />
-            ))}
+            .map((caseStudy) => {
+              // Safe to use type assertion after the filter
+              const validCaseStudy = caseStudy as CaseStudy;
+              return <CaseStudyCard key={validCaseStudy.slug} caseStudy={validCaseStudy} />;
+            })}
         </div>
       )}
     </main>
