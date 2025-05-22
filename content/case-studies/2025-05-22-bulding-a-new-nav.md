@@ -4,8 +4,7 @@ date: 2025-05-22T04:00:00.000Z
 slug: bulding-a-new-nav
 description: >-
   This is going to be a great article and I'm assuming this is being used for
-  the excertp so that's cool
-_template: default
+  the excertp so that's cool. Updating
 ---
 
 # This is a heading

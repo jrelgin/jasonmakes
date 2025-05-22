@@ -1,10 +1,12 @@
 import { defineConfig } from "tinacms";
 import type { TinaField } from "tinacms";
 
-// Prioritize main branch to ensure consistent TinaCMS connections
+// Use the current Git ref in CI (Vercel/Netlify) or fall back to "main" locally
 const branch =
-  process.env.NEXT_PUBLIC_TINA_BRANCH ||
-  "main"; // Always default to main for more predictable deployments
+  process.env.TINA_BRANCH ||               // explicit override
+  process.env.VERCEL_GIT_COMMIT_REF ||     // Vercel
+  process.env.HEAD ||                      // Netlify & some CI systems
+  "main";
 
 // Define shared fields for both collections
 const sharedFields: TinaField[] = [
