@@ -2,7 +2,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { getArticles } from '../../../lib/tina-cms';
 
-// No need to import types that aren't directly used
 
 // Define local article type for the component
 type Article = {
