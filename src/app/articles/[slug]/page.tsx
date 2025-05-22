@@ -1,19 +1,15 @@
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { getArticles, getContentBySlug, convertMarkdownToHtml } from '../../../../lib/content';
+import { getArticleBySlug, getAllSlugs } from '../../../../lib/tina-cms';
+import { TinaMarkdown } from 'tinacms/dist/rich-text';
+import type { TinaMarkdownContent } from 'tinacms/dist/rich-text';
 import type { Metadata } from 'next';
+import type { Articles } from '../../../../tina/__generated__/types';
 
-// Define type for article content
-type Article = {
-  title: string;
-  slug: string;
-  date: string;
-  type: string;
-  excerpt?: string;
-  coverImage?: string;
-  tags?: string[];
-  content?: string;
-};
+// Extend the TinaCMS generated types with our additional fields
+interface ArticleContent extends Articles {
+  coverImage?: string; // Add the coverImage field that's missing from generated types
+}
 
 // Define params interface for this page component - in Next.js 15, params is a Promise
 type Params = {
@@ -23,9 +19,9 @@ type Params = {
 // Generate metadata for SEO
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { slug } = await params;
-  const article = getContentBySlug(slug) as Article | null;
+  const article = await getArticleBySlug(slug);
   
-  if (!article || article.type !== 'article') {
+  if (!article) {
     return {
       title: 'Article Not Found',
     };
@@ -33,34 +29,31 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   
   return {
     title: `${article.title} | Jason Makes`,
-    description: article.excerpt || '',
+    description: article.description || '',
     openGraph: {
       title: article.title,
-      description: article.excerpt || '',
-      images: article.coverImage ? [article.coverImage] : [],
+      description: article.description || '',
+      // Only include images if coverImage exists and it's a string
+      images: (article as ArticleContent).coverImage ? 
+        [{ url: (article as ArticleContent).coverImage as string }] : 
+        undefined
     },
   };
 }
 
 // Generate static paths at build time
 export async function generateStaticParams() {
-  const articles = getArticles();
-  return articles.map((article) => ({
-    slug: article.slug,
-  }));
+  return await getAllSlugs('articles');
 }
 
 export default async function ArticlePage({ params }: { params: Promise<Params> }) {
   const { slug } = await params;
-  const article = getContentBySlug(slug) as Article | null;
+  const article = await getArticleBySlug(slug);
   
-  // If the article doesn't exist or is not of type 'article', show 404
-  if (!article || article.type !== 'article') {
+  // If the article doesn't exist, show 404
+  if (!article) {
     notFound();
   }
-  
-  // Convert markdown content to HTML
-  const contentHtml = await convertMarkdownToHtml(article.content || '');
   
   // Format the date
   const formattedDate = new Date(article.date).toLocaleDateString('en-US', {
@@ -77,10 +70,11 @@ export default async function ArticlePage({ params }: { params: Promise<Params> 
           <time dateTime={article.date}>{formattedDate}</time>
         </div>
         
-        {article.coverImage && (
+        {/* Optional coverImage handling with proper typing */}
+        {(article as ArticleContent).coverImage && (
           <div className="relative h-64 md:h-96 mb-8 rounded-lg overflow-hidden">
             <Image
-              src={article.coverImage}
+              src={(article as ArticleContent).coverImage || ''}
               alt={article.title}
               fill
               className="object-cover"
@@ -88,28 +82,17 @@ export default async function ArticlePage({ params }: { params: Promise<Params> 
             />
           </div>
         )}
+        
+        {article.description && (
+          <div className="text-lg text-gray-600 mb-6">
+            {article.description}
+          </div>
+        )}
       </header>
       
-      <div 
-        className="prose max-w-none"
-        dangerouslySetInnerHTML={{ __html: contentHtml }} 
-      />
-      
-      {article.tags && article.tags.length > 0 && (
-        <div className="mt-12 pt-6 border-t">
-          <h2 className="text-lg font-medium mb-4">Tags</h2>
-          <div className="flex flex-wrap gap-2">
-            {article.tags.map((tag) => (
-              <span 
-                key={tag}
-                className="px-3 py-1 bg-gray-100 rounded-full text-sm"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
+      <div className="prose max-w-none">
+        <TinaMarkdown content={article.body as TinaMarkdownContent} />
+      </div>
     </article>
   );
 }

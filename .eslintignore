@@ -1,0 +1,5 @@
+# Ignore TinaCMS generated files
+tina/__generated__/**/*
+
+# Temporarily ignore vitest config until we can resolve the version mismatch
+vitest.config.ts
