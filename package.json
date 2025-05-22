@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "TINA_PUBLIC_IS_LOCAL=true tinacms dev -c \"next dev --turbopack\"",
-    "build": "tinacms build && next build",
+    "build": "next build",
+    "build:tina": "tinacms build && next build",
     "start": "next start",
     "lint": "next lint",
     "test": "vitest run",
