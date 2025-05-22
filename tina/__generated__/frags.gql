@@ -1,0 +1,17 @@
+fragment ArticlesParts on Articles {
+  __typename
+  title
+  date
+  slug
+  description
+  body
+}
+
+fragment CaseStudiesParts on CaseStudies {
+  __typename
+  title
+  date
+  slug
+  description
+  body
+}
