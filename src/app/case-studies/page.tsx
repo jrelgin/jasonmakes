@@ -2,8 +2,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { getCaseStudies } from '../../../lib/tina-cms';
 
-// No need to import types that aren't directly used
-
 // Define local case study type for the component
 type CaseStudy = {
   title: string;
