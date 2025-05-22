@@ -2,6 +2,7 @@
 export const revalidate = 86_400; // 24 hours (daily refresh)
 
 import { kv } from '../../../lib/kv';
+import Image from 'next/image';
 import type { FeedlyData } from '../../../lib/providers/feedly';
 
 // Server component that fetches data
@@ -40,10 +41,12 @@ export default async function FeedlyArticlesWidget() {
           >
             {article.imageUrl ? (
               <div className="article-image h-40 overflow-hidden">
-                <img 
+                <Image 
                   src={article.imageUrl} 
                   alt={article.title} 
                   className="w-full h-full object-cover"
+                  width={400}
+                  height={225}
                 />
               </div>
             ) : (

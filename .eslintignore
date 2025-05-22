@@ -1,0 +1,2 @@
+# Ignore TinaCMS generated files
+tina/__generated__/**/*
