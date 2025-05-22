@@ -41,4 +41,6 @@ yarn-error.log*
 next-env.d.ts
 
 node_modules
-.envtina/__generated__/.cache/
+
+# tina
+tina/__generated__/.cache/
