@@ -92,8 +92,8 @@ const caseStudies = {
 
 export default defineConfig({
   branch,
-  clientId: process.env.NEXT_PUBLIC_TINA_CLIENT_ID || "", // Get this from tina.io
-  token: process.env.TINA_TOKEN || "", // Get this from tina.io
+  clientId: process.env.NEXT_PUBLIC_TINA_CLIENT_ID || "", // Client ID from TinaCMS Cloud
+  token: process.env.TINA_TOKEN || "", // Token from TinaCMS Cloud
   build: {
     outputFolder: "admin",
     publicFolder: "public",
