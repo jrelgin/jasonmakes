@@ -1,6 +1,9 @@
 // tina/config.ts
 import { defineConfig } from "tinacms";
-var branch = "feature/tinacms";
+var branch = process.env.TINA_BRANCH || // explicit override
+process.env.VERCEL_GIT_COMMIT_REF || // Vercel
+process.env.HEAD || // Netlify & some CI systems
+"main";
 var sharedFields = [
   {
     type: "string",
