@@ -32,13 +32,20 @@ const sharedFields: TinaField[] = [
     name: "slug",
     label: "Slug",
     required: true,
-    ui: { component: "text" },
   },
   {
     type: "string",
-    name: "description",
-    label: "Description",
+    name: "excerpt",
+    label: "Excerpt",
+    description: "A brief summary that will only appear on listing pages",
+    required: true,
     ui: { component: "textarea" },
+  },
+  {
+    type: "image",
+    name: "featureImage",
+    label: "Feature Image",
+    required: true,
   },
   {
     type: "rich-text",

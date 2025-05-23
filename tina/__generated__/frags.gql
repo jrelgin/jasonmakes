@@ -3,7 +3,8 @@ fragment ArticlesParts on Articles {
   title
   date
   slug
-  description
+  excerpt
+  featureImage
   body
 }
 
@@ -12,6 +13,7 @@ fragment CaseStudiesParts on CaseStudies {
   title
   date
   slug
-  description
+  excerpt
+  featureImage
   body
 }

@@ -8,7 +8,8 @@ import type { Articles } from '../../../../tina/__generated__/types';
 
 // Extend the TinaCMS generated types with our additional fields
 interface ArticleContent extends Articles {
-  coverImage?: string; // Add the coverImage field that's missing from generated types
+  featureImage: string; // Using the new required featureImage field
+  excerpt?: string;
 }
 
 // Define params interface for this page component - in Next.js 15, params is a Promise
@@ -29,14 +30,12 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   
   return {
     title: `${article.title} | Jason Makes`,
-    description: article.description || '',
+    description: (article as ArticleContent).excerpt || '',
     openGraph: {
       title: article.title,
-      description: article.description || '',
-      // Only include images if coverImage exists and it's a string
-      images: (article as ArticleContent).coverImage ? 
-        [{ url: (article as ArticleContent).coverImage as string }] : 
-        undefined
+      description: (article as ArticleContent).excerpt || '',
+      // Use the featureImage for social sharing
+      images: [{ url: (article as ArticleContent).featureImage }]
     },
   };
 }
@@ -70,24 +69,18 @@ export default async function ArticlePage({ params }: { params: Promise<Params> 
           <time dateTime={article.date}>{formattedDate}</time>
         </div>
         
-        {/* Optional coverImage handling with proper typing */}
-        {(article as ArticleContent).coverImage && (
-          <div className="relative h-64 md:h-96 mb-8 rounded-lg overflow-hidden">
-            <Image
-              src={(article as ArticleContent).coverImage || ''}
-              alt={article.title}
-              fill
-              className="object-cover"
-              priority
-            />
-          </div>
-        )}
+        {/* Feature image hero */}
+        <div className="relative h-64 md:h-96 mb-8 rounded-lg overflow-hidden">
+          <Image
+            src={(article as ArticleContent).featureImage}
+            alt={article.title}
+            fill
+            className="object-cover"
+            priority
+          />
+        </div>
         
-        {article.description && (
-          <div className="text-lg text-gray-600 mb-6">
-            {article.description}
-          </div>
-        )}
+        {/* Excerpt removed from individual article page as requested */}
       </header>
       
       <div className="prose max-w-none">

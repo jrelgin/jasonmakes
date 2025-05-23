@@ -188,7 +188,8 @@ export type Articles = Node & Document & {
   title: Scalars['String']['output'];
   date: Scalars['String']['output'];
   slug: Scalars['String']['output'];
-  description?: Maybe<Scalars['String']['output']>;
+  excerpt: Scalars['String']['output'];
+  featureImage: Scalars['String']['output'];
   body?: Maybe<Scalars['JSON']['output']>;
   id: Scalars['ID']['output'];
   _sys: SystemInfo;
@@ -210,6 +211,13 @@ export type DatetimeFilter = {
   in?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
 };
 
+export type ImageFilter = {
+  startsWith?: InputMaybe<Scalars['String']['input']>;
+  eq?: InputMaybe<Scalars['String']['input']>;
+  exists?: InputMaybe<Scalars['Boolean']['input']>;
+  in?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
 export type RichTextFilter = {
   startsWith?: InputMaybe<Scalars['String']['input']>;
   eq?: InputMaybe<Scalars['String']['input']>;
@@ -220,7 +228,8 @@ export type ArticlesFilter = {
   title?: InputMaybe<StringFilter>;
   date?: InputMaybe<DatetimeFilter>;
   slug?: InputMaybe<StringFilter>;
-  description?: InputMaybe<StringFilter>;
+  excerpt?: InputMaybe<StringFilter>;
+  featureImage?: InputMaybe<ImageFilter>;
   body?: InputMaybe<RichTextFilter>;
 };
 
@@ -242,7 +251,8 @@ export type CaseStudies = Node & Document & {
   title: Scalars['String']['output'];
   date: Scalars['String']['output'];
   slug: Scalars['String']['output'];
-  description?: Maybe<Scalars['String']['output']>;
+  excerpt: Scalars['String']['output'];
+  featureImage: Scalars['String']['output'];
   body?: Maybe<Scalars['JSON']['output']>;
   id: Scalars['ID']['output'];
   _sys: SystemInfo;
@@ -253,7 +263,8 @@ export type CaseStudiesFilter = {
   title?: InputMaybe<StringFilter>;
   date?: InputMaybe<DatetimeFilter>;
   slug?: InputMaybe<StringFilter>;
-  description?: InputMaybe<StringFilter>;
+  excerpt?: InputMaybe<StringFilter>;
+  featureImage?: InputMaybe<ImageFilter>;
   body?: InputMaybe<RichTextFilter>;
 };
 
@@ -355,7 +366,8 @@ export type ArticlesMutation = {
   title?: InputMaybe<Scalars['String']['input']>;
   date?: InputMaybe<Scalars['String']['input']>;
   slug?: InputMaybe<Scalars['String']['input']>;
-  description?: InputMaybe<Scalars['String']['input']>;
+  excerpt?: InputMaybe<Scalars['String']['input']>;
+  featureImage?: InputMaybe<Scalars['String']['input']>;
   body?: InputMaybe<Scalars['JSON']['input']>;
 };
 
@@ -363,20 +375,21 @@ export type CaseStudiesMutation = {
   title?: InputMaybe<Scalars['String']['input']>;
   date?: InputMaybe<Scalars['String']['input']>;
   slug?: InputMaybe<Scalars['String']['input']>;
-  description?: InputMaybe<Scalars['String']['input']>;
+  excerpt?: InputMaybe<Scalars['String']['input']>;
+  featureImage?: InputMaybe<Scalars['String']['input']>;
   body?: InputMaybe<Scalars['JSON']['input']>;
 };
 
-export type ArticlesPartsFragment = { __typename: 'Articles', title: string, date: string, slug: string, description?: string | null, body?: any | null };
+export type ArticlesPartsFragment = { __typename: 'Articles', title: string, date: string, slug: string, excerpt: string, featureImage: string, body?: any | null };
 
-export type CaseStudiesPartsFragment = { __typename: 'CaseStudies', title: string, date: string, slug: string, description?: string | null, body?: any | null };
+export type CaseStudiesPartsFragment = { __typename: 'CaseStudies', title: string, date: string, slug: string, excerpt: string, featureImage: string, body?: any | null };
 
 export type ArticlesQueryVariables = Exact<{
   relativePath: Scalars['String']['input'];
 }>;
 
 
-export type ArticlesQuery = { __typename?: 'Query', articles: { __typename: 'Articles', id: string, title: string, date: string, slug: string, description?: string | null, body?: any | null, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, hasReferences?: boolean | null, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } };
+export type ArticlesQuery = { __typename?: 'Query', articles: { __typename: 'Articles', id: string, title: string, date: string, slug: string, excerpt: string, featureImage: string, body?: any | null, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, hasReferences?: boolean | null, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } };
 
 export type ArticlesConnectionQueryVariables = Exact<{
   before?: InputMaybe<Scalars['String']['input']>;
@@ -388,14 +401,14 @@ export type ArticlesConnectionQueryVariables = Exact<{
 }>;
 
 
-export type ArticlesConnectionQuery = { __typename?: 'Query', articlesConnection: { __typename?: 'ArticlesConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasPreviousPage: boolean, hasNextPage: boolean, startCursor: string, endCursor: string }, edges?: Array<{ __typename?: 'ArticlesConnectionEdges', cursor: string, node?: { __typename: 'Articles', id: string, title: string, date: string, slug: string, description?: string | null, body?: any | null, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, hasReferences?: boolean | null, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } | null } | null> | null } };
+export type ArticlesConnectionQuery = { __typename?: 'Query', articlesConnection: { __typename?: 'ArticlesConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasPreviousPage: boolean, hasNextPage: boolean, startCursor: string, endCursor: string }, edges?: Array<{ __typename?: 'ArticlesConnectionEdges', cursor: string, node?: { __typename: 'Articles', id: string, title: string, date: string, slug: string, excerpt: string, featureImage: string, body?: any | null, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, hasReferences?: boolean | null, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } | null } | null> | null } };
 
 export type CaseStudiesQueryVariables = Exact<{
   relativePath: Scalars['String']['input'];
 }>;
 
 
-export type CaseStudiesQuery = { __typename?: 'Query', caseStudies: { __typename: 'CaseStudies', id: string, title: string, date: string, slug: string, description?: string | null, body?: any | null, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, hasReferences?: boolean | null, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } };
+export type CaseStudiesQuery = { __typename?: 'Query', caseStudies: { __typename: 'CaseStudies', id: string, title: string, date: string, slug: string, excerpt: string, featureImage: string, body?: any | null, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, hasReferences?: boolean | null, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } };
 
 export type CaseStudiesConnectionQueryVariables = Exact<{
   before?: InputMaybe<Scalars['String']['input']>;
@@ -407,7 +420,7 @@ export type CaseStudiesConnectionQueryVariables = Exact<{
 }>;
 
 
-export type CaseStudiesConnectionQuery = { __typename?: 'Query', caseStudiesConnection: { __typename?: 'CaseStudiesConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasPreviousPage: boolean, hasNextPage: boolean, startCursor: string, endCursor: string }, edges?: Array<{ __typename?: 'CaseStudiesConnectionEdges', cursor: string, node?: { __typename: 'CaseStudies', id: string, title: string, date: string, slug: string, description?: string | null, body?: any | null, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, hasReferences?: boolean | null, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } | null } | null> | null } };
+export type CaseStudiesConnectionQuery = { __typename?: 'Query', caseStudiesConnection: { __typename?: 'CaseStudiesConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasPreviousPage: boolean, hasNextPage: boolean, startCursor: string, endCursor: string }, edges?: Array<{ __typename?: 'CaseStudiesConnectionEdges', cursor: string, node?: { __typename: 'CaseStudies', id: string, title: string, date: string, slug: string, excerpt: string, featureImage: string, body?: any | null, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, hasReferences?: boolean | null, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } | null } | null> | null } };
 
 export const ArticlesPartsFragmentDoc = gql`
     fragment ArticlesParts on Articles {
@@ -415,7 +428,8 @@ export const ArticlesPartsFragmentDoc = gql`
   title
   date
   slug
-  description
+  excerpt
+  featureImage
   body
 }
     `;
@@ -425,7 +439,8 @@ export const CaseStudiesPartsFragmentDoc = gql`
   title
   date
   slug
-  description
+  excerpt
+  featureImage
   body
 }
     `;
@@ -605,7 +620,7 @@ export const ExperimentalGetTinaClient = () =>
   getSdk(
     generateRequester(
       createClient({
-        url: "https://content.tinajs.io/1.5/content/df2a174e-f407-422f-89bb-f72b04f52cb4/github/feature/tinacms",
+        url: "http://localhost:4001/graphql",
         queries,
       })
     )

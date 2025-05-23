@@ -8,7 +8,8 @@ import type { CaseStudies } from '../../../../tina/__generated__/types';
 
 // Extend the TinaCMS generated types with our additional fields
 interface CaseStudyContent extends CaseStudies {
-  coverImage?: string; // Add the coverImage field that's missing from generated types
+  featureImage: string; // Using the new required featureImage field
+  excerpt?: string;
 }
 
 // Define params interface for this page component - in Next.js 15, params is a Promise
@@ -29,14 +30,12 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   
   return {
     title: `${caseStudy.title} | Jason Makes`,
-    description: caseStudy.description || '',
+    description: (caseStudy as CaseStudyContent).excerpt || '',
     openGraph: {
       title: caseStudy.title,
-      description: caseStudy.description || '',
-      // Only include images if coverImage exists and it's a string
-      images: (caseStudy as CaseStudyContent).coverImage ? 
-        [{ url: (caseStudy as CaseStudyContent).coverImage as string }] : 
-        undefined
+      description: (caseStudy as CaseStudyContent).excerpt || '',
+      // Use the featureImage for social sharing
+      images: [{ url: (caseStudy as CaseStudyContent).featureImage }]
     },
   };
 }
@@ -70,24 +69,18 @@ export default async function CaseStudyPage({ params }: { params: Promise<Params
           <time dateTime={caseStudy.date}>{formattedDate}</time>
         </div>
         
-        {/* Optional coverImage handling with proper typing */}
-        {(caseStudy as CaseStudyContent).coverImage && (
-          <div className="relative h-64 md:h-96 mb-8 rounded-lg overflow-hidden">
-            <Image
-              src={(caseStudy as CaseStudyContent).coverImage || ''}
-              alt={caseStudy.title}
-              fill
-              className="object-cover"
-              priority
-            />
-          </div>
-        )}
+        {/* Feature image hero */}
+        <div className="relative h-64 md:h-96 mb-8 rounded-lg overflow-hidden">
+          <Image
+            src={(caseStudy as CaseStudyContent).featureImage}
+            alt={caseStudy.title}
+            fill
+            className="object-cover"
+            priority
+          />
+        </div>
         
-        {caseStudy.description && (
-          <div className="bg-gray-50 p-6 rounded-lg mb-8 italic">
-            {caseStudy.description}
-          </div>
-        )}
+        {/* Excerpt removed from individual case study page as requested */}
       </header>
       
       <div className="prose max-w-none">
