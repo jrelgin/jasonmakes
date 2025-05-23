@@ -21,30 +21,6 @@ export default async function SpotifyWidget() {
     return <div className="spotify-widget p-4 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-300 rounded-lg">Music data unavailable</div>;
   }
   
-  // Format the played at date
-  const formatPlayedAt = (dateString: string) => {
-    if (!dateString) return 'Recently';
-    
-    try {
-      const date = new Date(dateString);
-      const now = new Date();
-      const diffMs = now.getTime() - date.getTime();
-      const diffMins = Math.floor(diffMs / (1000 * 60));
-      
-      if (diffMins < 60) {
-        return `${diffMins} minute${diffMins === 1 ? '' : 's'} ago`;
-      } else if (diffMins < 24 * 60) {
-        const diffHours = Math.floor(diffMins / 60);
-        return `${diffHours} hour${diffHours === 1 ? '' : 's'} ago`;
-      }
-      
-      // More than a day ago
-      const diffDays = Math.floor(diffMins / (60 * 24));
-      return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`;
-    } catch {
-      return 'Recently';
-    }
-  };
   
   return (
     <div className="spotify-widget p-4 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
@@ -55,9 +31,6 @@ export default async function SpotifyWidget() {
           <p className="font-medium text-lg text-gray-900 dark:text-white">{trackData.title}</p>
           <p className="text-sm mt-1 text-gray-600 dark:text-gray-300">
             by {trackData.artist}
-          </p>
-          <p className="text-xs mt-1 text-gray-500 dark:text-gray-400">
-            {formatPlayedAt(trackData.playedAt)}
           </p>
           {trackData.trackUrl && (
             <a 
