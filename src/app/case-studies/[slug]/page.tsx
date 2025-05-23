@@ -9,7 +9,7 @@ import type { CaseStudies } from '../../../../tina/__generated__/types';
 // Extend the TinaCMS generated types with our additional fields
 interface CaseStudyContent extends CaseStudies {
   featureImage: string; // Using the new required featureImage field
-  excerpt?: string;
+  excerpt: string; // Changed from optional to required to match TinaCMS config
 }
 
 // Define params interface for this page component - in Next.js 15, params is a Promise
