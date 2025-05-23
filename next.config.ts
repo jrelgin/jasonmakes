@@ -1,13 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Configure image optimization for local images
+  // Configure Next.js to allow optimization of images from TinaCMS CDN
   images: {
     remotePatterns: [
       {
-        // This allows loading of images from your own domain
         protocol: 'https',
-        hostname: '**',
+        hostname: 'assets.tina.io',
       },
     ],
   },
