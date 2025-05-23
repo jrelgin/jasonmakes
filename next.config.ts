@@ -1,8 +1,15 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // We're using unoptimized images to handle unlimited remote sources
-  // This eliminates the need to maintain a list of allowed domains
+  // Configure Next.js to allow optimization of images from TinaCMS CDN
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'assets.tina.io',
+      },
+    ],
+  },
 };
 
 export default nextConfig;
