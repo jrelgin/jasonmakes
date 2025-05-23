@@ -8,8 +8,8 @@ type Article = {
   title: string;
   slug: string;
   date: string;
-  description?: string;
-  coverImage?: string;
+  excerpt?: string;
+  featureImage: string; // Required field from TinaCMS
 };
 
 export const metadata = {
@@ -43,7 +43,7 @@ export default async function ArticlesPage() {
 
 // Article card component
 function ArticleCard({ article }: { article: Article }) {
-  const { title, slug, date, description, coverImage } = article;
+  const { title, slug, date, excerpt, featureImage } = article;
   
   // Format the date in a human-readable format
   const formattedDate = new Date(date).toLocaleDateString('en-US', {
@@ -55,21 +55,25 @@ function ArticleCard({ article }: { article: Article }) {
   return (
     <Link href={`/articles/${slug}`} className="block h-full">
       <div className="border rounded-lg overflow-hidden h-full flex flex-col hover:shadow-lg transition-shadow duration-300">
-        {coverImage && (
+        {featureImage ? (
           <div className="h-48 relative">
             <Image 
-              src={coverImage}
+              src={featureImage}
               alt={title}
               fill
               className="object-cover"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
           </div>
+        ) : (
+          <div className="h-48 bg-gray-200 flex items-center justify-center">
+            <span className="text-gray-500">No image available</span>
+          </div>
         )}
         <div className="p-4 flex-1 flex flex-col">
           <h2 className="text-xl font-semibold mb-2">{title}</h2>
           <p className="text-sm text-gray-500 mb-2">{formattedDate}</p>
-          {description && <p className="mb-4 text-gray-700 flex-1">{description}</p>}
+          {excerpt && <p className="mb-4 text-gray-700 flex-1">{excerpt}</p>}
           
           <div className="mt-auto pt-4">
             <span className="text-sm font-medium text-blue-600">Read more →</span>

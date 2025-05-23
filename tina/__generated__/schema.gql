@@ -94,7 +94,8 @@ type Articles implements Node & Document {
   title: String!
   date: String!
   slug: String!
-  description: String
+  excerpt: String!
+  featureImage: String!
   body: JSON
   id: ID!
   _sys: SystemInfo!
@@ -116,6 +117,13 @@ input DatetimeFilter {
   in: [String]
 }
 
+input ImageFilter {
+  startsWith: String
+  eq: String
+  exists: Boolean
+  in: [String]
+}
+
 input RichTextFilter {
   startsWith: String
   eq: String
@@ -126,7 +134,8 @@ input ArticlesFilter {
   title: StringFilter
   date: DatetimeFilter
   slug: StringFilter
-  description: StringFilter
+  excerpt: StringFilter
+  featureImage: ImageFilter
   body: RichTextFilter
 }
 
@@ -145,7 +154,8 @@ type CaseStudies implements Node & Document {
   title: String!
   date: String!
   slug: String!
-  description: String
+  excerpt: String!
+  featureImage: String!
   body: JSON
   id: ID!
   _sys: SystemInfo!
@@ -156,7 +166,8 @@ input CaseStudiesFilter {
   title: StringFilter
   date: DatetimeFilter
   slug: StringFilter
-  description: StringFilter
+  excerpt: StringFilter
+  featureImage: ImageFilter
   body: RichTextFilter
 }
 
@@ -198,7 +209,8 @@ input ArticlesMutation {
   title: String
   date: String
   slug: String
-  description: String
+  excerpt: String
+  featureImage: String
   body: JSON
 }
 
@@ -206,7 +218,8 @@ input CaseStudiesMutation {
   title: String
   date: String
   slug: String
-  description: String
+  excerpt: String
+  featureImage: String
   body: JSON
 }
 
