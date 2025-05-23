@@ -59,8 +59,7 @@ export default async function FeedlyArticlesWidget() {
                 <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-3 mb-3">{article.excerpt}</p>
               )}
               
-              <div className="article-meta mt-auto text-xs text-gray-500 dark:text-gray-400 flex justify-between items-center">
-                <span>{new Date(article.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+              <div className="article-meta mt-auto text-xs text-gray-500 dark:text-gray-400 flex justify-end items-center">
                 {article.source && <span>{article.source}</span>}
               </div>
             </div>
