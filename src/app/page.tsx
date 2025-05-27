@@ -5,44 +5,54 @@ import SpotifyWidget from './components/SpotifyWidget';
 
 export default function Home() {
   return (
-    <div className="flex flex-col items-center justify-items-center p-8 pb-20 gap-8 sm:p-20 w-full">
-      <main className="flex flex-col gap-[32px] items-center max-w-4xl w-full">
+    <>
+      {/* Initial Viewport Section - Simple flex layout with centered heading */}
+      <div className="flex flex-col" style={{ minHeight: 'calc(100vh - 88px)' }}>
+        {/* Spacer to push heading to vertical center */}
+        <div className="flex-grow" />
         
-        {/* Daily Profile Section - Heading and Blurb */}
-        <section className="w-full">
-          {/* Heading and Blurb in flex layout */}
-          <div className="flex flex-col md:flex-row md:items-center md:gap-6 mb-8">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold md:w-1/3 mb-4 md:mb-0">Daily Profile</h1>
-            <div className="md:w-2/3">
-              <AboutBlurb />
-            </div>
+        {/* Professional Heading at left side - vertically centered */}
+        <h1 className="text-2xl md:text-3xl lg:text-4xl font-medium text-gray-800 dark:text-gray-200 leading-relaxed max-w-6xl">
+          Head of Product at Standard Education;
+          <br />
+          Product Design & Strategic Direction at Signal Lantern
+        </h1>
+        
+        {/* Spacer to push blurb to bottom */}
+        <div className="flex-grow" />
+
+        {/* Blurb positioned at bottom right */}
+        <div className="ml-auto max-w-md pb-8">
+          <AboutBlurb />
+        </div>
+      </div>
+      
+      {/* Below the fold - All widgets */}
+      <section className="w-full bg-gray-50 dark:bg-gray-900 py-16 -mx-4 px-4">
+        <h2 className="text-3xl md:text-4xl font-bold mb-8">Daily Profile</h2>
+        
+        {/* Weather and Spotify Widgets - side-by-side on desktop */}
+        <div className="flex flex-col md:flex-row md:gap-6 mb-8">
+          {/* Weather Widget */}
+          <div className="w-full md:w-1/2 mb-6 md:mb-0">
+            <WeatherWidget />
           </div>
           
-          {/* Border between blurb and widgets */}
-          <hr className="border-t border-gray-200 mb-8" />
-          
-          {/* Weather and Spotify Widgets - side-by-side on desktop */}
-          <div className="flex flex-col md:flex-row md:gap-6 mb-6">
-            {/* Weather Widget */}
-            <div className="w-full md:w-1/2 mb-6 md:mb-0">
-              <WeatherWidget />
-            </div>
-            
-            {/* Spotify Widget */}
-            <div className="w-full md:w-1/2">
-              <SpotifyWidget />
-            </div>
+          {/* Spotify Widget */}
+          <div className="w-full md:w-1/2">
+            <SpotifyWidget />
           </div>
-          
-          {/* Feedly Articles Widget */}
-          <div className="mt-6">
-            <FeedlyArticlesWidget />
-          </div>
-        </section>
-      </main>
-      <footer className="text-center mt-4">
+        </div>
+        
+        {/* Feedly Articles Widget */}
+        <div className="mt-8">
+          <FeedlyArticlesWidget />
+        </div>
+      </section>
+      
+      <footer className="text-center py-6">
         <p>&copy; {new Date().getFullYear()}</p>
       </footer>
-    </div>
+    </>
   );
 }
