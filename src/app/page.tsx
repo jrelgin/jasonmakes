@@ -14,7 +14,6 @@ export default function Home() {
         {/* Professional Heading at left side - vertically centered */}
         <h1 className="text-2xl md:text-3xl lg:text-4xl font-medium text-gray-800 dark:text-gray-200 leading-relaxed max-w-6xl">
           Head of Product at Standard Education;
-          <br />
           Product Design & Strategic Direction at Signal Lantern
         </h1>
         

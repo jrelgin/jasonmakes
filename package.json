@@ -6,7 +6,9 @@
     "dev": "TINA_PUBLIC_IS_LOCAL=true tinacms dev -c \"next dev --turbopack\"",
     "build": "tinacms build && next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "biome check .",
+    "lint:fix": "biome check --apply .",
+    "format": "biome format --write .",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui"
@@ -22,7 +24,7 @@
     "tinacms": "^2.7.7"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
+    "@biomejs/biome": "1.5.3",
     "@tailwindcss/postcss": "^4",
     "@testing-library/react": "^16.3.0",
     "@tinacms/cli": "^1.9.7",
@@ -31,8 +33,6 @@
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^3.1.0",
     "@vitest/ui": "^0.34.6",
-    "eslint": "^9",
-    "eslint-config-next": "15.3.2",
     "happy-dom": "^17.4.7",
     "jiti": "2.4.2",
     "tailwindcss": "^4",
