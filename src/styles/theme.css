@@ -1,0 +1,245 @@
+
+/* 
+ * JasonMakes Design System - Theme Definition
+ * ------------------------------------------------------
+ * This file defines the core design tokens for the JasonMakes website.
+ * Following Tailwind CSS v4 theming best practices using CSS variables.
+ */
+
+@import "tailwindcss";
+
+@theme {
+  /* =============================================================================
+   * COLORS
+   * =============================================================================
+   * Color system follows a consistent pattern with functional and semantic naming.
+   * Base neutral scale uses subtle warm grays for a sophisticated feel.
+   */
+  
+  /* Base color scales - foundations of the color system */
+  --color-gray-50: #fafafa;
+  --color-gray-100: #f5f5f5;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d4d4d8;
+  --color-gray-400: #a1a1aa;
+  --color-gray-500: #71717a;
+  --color-gray-600: #52525b;
+  --color-gray-700: #3f3f46;
+  --color-gray-800: #27272a;
+  --color-gray-900: #18181b;
+  --color-gray-950: #09090b;
+
+  --color-blue-50: #eff6ff;
+  --color-blue-100: #dbeafe;
+  --color-blue-200: #bfdbfe;
+  --color-blue-300: #93c5fd;
+  --color-blue-400: #60a5fa;
+  --color-blue-500: #3b82f6;
+  --color-blue-600: #2563eb;
+  --color-blue-700: #1d4ed8;
+  --color-blue-800: #1e40af;
+  --color-blue-900: #1e3a8a;
+  --color-blue-950: #172554;
+
+  /* Semantic color tokens - use these in the interface */
+  --color-background: var(--background, #ffffff);
+  --color-foreground: var(--foreground, #171717);
+  --color-primary: var(--color-blue-600);
+  --color-primary-light: var(--color-blue-400);
+  --color-primary-dark: var(--color-blue-800);
+  --color-secondary: var(--color-gray-700);
+  --color-accent: var(--color-blue-500);
+  --color-surface: var(--color-gray-50);
+  --color-surface-alt: var(--color-gray-100);
+  --color-muted: var(--color-gray-500);
+  --color-subtle: var(--color-gray-200);
+  --color-border: var(--color-gray-200);
+  --color-link: var(--color-blue-600);
+  --color-link-hover: var(--color-blue-700);
+  --color-focus: var(--color-blue-500);
+
+  /* =============================================================================
+   * TYPOGRAPHY
+   * =============================================================================
+   * Type scale uses a harmonic progression with clear purpose for each size.
+   * Font assignments leverage the custom fonts from layout.tsx.
+   */
+  
+  /* Font families */
+  --font-sans: var(--font-instrument), system-ui, sans-serif;
+  --font-heading: var(--font-apoc), serif;
+  --font-mono: var(--font-geist-mono), monospace;
+
+  /* Font sizes - follows a harmonic progression */
+  --font-size-xs: 0.75rem;     /* 12px */
+  --font-size-sm: 0.875rem;    /* 14px */
+  --font-size-base: 1rem;      /* 16px */
+  --font-size-lg: 1.125rem;    /* 18px */
+  --font-size-xl: 1.25rem;     /* 20px */
+  --font-size-2xl: 1.5rem;     /* 24px */
+  --font-size-3xl: 1.875rem;   /* 30px */
+  --font-size-4xl: 2.25rem;    /* 36px */
+  --font-size-5xl: 3rem;       /* 48px */
+  --font-size-6xl: 3.75rem;    /* 60px */
+  --font-size-7xl: 4.5rem;     /* 72px */
+  --font-size-8xl: 6rem;       /* 96px */
+  --font-size-9xl: 8rem;       /* 128px */
+  
+  /* Line heights - paired with font sizes for harmonious vertical rhythm */
+  --line-height-none: 1;
+  --line-height-tight: 1.25;
+  --line-height-snug: 1.375;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.625;
+  --line-height-loose: 2;
+
+  /* Letter spacing */
+  --letter-spacing-tighter: -0.05em;
+  --letter-spacing-tight: -0.025em;
+  --letter-spacing-normal: 0em;
+  --letter-spacing-wide: 0.025em;
+  --letter-spacing-wider: 0.05em;
+  --letter-spacing-widest: 0.1em;
+
+  /* Font weights */
+  --font-weight-thin: 100;
+  --font-weight-extralight: 200;
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+  --font-weight-black: 900;
+
+  /* =============================================================================
+   * SPACING
+   * =============================================================================
+   * Consistent spacing scale based on 4px (0.25rem) increments.
+   * These define paddings, margins, and layout gaps.
+   */
+  --spacing-0: 0px;
+  --spacing-px: 1px;
+  --spacing-0.5: 0.125rem;
+  --spacing-1: 0.25rem;
+  --spacing-1.5: 0.375rem;
+  --spacing-2: 0.5rem;
+  --spacing-2.5: 0.625rem;
+  --spacing-3: 0.75rem;
+  --spacing-3.5: 0.875rem;
+  --spacing-4: 1rem;
+  --spacing-5: 1.25rem;
+  --spacing-6: 1.5rem;
+  --spacing-7: 1.75rem;
+  --spacing-8: 2rem;
+  --spacing-9: 2.25rem;
+  --spacing-10: 2.5rem;
+  --spacing-11: 2.75rem;
+  --spacing-12: 3rem;
+  --spacing-14: 3.5rem;
+  --spacing-16: 4rem;
+  --spacing-20: 5rem;
+  --spacing-24: 6rem;
+  --spacing-28: 7rem;
+  --spacing-32: 8rem;
+  --spacing-36: 9rem;
+  --spacing-40: 10rem;
+  --spacing-44: 11rem;
+  --spacing-48: 12rem;
+  --spacing-52: 13rem;
+  --spacing-56: 14rem;
+  --spacing-60: 15rem;
+  --spacing-64: 16rem;
+  --spacing-72: 18rem;
+  --spacing-80: 20rem;
+  --spacing-96: 24rem;
+
+  /* =============================================================================
+   * BORDERS
+   * =============================================================================
+   * Border width and radius values for consistent UI components.
+   */
+  --border-width-0: 0px;
+  --border-width-1: 1px;
+  --border-width-2: 2px;
+  --border-width-4: 4px;
+  --border-width-8: 8px;
+
+  --border-radius-none: 0px;
+  --border-radius-sm: 0.125rem;
+  --border-radius-md: 0.25rem;
+  --border-radius-lg: 0.5rem;
+  --border-radius-xl: 0.75rem;
+  --border-radius-2xl: 1rem;
+  --border-radius-3xl: 1.5rem;
+  --border-radius-full: 9999px;
+
+  /* =============================================================================
+   * SHADOWS
+   * =============================================================================
+   * Box shadows for depth and elevation.
+   */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  --shadow-inner: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+
+  /* =============================================================================
+   * TRANSITIONS
+   * =============================================================================
+   * Transition properties for smooth animations and interactions.
+   */
+  --transition-property-none: none;
+  --transition-property-all: all;
+  --transition-property-default: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  --transition-property-colors: background-color, border-color, color, fill, stroke;
+  --transition-property-opacity: opacity;
+  --transition-property-shadow: box-shadow;
+  --transition-property-transform: transform;
+
+  --transition-duration-75: 75ms;
+  --transition-duration-100: 100ms;
+  --transition-duration-150: 150ms;
+  --transition-duration-200: 200ms;
+  --transition-duration-300: 300ms;
+  --transition-duration-500: 500ms;
+  --transition-duration-700: 700ms;
+  --transition-duration-1000: 1000ms;
+
+  --transition-timing-ease-linear: linear;
+  --transition-timing-ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --transition-timing-ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --transition-timing-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* =============================================================================
+   * MEDIA QUERIES & CONTAINER QUERIES
+   * =============================================================================
+   * Breakpoints for responsive design.
+   */
+  --screen-sm: 640px;
+  --screen-md: 768px;
+  --screen-lg: 1024px;
+  --screen-xl: 1280px;
+  --screen-2xl: 1536px;
+
+  /* =============================================================================
+   * Z-INDEX
+   * =============================================================================
+   * Z-index scale for consistent stacking.
+   */
+  --z-index-0: 0;
+  --z-index-10: 10;
+  --z-index-20: 20;
+  --z-index-30: 30;
+  --z-index-40: 40;
+  --z-index-50: 50;
+  --z-index-auto: auto;
+}
+
+/* 
+ * DARK MODE ENHANCEMENTS
+ * Additional theming for dark mode can be added below.
+ * Base dark mode handled by :root variables in globals.css
+ */

@@ -1,18 +1,13 @@
 /* eslint-disable */
 /* stylelint-disable */
-@import "tailwindcss";
 
+/* Import our comprehensive theme system */
+@import "../styles/theme.css";
+
+/* Base dark/light mode variables */
 :root {
   --background: #ffffff;
   --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-instrument), system-ui, sans-serif; /* Instrument Sans for body text */
-  --font-heading: var(--font-apoc); /* Apoc font specifically for headings */
-  --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
