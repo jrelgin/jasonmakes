@@ -7,7 +7,7 @@ export default function Home() {
   return (
     <>
       {/* Initial Viewport Section - Simple flex layout with centered heading */}
-      <div className="flex flex-col" style={{ minHeight: 'calc(100vh - 88px)' }}>
+      <div className="flex flex-col min-h-[calc(100vh-88px)]">
         {/* Spacer to push heading to vertical center */}
         <div className="flex-grow" />
         
