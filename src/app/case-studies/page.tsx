@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { getCaseStudies } from '../../../lib/tina-cms';
 
 // Define local case study type for the component
 type CaseStudy = {
@@ -16,9 +15,9 @@ export const metadata = {
   description: 'Featured case studies showcasing design and development projects',
 };
 
-export default async function CaseStudiesPage() {
-  // Get all case studies from TinaCMS
-  const caseStudies = await getCaseStudies();
+export default function CaseStudiesPage() {
+  // Temporary empty array - will be replaced with Sanity integration
+  const caseStudies: CaseStudy[] = [];
 
   return (
     <main className="container mx-auto px-4 py-8">

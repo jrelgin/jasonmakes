@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { getArticles } from '../../../lib/tina-cms';
 
 
 // Define local article type for the component
@@ -18,8 +17,8 @@ export const metadata = {
 };
 
 export default async function ArticlesPage() {
-  // Get all articles from TinaCMS
-  const articles = await getArticles();
+  // Temporary empty array - will be replaced with Sanity integration
+  const articles: Article[] = [];
 
   return (
     <main className="container mx-auto px-4 py-8">

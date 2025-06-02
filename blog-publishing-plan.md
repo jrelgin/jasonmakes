@@ -1,118 +1,201 @@
-# Implementation Plan for TinaCMS
 
-## Content‑Model Decision
 
-After weighing the trade‑offs, **use two collections**—`articles` and `caseStudies`—instead of one “posts” collection with a `category` field.  
-They share 90 % of their fields today, but splitting them now keeps future schema tweaks (e.g. unique case‑study metrics) clean and gives editors a dedicated sidebar section in Tina.
-
-| Consideration          | Separate collections (✅ chosen) | Single collection |
-| ---------------------- | -------------------------------- | ----------------- |
-| **Editor UX**          | Clear “Articles” vs “Case Studies” menus | Requires filtering |
-| **Shared fields**      | Duplicate in two templates, but Tina templates keep it DRY | All in one place |
-| **Future divergence**  | Easy—add fields only to the relevant collection | Risk of clutter for one type |
-| **Routing**            | Maps neatly to `/articles` and `/case-studies` folders | Needs filter logic |
-| **Build performance**  | Negligible difference at <500 docs | Same |
+# Next 15 × Notion CMS × Vercel — Implementation Guide  
+*(Blog + Case Studies · Free tier · On‑Demand Publish Button)*
 
 ---
 
-## Step‑by‑Step Implementation
+## 0 · Quick Overview
 
-1. **Prep**  
-   * Node 18 + and Next 15 already installed  
-   * Commit / push a clean branch called `feat/tina` for easy rollback
-
-2. **Install Tina**  
-   ```bash
-   pnpm add tinacms
-   pnpm add -D @tinacms/cli
-   ```
-
-3. **Scaffold**  
-   ```bash
-   npx @tinacms/cli@latest init
-   ```
-   Creates `/tina`, updates package.json scripts.
-
-4. **Define schema** — `/tina/config.ts`  
-   ```ts
-   import { defineConfig } from 'tinacms'
-
-   export default defineConfig({
-     branch: process.env.VERCEL_GIT_COMMIT_REF ?? 'main',
-     clientId: process.env.NEXT_PUBLIC_TINA_CLIENT_ID,
-     token: process.env.TINA_TOKEN,
-     schema: {
-       collections: [
-         {
-           name: 'articles',
-           label: 'Articles',
-           path: 'content/articles',
-           format: 'md',
-           templates: [{ name: 'default', label: 'Article', fields: sharedFields }]
-         },
-         {
-           name: 'caseStudies',
-           label: 'Case Studies',
-           path: 'content/case-studies',
-           format: 'md',
-           templates: [{ name: 'default', label: 'Case Study', fields: sharedFields }]
-         }
-       ]
-     }
-   })
-
-   // /tina/sharedFields.ts
-   export const sharedFields = [
-     { type: 'string', name: 'title', isTitle: true, required: true },
-     { type: 'datetime', name: 'date' },
-     { type: 'string', name: 'slug', required: true },
-     { type: 'rich-text', name: 'body', isBody: true },
-     // add more as needed
-   ]
-   ```
-
-5. **Re‑organise content**  
-   ```bash
-   mkdir -p content/articles content/case-studies
-   git mv content/sample-article.md      content/articles/sample-article.md
-   git mv content/sample-case-study.md   content/case-studies/sample-case-study.md
-   # move / rename other dummy files similarly
-   ```
-
-6. **Update routes** (`src/app/...`)  
-   * `articles/[slug]/page.tsx` → fetch from `articles` collection  
-   * `case-studies/[slug]/page.tsx` → fetch from `caseStudies` collection  
-   * Util: `allSlugs(collection)` to feed `generateStaticParams`
-
-7. **Env vars**  
-   Add to `.env.local` and Vercel dashboard:  
-   ```
-   NEXT_PUBLIC_TINA_CLIENT_ID=xxx
-   TINA_TOKEN=yyy
-   ```
-
-8. **Dev test**  
-   ```bash
-   pnpm dev     # runs Tina + Next
-   # open http://localhost:3000/admin
-   ```
-   Create a new Article & Case Study to verify sidebar separation.
-
-9. **Clean‑up legacy code**  
-   * Remove any `gray-matter`, `remark`, `fs` loaders.  
-   * Delete your old `lib/posts.ts` utilities once pages compile without them.
-
-10. **Deploy**  
-    Push branch → Vercel runs `tinacms build` automatically.  
-    Test admin at `/admin` on preview URL.
-
-11. **Merge & celebrate** 🥳  
-    Merge `feat/tina` → main once preview looks good.
+* **Tech stack:** Next.js 15 (App Router) + `@notionhq/client` + `react-notion‑x`  
+* **Authoring:** Notion database — no extra UI to host  
+* **Publishing:** One‑click **Publish** button in Notion triggers on‑demand ISR (`/api/revalidate`)  
+* **Cost:** \$0 on Notion free tier + Vercel hobby
 
 ---
 
-### Next upgrades
+## 1 · Create the Notion database
 
-* **Media uploads** → Add S3 credentials and `media` config.  
-* **MDX support** → `pnpm add @tinacms/mdx` and swap `rich-text` → `mdx`.  
-* **Editorial workflow** → Enable PR‑based mode in Tina Cloud settings.
+| Property (type)      | Example value          | Purpose                  |
+|----------------------|------------------------|--------------------------|
+| **Name** (Title)     | “My First Post”        | Page title               |
+| **Slug** (Text)      | `my-first-post`        | URL slug (must be unique)|
+| **Status** (Select)  | Draft / Published      | Publish control          |
+| **Published At** (Date) | 2025‑06‑01        | Sort & SEO               |
+| **Excerpt** (Rich text) | “Short teaser …”  | Meta description         |
+| **Featured Image** (Files) | *(upload)*     | Hero / OG image          |
+| **Tags** (Multi‑select) | Design, CaseStudy | Filtering (optional)     |
+
+> The article body lives inside the page as normal Notion blocks—no extra column needed.
+
+---
+
+## 2 · Add the **Publish Site** button (Automation)
+
+1. In the DB, add a **Button** property named **Publish Site**.  
+2. Action → **Call webhook**.  
+3. URL: `https://<YOUR_DOMAIN>/api/revalidate`  
+4. Method: `POST`  
+5. Body (JSON):  
+   ```json
+   { "tag": "post" }
+   ```
+6. Set button visibility to show only when **Status = Published**.
+
+---
+
+## 3 · Install dependencies
+
+```bash
+pnpm add @notionhq/client react-notion-x notion-types
+```
+
+---
+
+## 4 · Environment variables (Vercel)
+
+```env
+NOTION_TOKEN=<secret integration token>
+NOTION_DATABASE_ID=<db id>
+```
+
+Create an internal integration at notion.com → Settings → Integrations, share the DB with it, and grab the token.
+
+---
+
+## 5 · Helper layer – `/lib/notion.ts`
+
+```ts
+import { Client } from '@notionhq/client'
+
+export const notion = new Client({ auth: process.env.NOTION_TOKEN! })
+export const DB_ID = process.env.NOTION_DATABASE_ID!
+
+export async function listPosts() {
+  const { results } = await notion.databases.query({
+    database_id: DB_ID,
+    filter: { property: 'Status', select: { equals: 'Published' } },
+    sorts: [{ property: 'Published At', direction: 'descending' }]
+  })
+  return results.map(normalize)
+}
+
+export async function getPost(slug: string) {
+  const { results } = await notion.databases.query({
+    database_id: DB_ID,
+    filter: { property: 'Slug', rich_text: { equals: slug } }
+  })
+  if (!results.length) return null
+  const page = results[0]
+  const blocks = await notion.blocks.children.list({ block_id: page.id, page_size: 999 })
+  return { meta: normalize(page), blocks }
+}
+
+function normalize(p: any) {
+  const props = p.properties
+  return {
+    id: p.id,
+    title: props.Name.title[0]?.plain_text ?? '',
+    slug: props.Slug.rich_text[0]?.plain_text ?? '',
+    excerpt: props.Excerpt?.rich_text[0]?.plain_text ?? '',
+    date: props['Published At']?.date?.start ?? '',
+    feature: props['Featured Image']?.files?.[0]?.file?.url ?? null,
+    tags: props.Tags?.multi_select.map((t: any) => t.name) ?? []
+  }
+}
+```
+
+---
+
+## 6 · Next 15 Pages
+
+### Blog listing — `app/blog/page.tsx`
+
+```tsx
+export const dynamic = 'force-static'
+export const fetchCache = 'force-cache'
+
+import { listPosts } from '@/lib/notion'
+import PostCard from '@/components/PostCard'
+
+export default async function Blog() {
+  const posts = await listPosts({ next: { tags: ['post'] } })
+  return <ul>{posts.map(p => <PostCard key={p.id} {...p} />)}</ul>
+}
+```
+
+### Detail page — `app/blog/[slug]/page.tsx`
+
+```tsx
+export const dynamic = 'force-static'
+export const fetchCache = 'force-cache'
+
+import { getPost } from '@/lib/notion'
+import { NotionRenderer } from 'react-notion-x'
+
+export default async function BlogPost({ params }) {
+  const post = await getPost(params.slug, { next: { tags: ['post'] } })
+  if (!post) notFound()
+
+  return (
+    <>
+      <Hero img={post.meta.feature} title={post.meta.title}/>
+      <NotionRenderer recordMap={post.blocks}/>
+    </>
+  )
+}
+```
+
+> **Optional safety net:** add `export const revalidate = 86_400` (24 h) if you want a daily auto-refresh in case the button fails.
+
+---
+
+## 7 · On‑Demand ISR endpoint — `app/api/revalidate/route.ts`
+
+```ts
+import { revalidateTag } from 'next/cache'
+
+export async function POST(req: Request) {
+  try {
+    const { tag } = await req.json()
+    revalidateTag(tag ?? 'post')
+    return Response.json({ revalidated: true })
+  } catch {
+    return Response.json({ revalidated: false }, { status: 400 })
+  }
+}
+```
+
+---
+
+## 8 · Image handling
+
+* Use Next 15 `<Image src={url} width={…} height={…} />` — it will download, optimize, and store variants in Vercel’s cache.  
+* For **alt text**, use the Notion block caption or add a custom “Alt” property.  
+* If an image 403s (URL expired), the next request refetches a new signed URL automatically.
+
+---
+
+## 9 · SEO checklist
+
+- `<title>` → `meta.title`  
+- `<meta name="description">` → `excerpt`  
+- OpenGraph image → `feature`  
+- JSON‑LD (`Article`) using slug/date/title  
+- Sitemap.xml → generate in `/app/api/sitemap/route.ts` and tag with `revalidateTag('sitemap')`.
+
+---
+
+## 10 · Effort snapshot
+
+| Task                          | Time |
+|-------------------------------|------|
+| Notion DB + button setup      | 15 min |
+| Install deps & helpers        | 30 min |
+| Build listing + detail pages  | 45 min |
+| `/api/revalidate` endpoint    | 10 min |
+| **First post live**           | **~2 hours** |
+
+---
+
+### That’s it—click **Publish Site** in Notion, watch pages update instantly, and enjoy a friction‑free CMS workflow.

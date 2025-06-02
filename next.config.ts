@@ -1,14 +1,9 @@
 import type { NextConfig } from "next";
 
+// Basic Next.js configuration - will be updated for Sanity integration
 const nextConfig: NextConfig = {
-  // Configure Next.js to allow optimization of images from TinaCMS CDN
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'assets.tina.io',
-      },
-    ],
+    remotePatterns: [],
   },
 };
 
