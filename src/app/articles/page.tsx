@@ -1,24 +1,36 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import { listPosts, type PostMeta } from '../../../lib/providers/notion';
 
-
-// Define local article type for the component
-type Article = {
-  title: string;
-  slug: string;
-  date: string;
-  excerpt?: string;
-  featureImage: string; // Required field from TinaCMS
-};
+// Use the PostMeta type directly from the Notion provider
+type Article = PostMeta;
 
 export const metadata = {
   title: 'Articles | Jason Makes',
   description: 'Articles and thoughts on design, development, and creativity',
 };
 
+// Set static rendering with cache
+export const dynamic = 'force-static';
+// Using revalidatePath in the API is a better approach than tags here
+export const fetchCache = 'force-cache';
+
 export default async function ArticlesPage() {
-  // Temporary empty array - will be replaced with Sanity integration
-  const articles: Article[] = [];
+  // Fetch articles from Notion
+  const articles = await listPosts({ 
+    filter: {
+      and: [
+        { property: 'Type', select: { equals: 'Article' } },
+        { property: 'Status', select: { equals: 'Published' } }
+      ]
+    }
+  });
+
+  // Debug logging only in development
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('Article slugs from Notion:', articles.map(a => a.slug));
+    console.log('Article count:', articles.length);
+  }
 
   return (
     <main className="container mx-auto px-4 py-8">
@@ -28,12 +40,9 @@ export default async function ArticlesPage() {
         <p>No articles found. Check back soon!</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {articles.filter(article => article !== null && article !== undefined)
-            .map((article) => {
-              // Safe to use non-null assertion after the filter
-              const validArticle = article as Article;
-              return <ArticleCard key={validArticle.slug} article={validArticle} />;
-            })}
+          {articles.map((article) => (
+            <ArticleCard key={article.slug} article={article} />
+          ))}
         </div>
       )}
     </main>
@@ -42,7 +51,7 @@ export default async function ArticlesPage() {
 
 // Article card component
 function ArticleCard({ article }: { article: Article }) {
-  const { title, slug, date, excerpt, featureImage } = article;
+  const { title, slug, date, excerpt, feature } = article;
   
   // Format the date in a human-readable format
   const formattedDate = new Date(date).toLocaleDateString('en-US', {
@@ -54,19 +63,19 @@ function ArticleCard({ article }: { article: Article }) {
   return (
     <Link href={`/articles/${slug}`} className="block h-full">
       <div className="border rounded-lg overflow-hidden h-full flex flex-col hover:shadow-lg transition-shadow duration-300">
-        {featureImage ? (
-          <div className="h-48 relative">
-            <Image 
-              src={featureImage}
+        {feature ? (
+          <div className="mb-4 h-48 relative overflow-hidden rounded-lg">
+            <Image
+              src={feature}
               alt={title}
               fill
-              className="object-cover"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className="object-cover transition-transform hover:scale-105 duration-300"
             />
           </div>
         ) : (
-          <div className="h-48 bg-gray-200 flex items-center justify-center">
-            <span className="text-gray-500">No image available</span>
+          <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+            <span className="text-gray-400">No image</span>
           </div>
         )}
         <div className="p-4 flex-1 flex flex-col">

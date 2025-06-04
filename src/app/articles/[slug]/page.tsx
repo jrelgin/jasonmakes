@@ -1,43 +1,109 @@
 import { notFound } from 'next/navigation';
+import { cache } from 'react';
+import Image from 'next/image';
 import type { Metadata } from 'next';
+import { getPost, listPosts } from '../../../../lib/providers/notion';
+import NotionClient from '../../../components/NotionClient';
 
-// Define article type for the component
-type Article = {
-  title: string;
-  slug: string;
-  date: string;
-  excerpt?: string;
-  featureImage?: string;
-  body?: any;
-};
+// Set static rendering with cache
+export const dynamic = 'force-static';
+export const fetchCache = 'force-cache';
 
-// Define params interface for this page component - in Next.js 15, params is a Promise
+// Define params interface for this page component
 type Params = {
-  slug: string;
+  params: {
+    slug: string;
+  };
 };
 
-// Generate metadata for SEO
-export function generateMetadata(): Metadata {
+// Cache the listPosts function to avoid duplicate DB queries during build
+const cachedListPosts = cache(listPosts);
+
+// Generate metadata for SEO dynamically based on the article
+export async function generateMetadata({ params }: Params): Promise<Metadata> {
+  // Await params before accessing properties (Next.js 15 requirement)
+  const { slug } = await params;
+  const post = await getPost(slug);
+  
+  if (!post || post.meta.type !== 'Article') {
+    return {
+      title: 'Article Not Found | Jason Makes',
+    };
+  }
+  
   return {
-    title: 'Article Coming Soon | Jason Makes',
+    title: `${post.meta.title} | Jason Makes`,
+    description: post.meta.excerpt || `Read ${post.meta.title} by Jason Elgin`,
   };
 }
 
-// Temporary removal of static paths generation
-export function generateStaticParams() {
-  return [];
+// Generate static paths for all published articles
+export async function generateStaticParams() {
+  // Use cached listPosts to avoid duplicate DB queries during build
+  const articles = await cachedListPosts({ 
+    filter: { property: 'Type', select: { equals: 'Article' } } 
+  });
+  
+  return articles.map((article) => ({ 
+    slug: article.slug 
+  }));
 }
 
-export default function ArticlePage() {
-  // This is a temporary placeholder until we implement Sanity integration
+export default async function Page({ params }: Params) {
+  // Await params before accessing properties (Next.js 15 requirement)
+  const { slug } = await params;
+  
+  // Update to match the new getPost signature (no next parameter)
+  const post = await getPost(slug);
+  
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('Post data retrieved:', post ? 'Found' : 'Not found');
+  }
+  
+  // Combine the two notFound checks
+  if (!post || post.meta.type !== 'Article') {
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('Post not found or wrong type:', { 
+        found: !!post, 
+        type: post?.meta.type 
+      });
+    }
+    notFound();
+  }
+  
   return (
-    <article className="max-w-3xl mx-auto py-8">
+    <article className="max-w-3xl mx-auto py-8 px-4">
       <header className="mb-8">
-        <h1 className="text-3xl md:text-4xl font-bold mb-4">Articles Coming Soon</h1>
-        <p className="text-gray-600">
-          We're currently updating our content management system. Check back soon for new articles.
-        </p>
+        {post.meta.feature && (
+          <div className="mb-6 aspect-video relative rounded-lg overflow-hidden">
+            <Image
+              src={post.meta.feature}
+              alt={post.meta.title}
+              fill
+              priority
+              className="object-cover"
+            />
+          </div>
+        )}
+        <h1 className="text-3xl md:text-4xl font-bold mb-4">{post.meta.title}</h1>
+        {post.meta.date && (
+          <p className="text-gray-600 mb-2">
+            {new Date(post.meta.date).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            })}
+          </p>
+        )}
+        {post.meta.excerpt && (
+          <p className="text-xl text-gray-700">{post.meta.excerpt}</p>
+        )}
       </header>
+      
+      <div className="prose prose-lg max-w-none">
+        {/* Render the Notion content blocks using client component */}
+        <NotionClient recordMap={post.recordMap} />
+      </div>
     </article>
   );
 }
