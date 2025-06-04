@@ -2,12 +2,17 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { revalidatePath } from 'next/cache';
 
-// List of allowed paths for revalidation
-const ALLOWED_PATHS = ['/', '/blog', '/about'];
+// List of allowed paths for content refreshing
+const ALLOWED_PATHS = [
+  '/',                 // Homepage
+  '/articles',          // Articles listing
+  '/case-studies',      // Case studies listing
+  // Dynamic path patterns are handled with path.startsWith()
+];
 
 /**
- * Revalidation endpoint for on-demand ISR
- * Called by the cron job to refresh the homepage after data updates
+ * Content refresh endpoint for on-demand ISR (Incremental Static Regeneration)
+ * Can be called by webhooks or manually to refresh content after updates in CMS
  */
 export async function POST(request: NextRequest) {
   try {
@@ -21,10 +26,24 @@ export async function POST(request: NextRequest) {
     // Get the path to revalidate from query params
     const requestedPath = request.nextUrl.searchParams.get('path') || '/';
     
-    // Validate path is on our whitelist
-    const path = ALLOWED_PATHS.includes(requestedPath) ? requestedPath : '/';
-    if (path !== requestedPath) {
-      console.warn(`Attempted to revalidate non-whitelisted path: ${requestedPath}, defaulting to /`);
+    // Validate path is on our whitelist or matches dynamic patterns
+    let path = '/';
+    
+    // Check if it's an exact match to allowed paths
+    if (ALLOWED_PATHS.includes(requestedPath)) {
+      path = requestedPath;
+    }
+    // Check for article dynamic routes
+    else if (requestedPath.startsWith('/articles/')) {
+      path = requestedPath;
+    }
+    // Check for case study dynamic routes
+    else if (requestedPath.startsWith('/case-studies/')) {
+      path = requestedPath;
+    }
+    // If no matches, log warning and default to homepage
+    else {
+      console.warn(`Attempted to refresh non-whitelisted path: ${requestedPath}, defaulting to /`);
     }
     
     // Get and validate the secret token
