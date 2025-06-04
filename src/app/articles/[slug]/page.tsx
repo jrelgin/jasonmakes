@@ -1,90 +1,109 @@
-import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { getArticleBySlug, getAllSlugs } from '../../../../lib/tina-cms';
-import { TinaMarkdown } from 'tinacms/dist/rich-text';
-import type { TinaMarkdownContent } from 'tinacms/dist/rich-text';
+import { cache } from 'react';
+import Image from 'next/image';
 import type { Metadata } from 'next';
-import type { Articles } from '../../../../tina/__generated__/types';
+import { getPost, listPosts } from '../../../../lib/providers/notion';
+import NotionClient from '../../../components/NotionClient';
 
-// Extend the TinaCMS generated types with our additional fields
-interface ArticleContent extends Articles {
-  featureImage: string; // Using the new required featureImage field
-  excerpt: string; // Changed from optional to required to match TinaCMS config
-}
+// Set static rendering with cache
+export const dynamic = 'force-static';
+export const fetchCache = 'force-cache';
 
-// Define params interface for this page component - in Next.js 15, params is a Promise
+// Define params interface for this page component
 type Params = {
-  slug: string;
+  params: Promise<{
+    slug: string;
+  }>;
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
-// Generate metadata for SEO
-export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
+// Cache the listPosts function to avoid duplicate DB queries during build
+const cachedListPosts = cache(listPosts);
+
+// Generate metadata for SEO dynamically based on the article
+export async function generateMetadata({ params }: Params): Promise<Metadata> {
+  // Await params as it's a promise in Next.js 15
   const { slug } = await params;
-  const article = await getArticleBySlug(slug);
+  const post = await getPost(slug);
   
-  if (!article) {
+  if (!post || post.meta.type !== 'Article') {
     return {
-      title: 'Article Not Found',
+      title: 'Article Not Found | Jason Makes',
     };
   }
   
   return {
-    title: `${article.title} | Jason Makes`,
-    description: (article as ArticleContent).excerpt || '',
-    openGraph: {
-      title: article.title,
-      description: (article as ArticleContent).excerpt || '',
-      // Use the featureImage for social sharing
-      images: [{ url: (article as ArticleContent).featureImage }]
-    },
+    title: `${post.meta.title} | Jason Makes`,
+    description: post.meta.excerpt || `Read ${post.meta.title} by Jason Elgin`,
   };
 }
 
-// Generate static paths at build time
+// Generate static paths for all published articles
 export async function generateStaticParams() {
-  return await getAllSlugs('articles');
+  // Use cached listPosts to avoid duplicate DB queries during build
+  const articles = await cachedListPosts({ 
+    filter: { property: 'Type', select: { equals: 'Article' } } 
+  });
+  
+  return articles.map((article) => ({ 
+    slug: article.slug 
+  }));
 }
 
-export default async function ArticlePage({ params }: { params: Promise<Params> }) {
+export default async function Page({ params }: Params) {
+  // Await params as it's a promise in Next.js 15
   const { slug } = await params;
-  const article = await getArticleBySlug(slug);
   
-  // If the article doesn't exist, show 404
-  if (!article) {
+  // Update to match the new getPost signature (no next parameter)
+  const post = await getPost(slug);
+  
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('Post data retrieved:', post ? 'Found' : 'Not found');
+  }
+  
+  // Combine the two notFound checks
+  if (!post || post.meta.type !== 'Article') {
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('Post not found or wrong type:', { 
+        found: !!post, 
+        type: post?.meta.type 
+      });
+    }
     notFound();
   }
   
-  // Format the date
-  const formattedDate = new Date(article.date).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-  
   return (
-    <article className="max-w-3xl mx-auto py-8">
+    <article className="max-w-3xl mx-auto py-8 px-4">
       <header className="mb-8">
-        <h1 className="text-3xl md:text-4xl font-bold mb-4">{article.title}</h1>
-        <div className="flex items-center text-gray-600 mb-6">
-          <time dateTime={article.date}>{formattedDate}</time>
-        </div>
-        
-        {/* Feature image hero */}
-        <div className="relative h-64 md:h-96 mb-8 rounded-lg overflow-hidden">
-          <Image
-            src={(article as ArticleContent).featureImage}
-            alt={article.title}
-            fill
-            className="object-cover"
-            priority
-          />
-        </div>
-        
-        {/* Excerpt removed from individual article page as requested */}
+        {post.meta.feature && (
+          <div className="mb-6 aspect-video relative rounded-lg overflow-hidden">
+            <Image
+              src={post.meta.feature}
+              alt={post.meta.title}
+              fill
+              priority
+              className="object-cover"
+            />
+          </div>
+        )}
+        <h1 className="text-3xl md:text-4xl font-bold mb-4">{post.meta.title}</h1>
+        {post.meta.date && (
+          <p className="text-gray-600 mb-2">
+            {new Date(post.meta.date).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            })}
+          </p>
+        )}
+        {post.meta.excerpt && (
+          <p className="text-xl text-gray-700">{post.meta.excerpt}</p>
+        )}
       </header>
       
-      <div className="prose max-w-none">
-        <TinaMarkdown content={article.body as TinaMarkdownContent} />
+      <div className="prose prose-lg max-w-none">
+        {/* Render the Notion content blocks using client component */}
+        <NotionClient recordMap={post.recordMap} />
       </div>
     </article>
   );

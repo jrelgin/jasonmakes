@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "TINA_PUBLIC_IS_LOCAL=true tinacms dev -c \"next dev --turbopack\"",
-    "build": "tinacms build && next build",
+    "dev": "next dev --turbopack",
+    "build": "next build",
     "start": "next start",
     "lint": "biome check .",
     "lint:fix": "biome check --apply .",
@@ -14,20 +14,21 @@
     "test:ui": "vitest --ui"
   },
   "dependencies": {
+    "@notionhq/client": "^3.0.0",
     "@vercel/analytics": "^1.5.0",
     "@vercel/edge-config": "^1.4.0",
     "@vercel/kv": "^3.0.0",
     "next": "15.3.2",
+    "notion-types": "^7.3.0",
     "openai": "^4.100.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "tinacms": "^2.7.7"
+    "react-notion-x": "^7.0.0"
   },
   "devDependencies": {
     "@biomejs/biome": "1.5.3",
     "@tailwindcss/postcss": "^4",
     "@testing-library/react": "^16.3.0",
-    "@tinacms/cli": "^1.9.7",
     "@types/node": "^20.17.46",
     "@types/react": "^19",
     "@types/react-dom": "^19",
