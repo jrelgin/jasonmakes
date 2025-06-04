@@ -63,15 +63,6 @@ pnpm start
 
 ## Content Management
 
-### Markdown Content
-
-Content is managed through Markdown files in the `/content` directory:
-
-- Each Markdown file includes frontmatter for metadata (title, date, tags, etc.)
-- Articles have `type: article` in frontmatter
-- Case studies have `type: case-study` in frontmatter
-- Add images to `/public/images` and reference them in content
-
 ### Notion Integration
 
 The site also supports content management through Notion as a headless CMS:
@@ -83,6 +74,10 @@ The site also supports content management through Notion as a headless CMS:
 - Supports various block types including paragraphs, headings, lists, and todos
 
 #### Nice-to-Haves / Next Up
+
+- [ ] **Add same functionality for case studies**  
+  - Work on the case study page to add the same functionality as the article page
+  - Work on the case study list page to add the same functionality as the article list page
 
 - [ ] **Finish the _Publish Site_ button flow**  
   - Confirm the button posts to `/api/revalidate` with `X-Revalidate-Secret`  
