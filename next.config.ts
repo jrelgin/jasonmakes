@@ -25,9 +25,26 @@ const nextConfig: NextConfig = {
         hostname: "www.notion.so",
         pathname: "/**",
       },
+      // Individual S3 domains (more specific for better security)
       {
         protocol: "https",
-        hostname: "*.amazonaws.com",
+        hostname: "s3.us-west-2.amazonaws.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "prod-files-secure.s3.us-west-2.amazonaws.com",
+        pathname: "/**",
+      },
+      // Other possible S3 regions
+      {
+        protocol: "https",
+        hostname: "s3.*.amazonaws.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "prod-files-secure.s3.*.amazonaws.com",
         pathname: "/**",
       },
     ],
