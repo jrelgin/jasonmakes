@@ -63,12 +63,45 @@ pnpm start
 
 ## Content Management
 
+### Markdown Content
+
 Content is managed through Markdown files in the `/content` directory:
 
 - Each Markdown file includes frontmatter for metadata (title, date, tags, etc.)
 - Articles have `type: article` in frontmatter
 - Case studies have `type: case-study` in frontmatter
 - Add images to `/public/images` and reference them in content
+
+### Notion Integration
+
+The site also supports content management through Notion as a headless CMS:
+
+- Uses the official Notion API with `@notionhq/client`
+- Articles are stored in a Notion database and rendered with `react-notion-x`
+- Custom block rendering and conversion from Notion API format to `react-notion-x` format
+- Handles rich text content with proper formatting (bold, italic, etc.)
+- Supports various block types including paragraphs, headings, lists, and todos
+
+#### Nice-to-Haves / Next Up
+
+- [ ] **Finish the _Publish Site_ button flow**  
+  - Confirm the button posts to `/api/revalidate` with `X-Revalidate-Secret`  
+  - Verify page refreshes end-to-end after a click
+
+- [ ] **Remove dev-only console logs**  
+  - Guard logs with `if (process.env.NODE_ENV !== 'production')` or delete
+
+- [ ] **Add SEO & social meta**  
+  - `<title>` and `<meta name="description">` from Notion → Excerpt  
+  - `<meta property="og:image">` from Featured Image  
+  - Optional JSON-LD `Article` schema
+
+- [ ] **Fallback revalidation safety net**  
+  - Add `export const revalidate = 86_400` (24 h) to article & case-study pages
+
+- [ ] **Support custom / new Notion blocks**  
+  - Map unsupported block types in `components` prop inside `NotionClient`  
+  - Example: Notion "Button" → custom `<MyButton />`
 
 ## Daily Profile System
 
