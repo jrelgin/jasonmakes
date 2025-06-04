@@ -57,18 +57,10 @@ export default async function Page({ params }: Params) {
   // Update to match the new getPost signature (no next parameter)
   const post = await getPost(slug);
   
-  if (process.env.NODE_ENV !== 'production') {
-    console.log('Post data retrieved:', post ? 'Found' : 'Not found');
-  }
   
   // Combine the two notFound checks
   if (!post || post.meta.type !== 'Article') {
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('Post not found or wrong type:', { 
-        found: !!post, 
-        type: post?.meta.type 
-      });
-    }
+
     notFound();
   }
   

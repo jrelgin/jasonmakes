@@ -136,7 +136,6 @@ export async function fetchSpotify(): Promise<{
     
     // Use cached data if it's still fresh
     if (now - timestamp < CACHE_DURATION_MS) {
-      console.log('[DEV] Using cached Spotify data');
       return data;
     }
   }
@@ -168,7 +167,6 @@ export async function fetchSpotify(): Promise<{
           data: result,
           timestamp: Date.now()
         };
-        console.log('[DEV] Spotify data cached for 15 minutes');
       }
       
       return result;
@@ -186,7 +184,6 @@ export async function fetchSpotify(): Promise<{
       const profile = await kv.get('profile') as { spotify?: { track: SpotifyTrack | null; lastUpdated: string } } | null;
       
       if (profile?.spotify) {
-        console.log('Using previous Spotify data from KV as fallback');
         return profile.spotify;
       }
     } catch (kvError) {
@@ -195,7 +192,6 @@ export async function fetchSpotify(): Promise<{
     
     // Return cached data if available, even if expired
     if (isDev && memoryCache[cacheKey]) {
-      console.log('[DEV] Using expired cached Spotify data due to fetch error');
       return memoryCache[cacheKey].data;
     }
     

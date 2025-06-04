@@ -31,7 +31,6 @@ function seedMockData() {
   if (isDevelopment && !useRealServices) {
     // Only seed if store is empty
     if (mockStore.size === 0) {
-      console.log('[MOCK-KV] Seeding initial data for local development');
       
       // Sample weather data
       const sampleWeather = {
@@ -53,7 +52,6 @@ function seedMockData() {
       // Sample blurb
       mockStore.set('blurb', `Jason is currently in Atlanta where it's 75.5°F and partly cloudy.`);
       
-      console.log('[MOCK-KV] Seed data loaded successfully');
     }
   }
 }
@@ -78,9 +76,7 @@ const mockKV = {
     mockStore.set(key, value);
     if (options?.ex) {
       mockExpirations.set(key, Date.now() + options.ex * 1000);
-      console.log(`[MOCK-KV] Set ${key} with ${options.ex}s expiry`);
     } else {
-      console.log(`[MOCK-KV] Set ${key} with no expiry`);
     }
     return 'OK';
   },

@@ -25,11 +25,6 @@ export default async function ArticlesPage() {
     }
   });
 
-  // Debug logging only in development
-  if (process.env.NODE_ENV !== 'production') {
-    console.log('Article slugs from Notion:', articles.map(a => a.slug));
-    console.log('Article count:', articles.length);
-  }
 
   return (
     <main className="container mx-auto px-4 py-8">

@@ -83,7 +83,7 @@ The site also supports content management through Notion as a headless CMS:
   - Confirm the button posts to `/api/revalidate` with `X-Revalidate-Secret`  
   - Verify page refreshes end-to-end after a click
 
-- [ ] **Remove dev-only console logs**  
+- [x] **Remove dev-only console logs**
   - Guard logs with `if (process.env.NODE_ENV !== 'production')` or delete
 
 - [ ] **Add SEO & social meta**  
