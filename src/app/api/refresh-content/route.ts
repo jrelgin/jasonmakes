@@ -64,9 +64,6 @@ export async function POST(request: NextRequest) {
     // Revalidate the path
     revalidatePath(path);
     
-    // Log success for better visibility in Vercel logs
-    console.log(`Revalidated ${path} at ${new Date().toISOString()}`);
-    
     // Return success
     return NextResponse.json({
       success: true,

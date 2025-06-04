@@ -15,9 +15,6 @@ const notion = new Client({ auth: process.env.NOTION_TOKEN! })
  * into the recordMap format react-notion-x expects.
  */
 export async function getRecordMap(pageIdWithDashes: string): Promise<ExtendedRecordMap> {
-  if (process.env.NODE_ENV !== 'production') {
-    console.log('getRecordMap called with pageId:', pageIdWithDashes);
-  }
   const page = await notion.pages.retrieve({ page_id: pageIdWithDashes })
 
   const blocks: any[] = []

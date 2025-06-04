@@ -41,7 +41,6 @@ export async function buildProfile(): Promise<Profile> {
     
     // Use cached data if it's still fresh
     if (now - timestamp < CACHE_DURATION_MS) {
-      console.log('[DEV] Using cached profile data');
       return data;
     }
   }
@@ -54,7 +53,6 @@ export async function buildProfile(): Promise<Profile> {
   try {
     const startTime = Date.now();
     weather = await fetchWeather();
-    console.log(`[DEV] Weather fetched in ${Date.now() - startTime}ms`);
   } catch (error) {
     console.error('[DEV] Weather fetch failed:', error);
     // Return minimal fallback weather data
@@ -75,7 +73,6 @@ export async function buildProfile(): Promise<Profile> {
   try {
     const startTime = Date.now();
     feedly = await fetchFeedly();
-    console.log(`[DEV] Feedly fetched in ${Date.now() - startTime}ms`);
   } catch (error) {
     console.error('[DEV] Feedly fetch failed:', error);
     // Return minimal fallback Feedly data
@@ -97,7 +94,6 @@ export async function buildProfile(): Promise<Profile> {
   try {
     const startTime = Date.now();
     spotify = await fetchSpotify();
-    console.log(`[DEV] Spotify fetched in ${Date.now() - startTime}ms`);
   } catch (error) {
     console.error('[DEV] Spotify fetch failed:', error);
     // Return minimal fallback Spotify data
@@ -119,7 +115,6 @@ export async function buildProfile(): Promise<Profile> {
       data: profileData,
       timestamp: Date.now()
     };
-    console.log('[DEV] Profile data cached for 5 minutes');
   }
   
   return profileData;

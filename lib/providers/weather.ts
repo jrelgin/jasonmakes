@@ -51,7 +51,6 @@ export async function fetchWeather(): Promise<Weather> {
     
     // Use cached data if it's still fresh
     if (now - timestamp < CACHE_DURATION_MS) {
-      console.log('[DEV] Using cached weather data');
       return data;
     }
   }
@@ -105,7 +104,6 @@ export async function fetchWeather(): Promise<Weather> {
         data: weatherData,
         timestamp: Date.now()
       };
-      console.log('[DEV] Weather data cached for 15 minutes');
     }
     
     return weatherData;
@@ -114,7 +112,6 @@ export async function fetchWeather(): Promise<Weather> {
     
     // Return cached data if available, even if expired
     if (isDev && memoryCache[cacheKey]) {
-      console.log('[DEV] Using expired cached weather data due to fetch error');
       return memoryCache[cacheKey].data;
     }
     

@@ -92,7 +92,6 @@ Create a natural-sounding, casual sentence (max 80 tokens) that mentions these a
     try {
       const previousBlurb = await kv.get('blurb') as string;
       if (previousBlurb) {
-        console.log('Using previous blurb as fallback');
         return previousBlurb;
       }
     } catch (fallbackError) {

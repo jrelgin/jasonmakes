@@ -72,7 +72,6 @@ export async function fetchFeedly(): Promise<FeedlyData> {
     
     // Use cached data if it's still fresh
     if (now - timestamp < CACHE_DURATION_MS) {
-      console.log('[DEV] Using cached Feedly data');
       return data;
     }
   }
@@ -158,7 +157,6 @@ export async function fetchFeedly(): Promise<FeedlyData> {
         data: feedlyData,
         timestamp: Date.now()
       };
-      console.log('[DEV] Feedly data cached for 15 minutes');
     }
     
     return feedlyData;
@@ -172,7 +170,6 @@ export async function fetchFeedly(): Promise<FeedlyData> {
       const profile = await kv.get('profile') as { feedly?: FeedlyData } | null;
       
       if (profile?.feedly) {
-        console.log('Using previous Feedly data from KV as fallback');
         return profile.feedly;
       }
     } catch (kvError) {
@@ -181,7 +178,6 @@ export async function fetchFeedly(): Promise<FeedlyData> {
     
     // Return cached data if available, even if expired
     if (isDev && memoryCache[cacheKey]) {
-      console.log('[DEV] Using expired cached Feedly data due to fetch error');
       return memoryCache[cacheKey].data;
     }
     

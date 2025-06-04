@@ -71,9 +71,6 @@ export async function listPosts(options: {
  */
 export async function getPost(slug: string): Promise<{ meta: PostMeta; recordMap: ExtendedRecordMap } | null> {
   try {
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('getPost called with slug:', slug);
-    }
     // TypeScript doesn't recognize next as a valid parameter, but it works at runtime
     // Remove next parameter as it causes type errors and doesn't propagate to React's fetch cache
     const { results } = await notionOfficial.databases.query({
@@ -87,26 +84,15 @@ export async function getPost(slug: string): Promise<{ meta: PostMeta; recordMap
     });
     
     if (!results.length) {
-      if (process.env.NODE_ENV !== 'production') {
-        console.log('No results found for slug:', slug);
-      }
       return null;
     }
     const page = results[0];
     
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('Found page with ID:', page.id);
-    }
     
     // Ensure we're passing the ID with dashes as expected by the official API
     const recordMap = await getRecordMap(page.id);
     const normalizedData = normalize(page);
 
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('RecordMap created successfully:', {
-        hasBlocks: Object.keys(recordMap.block || {}).length > 0
-      });
-    }
     
     return {
       meta: normalizedData,
