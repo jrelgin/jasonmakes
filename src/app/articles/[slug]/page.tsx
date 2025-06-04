@@ -11,9 +11,10 @@ export const fetchCache = 'force-cache';
 
 // Define params interface for this page component
 type Params = {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
 // Cache the listPosts function to avoid duplicate DB queries during build
@@ -21,7 +22,7 @@ const cachedListPosts = cache(listPosts);
 
 // Generate metadata for SEO dynamically based on the article
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
-  // Await params before accessing properties (Next.js 15 requirement)
+  // Await params as it's a promise in Next.js 15
   const { slug } = await params;
   const post = await getPost(slug);
   
@@ -50,7 +51,7 @@ export async function generateStaticParams() {
 }
 
 export default async function Page({ params }: Params) {
-  // Await params before accessing properties (Next.js 15 requirement)
+  // Await params as it's a promise in Next.js 15
   const { slug } = await params;
   
   // Update to match the new getPost signature (no next parameter)
