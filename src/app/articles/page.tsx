@@ -10,10 +10,9 @@ export const metadata = {
   description: 'Articles and thoughts on design, development, and creativity',
 };
 
-// Set static rendering with cache
-export const dynamic = 'force-static';
-// Using revalidatePath in the API is a better approach than tags here
-export const fetchCache = 'force-cache';
+// Allow both static generation and on-demand revalidation
+export const dynamic = 'auto';
+// Remove fetchCache setting to allow revalidatePath to work
 
 export default async function ArticlesPage() {
   // Fetch articles from Notion

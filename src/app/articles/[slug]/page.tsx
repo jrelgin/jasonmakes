@@ -5,9 +5,9 @@ import type { Metadata } from 'next';
 import { getPost, listPosts } from '../../../../lib/providers/notion';
 import NotionClient from '../../../components/NotionClient';
 
-// Set static rendering with cache
-export const dynamic = 'force-static';
-export const fetchCache = 'force-cache';
+// Allow both static generation and on-demand revalidation
+export const dynamic = 'auto';
+// Remove fetchCache setting to allow revalidatePath to work
 
 // Define params interface for this page component
 type Params = {
