@@ -82,6 +82,7 @@ export default async function Page({ params }: Params) {
               alt={post.meta.title}
               fill
               priority
+              sizes="(max-width: 768px) 100vw, 768px"
               className="object-cover"
             />
           </div>
