@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { listPosts, type PostMeta } from '../../../lib/providers/notion';
+import { getProxiedNotionImage } from '../../../lib/utils/notion-image';
 
 // Use the PostMeta type directly from the Notion provider
 type Article = PostMeta;
@@ -52,6 +53,9 @@ function ArticleCard({ article }: { article: Article }) {
     day: 'numeric'
   });
 
+  // Get proxied image URL to avoid 403 errors
+  const imageUrl = getProxiedNotionImage(feature);
+
   return (
     <Link 
       href={`/articles/${slug}`} 
@@ -60,10 +64,10 @@ function ArticleCard({ article }: { article: Article }) {
       prefetch={true}
     >
       <div className="border rounded-lg overflow-hidden h-full flex flex-col hover:shadow-lg transition-shadow duration-300">
-        {feature ? (
+        {imageUrl ? (
           <div className="h-48 relative overflow-hidden">
             <Image
-              src={feature}
+              src={imageUrl}
               alt={title}
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"

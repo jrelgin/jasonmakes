@@ -4,9 +4,7 @@ import Image from 'next/image';
 import type { Metadata } from 'next';
 import { getPost, listPosts } from '../../../../lib/providers/notion';
 import NotionClient from '../../../components/NotionClient';
-
-// Force static generation - only revalidate via webhook
-export const dynamic = 'force-static';
+import { getProxiedNotionImage } from '../../../../lib/utils/notion-image';
 
 // Define params interface for this page component
 type Params = {
@@ -53,7 +51,8 @@ export default async function Page({ params }: Params) {
   // Await params as it's a promise in Next.js 15
   const { slug } = await params;
   
-  // This will be cached after the first build
+  // In development, this will refetch every 60 seconds
+  // In production, this will be cached until manually revalidated
   const post = await getPost(slug);
   
   // Combine the two notFound checks
@@ -61,13 +60,16 @@ export default async function Page({ params }: Params) {
     notFound();
   }
   
+  // Get proxied image URL to avoid 403 errors
+  const imageUrl = getProxiedNotionImage(post.meta.feature);
+  
   return (
     <article className="max-w-3xl mx-auto py-8 px-4">
       <header className="mb-8">
-        {post.meta.feature && (
+        {imageUrl && (
           <div className="mb-6 aspect-video relative rounded-lg overflow-hidden">
             <Image
-              src={post.meta.feature}
+              src={imageUrl}
               alt={post.meta.title}
               fill
               priority
