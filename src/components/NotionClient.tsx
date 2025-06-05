@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect } from 'react'
 import { NotionRenderer } from 'react-notion-x'
 import { ExtendedRecordMap } from 'notion-types'
+import { getProxiedNotionImage } from '../../lib/utils/notion-image'
 import 'react-notion-x/src/styles.css'
 
 
@@ -15,10 +15,11 @@ export default function NotionClient({ recordMap }: { recordMap: ExtendedRecordM
 
   return (
     <div className="notion-renderer-wrapper prose max-w-none">
-      <NotionRenderer 
+      <NotionRenderer
         recordMap={recordMap}
         components={components}
-        fullPage={false} 
+        mapImageUrl={(url: string) => getProxiedNotionImage(url) ?? url}
+        fullPage={false}
         darkMode={false} // Set to false for now without theme integration
         disableHeader
       />
