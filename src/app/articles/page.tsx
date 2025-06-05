@@ -10,12 +10,11 @@ export const metadata = {
   description: 'Articles and thoughts on design, development, and creativity',
 };
 
-// Allow both static generation and on-demand revalidation
-export const dynamic = 'auto';
-// Remove fetchCache setting to allow revalidatePath to work
+// Force static generation - only revalidate via webhook
+export const dynamic = 'force-static';
 
 export default async function ArticlesPage() {
-  // Fetch articles from Notion
+  // Fetch articles from Notion - this will be cached after build
   const articles = await listPosts({ 
     filter: {
       and: [
@@ -24,7 +23,6 @@ export default async function ArticlesPage() {
       ]
     }
   });
-
 
   return (
     <main className="container mx-auto px-4 py-8">
@@ -43,7 +41,7 @@ export default async function ArticlesPage() {
   );
 }
 
-// Article card component
+// Article card component with prefetching
 function ArticleCard({ article }: { article: Article }) {
   const { title, slug, date, excerpt, feature } = article;
   
@@ -55,10 +53,15 @@ function ArticleCard({ article }: { article: Article }) {
   });
 
   return (
-    <Link href={`/articles/${slug}`} className="block h-full">
+    <Link 
+      href={`/articles/${slug}`} 
+      className="block h-full"
+      // Prefetch the article on hover for instant navigation
+      prefetch={true}
+    >
       <div className="border rounded-lg overflow-hidden h-full flex flex-col hover:shadow-lg transition-shadow duration-300">
         {feature ? (
-          <div className="mb-4 h-48 relative overflow-hidden rounded-lg">
+          <div className="h-48 relative overflow-hidden">
             <Image
               src={feature}
               alt={title}
@@ -68,7 +71,7 @@ function ArticleCard({ article }: { article: Article }) {
             />
           </div>
         ) : (
-          <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+          <div className="h-48 bg-gray-200 flex items-center justify-center">
             <span className="text-gray-400">No image</span>
           </div>
         )}

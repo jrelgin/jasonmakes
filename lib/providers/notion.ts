@@ -1,6 +1,7 @@
 import { Client } from '@notionhq/client'
 import { getRecordMap } from '../notionRecordMap'
 import { ExtendedRecordMap } from 'notion-types'
+import { unstable_cache } from 'next/cache'
 
 // Define type for post metadata
 export type PostMeta = {
@@ -25,14 +26,14 @@ if (!DB_ID) {
   throw new Error('NOTION_DATABASE_ID environment variable is required')
 }
 
-// Initialize both Notion clients
-// Official client for database queries
+// Initialize Notion client
 const notionOfficial = new Client({ auth: NOTION_TOKEN as string })
 
 /**
  * List posts from Notion database with optional filters
+ * Cached with 'post' tag for manual revalidation
  */
-export async function listPosts(options: {
+async function _listPosts(options: {
   filter?: any
   sorts?: any[]
 } = {}): Promise<PostMeta[]> {
@@ -50,7 +51,6 @@ export async function listPosts(options: {
       { property: 'Publication Date', direction: 'descending' }
     ]
 
-    // Remove next parameter as it causes type errors and doesn't propagate to React's fetch cache
     const { results } = await notionOfficial.databases.query({
       database_id: DB_ID as string,
       filter,
@@ -66,13 +66,18 @@ export async function listPosts(options: {
   }
 }
 
+// Export cached version with the 'post' tag that your webhook uses
+export const listPosts = unstable_cache(
+  _listPosts,
+  ['list-posts'],
+  { tags: ['post'] }
+)
+
 /**
  * Get a specific post by slug
  */
-export async function getPost(slug: string): Promise<{ meta: PostMeta; recordMap: ExtendedRecordMap } | null> {
+async function _getPost(slug: string): Promise<{ meta: PostMeta; recordMap: ExtendedRecordMap } | null> {
   try {
-    // TypeScript doesn't recognize next as a valid parameter, but it works at runtime
-    // Remove next parameter as it causes type errors and doesn't propagate to React's fetch cache
     const { results } = await notionOfficial.databases.query({
       database_id: DB_ID as string,
       filter: {
@@ -88,11 +93,9 @@ export async function getPost(slug: string): Promise<{ meta: PostMeta; recordMap
     }
     const page = results[0];
     
-    
-    // Ensure we're passing the ID with dashes as expected by the official API
+    // Get record map for rendering
     const recordMap = await getRecordMap(page.id);
     const normalizedData = normalize(page);
-
     
     return {
       meta: normalizedData,
@@ -106,7 +109,12 @@ export async function getPost(slug: string): Promise<{ meta: PostMeta; recordMap
   }
 }
 
-// getBlocks function removed - use getRecordMap instead for rendering with NotionRenderer
+// Export cached version with the 'post' tag that your webhook uses
+export const getPost = unstable_cache(
+  _getPost,
+  ['get-post'],
+  { tags: ['post'] }
+)
 
 /**
  * Normalize Notion page data into a consistent format
