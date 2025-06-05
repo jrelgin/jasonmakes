@@ -5,9 +5,8 @@ import type { Metadata } from 'next';
 import { getPost, listPosts } from '../../../../lib/providers/notion';
 import NotionClient from '../../../components/NotionClient';
 
-// Allow both static generation and on-demand revalidation
-export const dynamic = 'auto';
-// Remove fetchCache setting to allow revalidatePath to work
+// Force static generation - only revalidate via webhook
+export const dynamic = 'force-static';
 
 // Define params interface for this page component
 type Params = {
@@ -38,7 +37,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   };
 }
 
-// Generate static paths for all published articles
+// Generate static paths for all published articles at build time
 export async function generateStaticParams() {
   // Use cached listPosts to avoid duplicate DB queries during build
   const articles = await cachedListPosts({ 
@@ -54,13 +53,11 @@ export default async function Page({ params }: Params) {
   // Await params as it's a promise in Next.js 15
   const { slug } = await params;
   
-  // Update to match the new getPost signature (no next parameter)
+  // This will be cached after the first build
   const post = await getPost(slug);
-  
   
   // Combine the two notFound checks
   if (!post || post.meta.type !== 'Article') {
-
     notFound();
   }
   
