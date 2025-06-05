@@ -1,6 +1,4 @@
 import { Client } from "@notionhq/client"
-import type { ExtendedRecordMap } from "notion-types"
-import { mapBlocksToRecordMap } from "../lib/mapBlocksToRecordMap"
 
 // Simple interface for the block properties we need
 interface BlockMeta {
@@ -11,13 +9,12 @@ interface BlockMeta {
 const notion = new Client({ auth: process.env.NOTION_TOKEN! })
 
 /**
- * Recursively fetch all blocks for a page and convert them
- * into the recordMap format react-notion-x expects.
+ * Recursively fetch all blocks for a page
+ * Returns a flat array of blocks for @9gustin/react-notion-render
  */
-export async function getRecordMap(pageIdWithDashes: string): Promise<ExtendedRecordMap> {
-  const page = await notion.pages.retrieve({ page_id: pageIdWithDashes })
-
+export async function getBlocks(pageIdWithDashes: string): Promise<any[]> {
   const blocks: any[] = []
+  
   async function fetchChildren(id: string) {
     let cursor: string | undefined
     do {
@@ -37,5 +34,5 @@ export async function getRecordMap(pageIdWithDashes: string): Promise<ExtendedRe
   }
 
   await fetchChildren(pageIdWithDashes)
-  return mapBlocksToRecordMap(page as any, blocks)
+  return blocks
 }

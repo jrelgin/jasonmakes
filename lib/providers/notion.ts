@@ -1,6 +1,5 @@
 import { Client } from '@notionhq/client'
-import { getRecordMap } from '../notionRecordMap'
-import { ExtendedRecordMap } from 'notion-types'
+import { getBlocks } from '../notionBlocks'
 
 // Define type for post metadata
 export type PostMeta = {
@@ -25,8 +24,7 @@ if (!DB_ID) {
   throw new Error('NOTION_DATABASE_ID environment variable is required')
 }
 
-// Initialize both Notion clients
-// Official client for database queries
+// Initialize Notion client
 const notionOfficial = new Client({ auth: NOTION_TOKEN as string })
 
 /**
@@ -50,7 +48,6 @@ export async function listPosts(options: {
       { property: 'Publication Date', direction: 'descending' }
     ]
 
-    // Remove next parameter as it causes type errors and doesn't propagate to React's fetch cache
     const { results } = await notionOfficial.databases.query({
       database_id: DB_ID as string,
       filter,
@@ -68,11 +65,10 @@ export async function listPosts(options: {
 
 /**
  * Get a specific post by slug
+ * Now returns blocks array instead of recordMap
  */
-export async function getPost(slug: string): Promise<{ meta: PostMeta; recordMap: ExtendedRecordMap } | null> {
+export async function getPost(slug: string): Promise<{ meta: PostMeta; blocks: any[] } | null> {
   try {
-    // TypeScript doesn't recognize next as a valid parameter, but it works at runtime
-    // Remove next parameter as it causes type errors and doesn't propagate to React's fetch cache
     const { results } = await notionOfficial.databases.query({
       database_id: DB_ID as string,
       filter: {
@@ -88,15 +84,13 @@ export async function getPost(slug: string): Promise<{ meta: PostMeta; recordMap
     }
     const page = results[0];
     
-    
-    // Ensure we're passing the ID with dashes as expected by the official API
-    const recordMap = await getRecordMap(page.id);
+    // Fetch blocks instead of recordMap
+    const blocks = await getBlocks(page.id);
     const normalizedData = normalize(page);
 
-    
     return {
       meta: normalizedData,
-      recordMap
+      blocks
     };
   } catch (error) {
     if (process.env.NODE_ENV !== 'production') {
@@ -105,8 +99,6 @@ export async function getPost(slug: string): Promise<{ meta: PostMeta; recordMap
     return null;
   }
 }
-
-// getBlocks function removed - use getRecordMap instead for rendering with NotionRenderer
 
 /**
  * Normalize Notion page data into a consistent format

@@ -3,11 +3,10 @@ import { cache } from 'react';
 import Image from 'next/image';
 import type { Metadata } from 'next';
 import { getPost, listPosts } from '../../../../lib/providers/notion';
-import NotionClient from '../../../components/NotionClient';
+import NotionArticle from '../../../components/NotionArticle';
 
 // Allow both static generation and on-demand revalidation
 export const dynamic = 'auto';
-// Remove fetchCache setting to allow revalidatePath to work
 
 // Define params interface for this page component
 type Params = {
@@ -54,13 +53,11 @@ export default async function Page({ params }: Params) {
   // Await params as it's a promise in Next.js 15
   const { slug } = await params;
   
-  // Update to match the new getPost signature (no next parameter)
+  // Get post with blocks instead of recordMap
   const post = await getPost(slug);
-  
   
   // Combine the two notFound checks
   if (!post || post.meta.type !== 'Article') {
-
     notFound();
   }
   
@@ -94,10 +91,8 @@ export default async function Page({ params }: Params) {
         )}
       </header>
       
-      <div className="prose prose-lg max-w-none">
-        {/* Render the Notion content blocks using client component */}
-        <NotionClient recordMap={post.recordMap} />
-      </div>
+      {/* Render the Notion content blocks using server component */}
+      <NotionArticle blocks={post.blocks} />
     </article>
   );
 }
