@@ -75,7 +75,7 @@ The site also supports content management through Notion as a headless CMS:
 
 #### Nice-to-Haves / Next Up
 
-- [ ] **Add same functionality for case studies**  
+- [x] **Add same functionality for case studies**
   - Work on the case study page to add the same functionality as the article page
   - Work on the case study list page to add the same functionality as the article list page
 

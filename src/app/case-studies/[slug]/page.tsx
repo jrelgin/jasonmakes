@@ -1,43 +1,90 @@
 import { notFound } from 'next/navigation';
+import { cache } from 'react';
+import Image from 'next/image';
 import type { Metadata } from 'next';
+import { getPost, listPosts } from '../../../../lib/providers/notion';
+import NotionClient from '../../../components/NotionClient';
+import { getProxiedNotionImage } from '../../../../lib/utils/notion-image';
 
-// Define case study type for the component
-type CaseStudy = {
-  title: string;
-  slug: string;
-  date: string;
-  excerpt?: string;
-  featureImage?: string;
-  body?: any;
-};
+// Define params interface for this page component
+interface Params {
+  params: Promise<{ slug: string }>;
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+}
 
-// Define params interface for this page component - in Next.js 15, params is a Promise
-type Params = {
-  slug: string;
-};
+// Cache the listPosts function to avoid duplicate DB queries during build
+const cachedListPosts = cache(listPosts);
 
-// Generate metadata for SEO
-export function generateMetadata(): Metadata {
+// Generate metadata for SEO dynamically based on the case study
+export async function generateMetadata({ params }: Params): Promise<Metadata> {
+  const { slug } = await params;
+  const post = await getPost(slug);
+
+  if (!post || post.meta.type !== 'Case Study') {
+    return {
+      title: 'Case Study Not Found | Jason Makes',
+    };
+  }
+
   return {
-    title: 'Case Study Coming Soon | Jason Makes',
+    title: `${post.meta.title} | Jason Makes`,
+    description: post.meta.excerpt || `Read ${post.meta.title} by Jason Elgin`,
   };
 }
 
-// Temporary removal of static paths generation
-export function generateStaticParams() {
-  return [];
+// Generate static paths for all published case studies at build time
+export async function generateStaticParams() {
+  const caseStudies = await cachedListPosts({
+    filter: { property: 'Type', select: { equals: 'Case Study' } },
+  });
+
+  return caseStudies.map((cs) => ({ slug: cs.slug }));
 }
 
-export default function CaseStudyPage() {
-  // This is a temporary placeholder until we implement Sanity integration
+export default async function Page({ params }: Params) {
+  const { slug } = await params;
+  const post = await getPost(slug);
+
+  if (!post || post.meta.type !== 'Case Study') {
+    notFound();
+  }
+
+  const imageUrl = getProxiedNotionImage(post.meta.feature);
+
   return (
-    <article className="max-w-3xl mx-auto py-8">
+    <article className="max-w-3xl mx-auto py-8 px-4">
       <header className="mb-8">
-        <h1 className="text-3xl md:text-4xl font-bold mb-4">Case Studies Coming Soon</h1>
-        <p className="text-gray-600">
-          We're currently updating our content management system. Check back soon for new case studies.
-        </p>
+        {imageUrl && (
+          <div className="mb-6 aspect-video relative rounded-lg overflow-hidden">
+            <Image
+              src={imageUrl}
+              alt={post.meta.title}
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, 768px"
+              className="object-cover"
+            />
+          </div>
+        )}
+        <h1 className="text-3xl md:text-4xl font-bold mb-4">{post.meta.title}</h1>
+        {post.meta.date && (
+          <p className="text-gray-600 mb-2">
+            {new Date(post.meta.date).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            })}
+          </p>
+        )}
+        {post.meta.excerpt && (
+          <p className="text-xl text-gray-700">{post.meta.excerpt}</p>
+        )}
       </header>
+
+      <div className="prose prose-lg max-w-none">
+        <NotionClient recordMap={post.recordMap} />
+      </div>
     </article>
   );
 }
+
