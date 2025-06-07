@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import { NotionRenderer } from 'react-notion-x'
 import { ExtendedRecordMap, Block } from 'notion-types'
-import 'react-notion-x/src/styles.css'
 import { getProxiedNotionImage } from '../../lib/utils/notion-image'
 
 interface NotionClientProps {

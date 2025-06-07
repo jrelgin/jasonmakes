@@ -42,7 +42,9 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-geist-mono);
 }
 
-/* React Notion X Image Styles */
+/* React Notion X Minimal Styles */
+
+/* Image Styles */
 .notion-asset-wrapper {
   max-width: 100%;
   margin: 1.5rem auto;
@@ -58,4 +60,41 @@ h1, h2, h3, h4, h5, h6 {
   display: block !important;
   max-width: 100%;
   height: auto;
+}
+
+/* Callout Blocks */
+.notion-callout {
+  @apply bg-gray-50 dark:bg-gray-800 border-l-4 border-gray-300 dark:border-gray-600 p-4 my-4 rounded-r;
+}
+
+.notion-callout-icon {
+  @apply text-lg mr-2;
+}
+
+/* Dividers */
+.notion-hr {
+  @apply border-t border-gray-300 dark:border-gray-600 my-6;
+}
+
+/* Toggle Blocks */
+.notion-toggle {
+  @apply border border-gray-200 dark:border-gray-700 rounded mb-2;
+}
+
+.notion-toggle-summary {
+  @apply p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 font-medium;
+}
+
+.notion-toggle-content {
+  @apply p-3 pt-0 border-t border-gray-200 dark:border-gray-700;
+}
+
+/* Code Blocks (enhance prose styling) */
+.notion-code {
+  @apply font-mono text-sm;
+}
+
+/* Ensure proper spacing for all blocks */
+.notion-block {
+  @apply mb-2;
 }
