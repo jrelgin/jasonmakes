@@ -80,5 +80,8 @@ async function _getRecordMap(pageIdWithDashes: string): Promise<ExtendedRecordMa
 export const getRecordMap = unstable_cache(
   _getRecordMap,
   ['notion-recordmap'],
-  { tags: ['post'] }
+  { 
+    tags: ['post'],
+    revalidate: process.env.NODE_ENV === 'development' ? 300 : false // 5 min in dev, manual in prod
+  }
 )

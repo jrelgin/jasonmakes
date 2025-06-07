@@ -90,7 +90,7 @@ export default async function Page({ params }: Params) {
         )}
       </header>
       
-      <div className="prose prose-lg max-w-none dark:prose-invert">
+      <div>
         {/* Render the Notion content blocks using client component */}
         <NotionClient recordMap={post.recordMap} />
       </div>

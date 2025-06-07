@@ -5,11 +5,11 @@
 export function getProxiedNotionImage(url: string | null | undefined): string | null {
   if (!url) return null;
   
-  // Only proxy Notion S3 URLs
+  // Always proxy Notion S3 URLs in both development and production
   if (url.includes('amazonaws.com') && url.includes('X-Amz-')) {
     return `/api/notion-image?url=${encodeURIComponent(url)}`;
   }
-
+  
   // Return original URL for non-S3 images
   return url;
 }

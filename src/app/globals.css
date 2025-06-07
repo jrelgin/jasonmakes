@@ -41,3 +41,21 @@ h1, h2, h3, h4, h5, h6 {
 .font-code {
   font-family: var(--font-geist-mono);
 }
+
+/* React Notion X Image Styles */
+.notion-asset-wrapper {
+  max-width: 100%;
+  margin: 1.5rem auto;
+}
+
+.notion-asset-wrapper img {
+  display: block !important;
+  max-width: 100%;
+  height: auto;
+}
+
+.notion-image {
+  display: block !important;
+  max-width: 100%;
+  height: auto;
+}
