@@ -88,9 +88,6 @@ export default async function Page({ params }: Params) {
             })}
           </p>
         )}
-        {post.meta.excerpt && (
-          <p className="text-xl text-gray-700 dark:text-gray-300">{post.meta.excerpt}</p>
-        )}
       </header>
       
       <div className="prose prose-lg max-w-none dark:prose-invert">
