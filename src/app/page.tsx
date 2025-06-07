@@ -28,7 +28,7 @@ export default function Home() {
       
       {/* Below the fold - All widgets */}
       <section className="w-full bg-gray-50 dark:bg-gray-900 py-16 -mx-4 px-4">
-        <h2 className="text-3xl md:text-4xl font-bold mb-8">Daily Profile</h2>
+        <h2 className="text-3xl md:text-4xl font-bold mb-8 text-gray-900 dark:text-gray-100">Daily Profile</h2>
         
         {/* Weather and Spotify Widgets - side-by-side on desktop */}
         <div className="flex flex-col md:flex-row md:gap-6 mb-8">

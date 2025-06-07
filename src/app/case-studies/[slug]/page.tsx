@@ -78,9 +78,9 @@ export default async function Page({ params }: Params) {
             />
           </div>
         )}
-        <h1 className="text-3xl md:text-4xl font-bold mb-4">{post.meta.title}</h1>
+        <h1 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900 dark:text-gray-100">{post.meta.title}</h1>
         {post.meta.date && (
-          <p className="text-gray-600 mb-2">
+          <p className="text-gray-600 dark:text-gray-400 mb-2">
             {new Date(post.meta.date).toLocaleDateString('en-US', {
               year: 'numeric',
               month: 'long',
@@ -89,11 +89,11 @@ export default async function Page({ params }: Params) {
           </p>
         )}
         {post.meta.excerpt && (
-          <p className="text-xl text-gray-700">{post.meta.excerpt}</p>
+          <p className="text-xl text-gray-700 dark:text-gray-300">{post.meta.excerpt}</p>
         )}
       </header>
       
-      <div className="prose prose-lg max-w-none">
+      <div className="prose prose-lg max-w-none dark:prose-invert">
         {/* Render the Notion content blocks using client component */}
         <NotionClient recordMap={post.recordMap} />
       </div>
