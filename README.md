@@ -45,7 +45,7 @@ This site is built on:
 
 ## Development
 
-This project uses PNPM as the package manager and Turbopack in development mode for faster refresh times and improved developer experience.
+This project uses PNPM as the package manager and Turbopack in development mode for faster refresh times and improved developer experience. Make sure you have [Node.js](https://nodejs.org/) 18 or newer installed along with [PNPM](https://pnpm.io/).
 
 ```bash
 # Install dependencies
@@ -60,6 +60,10 @@ pnpm build
 # Start production server
 pnpm start
 ```
+# Lint and format code
+pnpm lint
+pnpm format
+
 
 ## Content Management
 
@@ -73,11 +77,11 @@ The site also supports content management through Notion as a headless CMS:
 - Handles rich text content with proper formatting (bold, italic, etc.)
 - Supports various block types including paragraphs, headings, lists, and todos
 
+For a deeper dive into how Notion data is fetched and rendered, see [docs/notion-guide.md](docs/notion-guide.md).
+
 #### Nice-to-Haves / Next Up
 
-- [ ] **Add same functionality for case studies**  
-  - Work on the case study page to add the same functionality as the article page
-  - Work on the case study list page to add the same functionality as the article list page
+- [x] **Case studies now use the same Notion workflow as articles**
 
 - [ ] **Finish the _Publish Site_ button flow**  
   - Confirm the button posts to `/api/revalidate` with `X-Revalidate-Secret`  
