@@ -12,10 +12,15 @@ export async function GET(request: NextRequest) {
 
   try {
     // Fetch the image from Notion's S3
-    const imageResponse = await fetch(imageUrl);
+    const imageResponse = await fetch(imageUrl, {
+      headers: {
+        // Add cache control headers to the request
+        'Cache-Control': 'public, max-age=31536000, immutable',
+      },
+    });
     
     if (!imageResponse.ok) {
-      // If the signed URL expired, we could implement fallback logic here
+      console.error(`Failed to fetch image: ${imageResponse.status} ${imageResponse.statusText}`);
       return new NextResponse('Failed to fetch image', { status: imageResponse.status });
     }
     
@@ -29,6 +34,7 @@ export async function GET(request: NextRequest) {
         'Content-Type': contentType,
         'Cache-Control': 'public, max-age=31536000, immutable', // Cache for 1 year
         'CDN-Cache-Control': 'max-age=31536000', // Vercel Edge Cache
+        'Vary': 'Accept-Encoding', // Vary by encoding for better compression
       },
     });
   } catch (error) {

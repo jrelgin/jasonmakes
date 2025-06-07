@@ -70,7 +70,10 @@ async function _listPosts(options: {
 export const listPosts = unstable_cache(
   _listPosts,
   ['list-posts'],
-  { tags: ['post'] }
+  { 
+    tags: ['post'],
+    revalidate: process.env.NODE_ENV === 'development' ? 300 : false // 5 min in dev, manual in prod
+  }
 )
 
 /**
@@ -113,7 +116,10 @@ async function _getPost(slug: string): Promise<{ meta: PostMeta; recordMap: Exte
 export const getPost = unstable_cache(
   _getPost,
   ['get-post'],
-  { tags: ['post'] }
+  { 
+    tags: ['post'],
+    revalidate: process.env.NODE_ENV === 'development' ? 300 : false // 5 min in dev, manual in prod
+  }
 )
 
 /**
