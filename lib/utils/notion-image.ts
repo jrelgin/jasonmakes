@@ -7,13 +7,10 @@ export function getProxiedNotionImage(url: string | null | undefined): string | 
   
   // Only proxy Notion S3 URLs
   if (url.includes('amazonaws.com') && url.includes('X-Amz-')) {
-    // In production, use the API route proxy
-    if (process.env.NODE_ENV === 'production') {
-      return `/api/notion-image?url=${encodeURIComponent(url)}`;
-    }
+    return `/api/notion-image?url=${encodeURIComponent(url)}`;
   }
-  
-  // Return original URL for non-S3 images or in development
+
+  // Return original URL for non-S3 images
   return url;
 }
 
