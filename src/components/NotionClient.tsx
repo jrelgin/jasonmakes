@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { NotionRenderer } from 'react-notion-x'
 import { ExtendedRecordMap } from 'notion-types'
 import 'react-notion-x/src/styles.css'
@@ -13,13 +13,23 @@ export default function NotionClient({ recordMap }: { recordMap: ExtendedRecordM
   // This is just a stub for future implementation
   const components = {} as Record<string, React.ComponentType<any>>
 
+  const [darkMode, setDarkMode] = useState(false)
+
+  useEffect(() => {
+    const query = window.matchMedia('(prefers-color-scheme: dark)')
+    setDarkMode(query.matches)
+    const listener = (e: MediaQueryListEvent) => setDarkMode(e.matches)
+    query.addEventListener('change', listener)
+    return () => query.removeEventListener('change', listener)
+  }, [])
+
   return (
-    <div className="notion-renderer-wrapper prose max-w-none">
-      <NotionRenderer 
+    <div className="notion-renderer-wrapper prose max-w-none dark:prose-invert">
+      <NotionRenderer
         recordMap={recordMap}
         components={components}
-        fullPage={false} 
-        darkMode={false} // Set to false for now without theme integration
+        fullPage={false}
+        darkMode={darkMode}
         disableHeader
       />
     </div>
