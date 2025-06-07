@@ -1,8 +1,13 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import { NotionRenderer } from 'react-notion-x'
 import { ExtendedRecordMap } from 'notion-types'
+import {
+  getProxiedNotionImage,
+  isNotionS3Url,
+} from '../../lib/utils/notion-image'
 import 'react-notion-x/src/styles.css'
 
 
@@ -11,7 +16,13 @@ import 'react-notion-x/src/styles.css'
 export default function NotionClient({ recordMap }: { recordMap: ExtendedRecordMap }) {
   // Define custom components for rendering unsupported Notion blocks
   // This is just a stub for future implementation
-  const components = {} as Record<string, React.ComponentType<any>>
+  const components = {
+    nextImage: Image,
+  } as Record<string, React.ComponentType<any>>
+
+  const mapImageUrl = (url: string) => {
+    return isNotionS3Url(url) ? getProxiedNotionImage(url)! : url
+  }
 
   const [darkMode, setDarkMode] = useState(false)
 
@@ -28,6 +39,7 @@ export default function NotionClient({ recordMap }: { recordMap: ExtendedRecordM
       <NotionRenderer
         recordMap={recordMap}
         components={components}
+        mapImageUrl={mapImageUrl}
         fullPage={false}
         darkMode={darkMode}
         disableHeader
