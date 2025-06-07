@@ -27,7 +27,7 @@ export default async function CaseStudiesPage() {
 
   return (
     <main className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Case Studies</h1>
+      <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-gray-100">Case Studies</h1>
       
       {caseStudies.length === 0 ? (
         <p>No case studies found. Check back soon!</p>
@@ -75,17 +75,17 @@ function CaseStudyCard({ caseStudy }: { caseStudy: CaseStudy }) {
             />
           </div>
         ) : (
-          <div className="h-48 bg-gray-200 flex items-center justify-center">
-            <span className="text-gray-400">No image</span>
+          <div className="h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+            <span className="text-gray-400 dark:text-gray-500">No image</span>
           </div>
         )}
         <div className="p-4 flex-1 flex flex-col">
           <h2 className="text-xl font-semibold mb-2">{title}</h2>
-          <p className="text-sm text-gray-500 mb-2">{formattedDate}</p>
-          {excerpt && <p className="mb-4 text-gray-700 flex-1">{excerpt}</p>}
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">{formattedDate}</p>
+          {excerpt && <p className="mb-4 text-gray-700 dark:text-gray-300 flex-1">{excerpt}</p>}
           
           <div className="mt-auto pt-4">
-            <span className="text-sm font-medium text-blue-600">Read more →</span>
+            <span className="text-sm font-medium text-blue-600 dark:text-blue-400">Read more →</span>
           </div>
         </div>
       </div>
