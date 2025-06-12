@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { mapWeatherCodeToCondition } from '../../../lib/providers/weather';
+import { mapWeatherCodeToCondition, classifyHumidity } from '../../../lib/providers/weather';
 
 describe('Weather Provider', () => {
   describe('mapWeatherCodeToCondition', () => {
@@ -37,6 +37,20 @@ describe('Weather Provider', () => {
     it('should return "Unknown" for undefined weather codes', () => {
       expect(mapWeatherCodeToCondition(999)).toBe('Unknown');
       expect(mapWeatherCodeToCondition(-1)).toBe('Unknown');
+    });
+  });
+
+  describe('classifyHumidity', () => {
+    it('should categorize humidity ranges correctly', () => {
+      expect(classifyHumidity(0)).toBe('Dry');
+      expect(classifyHumidity(30)).toBe('Dry');
+      expect(classifyHumidity(31)).toBe('Comfortable');
+      expect(classifyHumidity(50)).toBe('Comfortable');
+      expect(classifyHumidity(55)).toBe('Somewhat Humid');
+      expect(classifyHumidity(70)).toBe('Somewhat Humid');
+      expect(classifyHumidity(75)).toBe('Humid');
+      expect(classifyHumidity(80)).toBe('Humid');
+      expect(classifyHumidity(81)).toBe('Muggy');
     });
   });
 });
