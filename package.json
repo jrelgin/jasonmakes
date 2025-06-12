@@ -21,6 +21,8 @@
     "next": "15.3.2",
     "notion-types": "^7.3.0",
     "openai": "^4.100.0",
+    "posthog-js": "^1.250.2",
+    "posthog-node": "^5.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-notion-x": "^7.0.0"
