@@ -5,6 +5,9 @@
 ```bash
 # Cron Secret for secure API access
 CRON_SECRET=your-local-development-secret
+
+# Vercel Blob Storage (same token for local and production)
+BLOB_READ_WRITE_TOKEN=your-vercel-blob-token
 ```
 
 ## Add to your Vercel project environment variables:
@@ -12,10 +15,14 @@ CRON_SECRET=your-local-development-secret
 1. Go to your Vercel dashboard
 2. Select the project
 3. Navigate to "Settings" > "Environment Variables"
-4. Add the following variable:
+4. Add the following variables:
    - Name: `CRON_SECRET`
-   - Value: `[generate a secure random string]`
-   - Environment: Production (or all environments as needed)
+     - Value: `[generate a secure random string]`
+     - Environment: Production (or all environments as needed)
+   - Name: `BLOB_READ_WRITE_TOKEN`
+     - Value: `[your Vercel blob storage token]`
+     - Environment: Production (or all environments as needed)
+     - Note: Get this from Vercel dashboard > Storage > Blob > Settings
 
 ## Testing locally:
 
