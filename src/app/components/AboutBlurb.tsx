@@ -1,5 +1,5 @@
 // app/components/AboutBlurb.tsx
-export const revalidate = 86_400; // 24 hours (daily refresh)
+export const revalidate = 3600; // 1 hour (matches cron frequency)
 
 import { kv } from '../../../lib/kv';
 
