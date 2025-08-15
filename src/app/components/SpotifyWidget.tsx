@@ -1,5 +1,5 @@
 // app/components/SpotifyWidget.tsx
-export const revalidate = 86_400; // 24 hours (daily refresh)
+export const revalidate = 3600; // 1 hour (matches cron frequency)
 
 import { kv } from '../../../lib/kv';
 import type { SpotifyTrack } from '../../../lib/providers/spotify';

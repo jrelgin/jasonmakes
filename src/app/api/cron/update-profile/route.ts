@@ -9,8 +9,8 @@ import { revalidatePath } from 'next/cache';
 // Import OpenAI provider
 import { generateBlurb } from '../../../../../lib/providers/openai';
 
-// Mark this as compatible with Edge Runtime
-export const runtime = 'edge';
+// Use Node.js runtime to ensure revalidation works properly
+export const runtime = 'nodejs';
 
 // Profile expiration time in seconds
 const EXPIRATION_SECONDS = Number(process.env.PROFILE_TTL ?? 60 * 60 * 48); // default 48h
