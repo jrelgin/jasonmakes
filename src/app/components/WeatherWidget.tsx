@@ -1,5 +1,5 @@
 // app/components/WeatherWidget.tsx
-export const revalidate = 86_400; // 24 hours (daily refresh)
+export const revalidate = 3600; // 1 hour (matches cron frequency)
 
 import { kv } from '../../../lib/kv';
 import type { Weather } from '../../../lib/providers/weather';
