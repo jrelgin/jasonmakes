@@ -2,18 +2,25 @@
 
 This guide outlines the steps for migrating the site from the current Notion-based CMS to a basic Keystatic setup that supports content editing directly from the production deployment. Each step is framed as a short, testable task so progress can be verified incrementally. The migration targets a simple personal blog with a single editor, direct commits to `main`, and no legacy Notion content that must be preserved beyond reference.
 
+### Progress snapshot
+- [x] **Step 1 – Establish Baseline** (docs captured in `docs/notion-baseline.md`, representative snapshot in `tmp/notion-export/`)
+- [ ] **Step 2 – Install Keystatic**
+- [ ] **Step 3 – Enable Production Editing**
+- [ ] **Step 4 – Swap Runtime**
+- [ ] **Step 5 – Decommission Notion**
+
 ---
 
 ## 1. Establish Baseline
 
-1. **Document current Notion usage**  
+1. **Document current Notion usage** ✅  
    - Identify the exact blog content types that still rely on Notion (posts, author profile snippet, homepage highlights).  
    - Capture the API touchpoints (`lib/providers/notion.ts`, `/api/notion-image`, `NotionClient` renderer, etc.).  
    - Confirm all environment variables and secrets that power Notion integrations.  
    _Acceptance:_ Inventory document stored in `/docs` covering endpoints, schemas, and env vars.
 
-2. **Snapshot current content structure**  
-   - Save the Markdown/JSON for one current Notion-driven blog post strictly for field mapping.  
+2. **Snapshot current content structure** ✅  
+   - Save the Markdown/JSON for one current Notion-driven blog post strictly for field mapping (representative data is sufficient; no live export required).  
    - Store the snapshot in `/tmp/notion-export` (ignored by git) and note any data that will not return (e.g., experimental embeds).  
    _Acceptance:_ Snapshot reviewed and fields mapped to their Keystatic equivalents.
 
@@ -34,7 +41,7 @@ This guide outlines the steps for migrating the site from the current Notion-bas
 
 5. **Generate content directories**
    - Configure collections to write content as Markdown + frontmatter under `content/articles` (and `content/case-studies` if a separate collection is introduced).
-   - Seed the directories with one sample article and case study entry that match the intended Keystatic schema.
+   - Seed the directories with one sample article and case study entry via the Keystatic UI so Git commits the canonical Markdown/MDX files. No manual file editing needed.
    - Ensure the generated `content/` paths are tracked by git (update `.gitignore` if necessary) so production has access to seeded entries.
 
    _Acceptance:_ Running `pnpm keystatic build` produces the expected content structure.
