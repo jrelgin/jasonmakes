@@ -37,3 +37,8 @@
 | `Status` | Select | (filter only) | Determines publish state (`Published` required). |
 
 Caching behaviour: all fetchers use `unstable_cache` with tag `post`, revalidating every 5 minutes locally and manually in production, aligning with webhook-driven invalidation.
+
+## Migration assumptions moving forward
+- The snapshot living under `tmp/notion-export/` is intentionally representative. We do **not** plan to pull live Notion JSON prior to the switch; the sample simply documents field names so the Keystatic collection can mirror them.
+- Once `keystatic.config.ts` exists, all new or migrated entries will be created through the Keystatic UI (GitHub-backed), avoiding manual Markdown edits. Keystatic will write the Markdown/MDX files to `content/` on commit.
+- If the Keystatic schema diverges from the table above, update both this document and the sample export so future contributors have an accurate mapping reference.
