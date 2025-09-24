@@ -12,7 +12,7 @@ export default function Navigation() {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between">
           <div className="mb-4 md:mb-0">
             <Link href="/" className="text-xl font-semibold text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-              Jason Elgin
+              jason | makes
             </Link>
           </div>
           <ul className="flex space-x-8">

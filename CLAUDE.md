@@ -1,12 +1,12 @@
 # Jason Makes - Architectural Overview
 
 ## Project Overview
-Jason Makes is a dynamic personal portfolio website built with Next.js 15 that showcases articles and case studies while featuring a unique "Daily Profile" system. The site combines static content management through Notion with real-time personal data aggregation from multiple APIs.
+Jason Makes is a dynamic personal portfolio website built with Next.js 15 that showcases articles and case studies while featuring a unique "Daily Profile" system. Content is edited through Keystatic and committed directly to the repo, while the daily profile aggregates data from external APIs.
 
 ## Technology Stack
 - **Framework**: Next.js 15.3.2 with App Router
 - **UI**: React 19.0.0 with Tailwind CSS 4
-- **Content Management**: Notion as headless CMS
+- **Content Management**: Keystatic (GitHub storage)
 - **Database**: Vercel KV (Redis-compatible)
 - **Deployment**: Vercel with Edge Functions
 - **Testing**: Vitest with React Testing Library
@@ -14,47 +14,23 @@ Jason Makes is a dynamic personal portfolio website built with Next.js 15 that s
 
 ## Architecture Components
 
-### 1. Content Management System (Notion Integration)
+### 1. Content Management System (Keystatic)
 
-#### Notion Database Structure
-The site uses two main Notion databases:
-- **Articles Database**: Blog posts with properties for title, excerpt, featured image, tags, and published date
-- **Case Studies Database**: Portfolio pieces with similar properties
+#### Collections
+Keystatic defines two Git-backed collections in `keystatic.config.ts`:
+- **Articles** – Markdown/MDX files in `content/articles` with frontmatter (`title`, `slug`, `excerpt`, `publishDate`, `heroImage`, `tags`).
+- **Case Studies** – Mirror the article schema but write to `content/case-studies`.
 
-#### Notion API Integration Flow
+#### Editing Flow
 
-1. **Content Fetching** (`lib/providers/notion.ts`):
-   ```typescript
-   // Key components:
-   - NotionClient: Wrapper around @notionhq/client
-   - getArticles(): Fetches and transforms article pages
-   - getCaseStudies(): Fetches and transforms case study pages
-   - getPageContent(): Retrieves full page blocks for rendering
-   ```
+1. **Admin UI** (`src/app/(admin)/keystatic/[[...params]]/page.tsx`): renders the Keystatic interface backed by the GitHub storage adapter.
+2. **GitHub App**: `KEYSTATIC_GITHUB_CLIENT_ID/SECRET/SLUG` configure the App so production and local editing use the same credentials. Commits land directly on `main`.
+3. **Data Access** (`lib/data/content.ts`): wraps Keystatic's reader for listing and fetching entries. Body content is resolved as Markdown and rendered with a small Markdown component.
+4. **Assets**: Hero images are committed under `public/images/...` so Vercel serves them statically without additional storage services.
 
-2. **Data Transformation**:
-   - Raw Notion API responses are transformed into typed interfaces
-   - Page properties are extracted and normalized
-   - Rich text is converted to plain text for excerpts
-   - Images are processed and proxied through custom endpoint
-
-3. **Content Rendering** (`src/components/NotionClient.tsx`):
-   - Uses `react-notion-x` for rendering Notion blocks
-   - Custom components for specific block types
-   - Server-side rendering for optimal performance
-   - Supports all major Notion block types (text, images, code, embeds, etc.)
-
-4. **Image Handling** (`/api/notion-image/route.ts`):
-   - Custom proxy to prevent 403 errors from expired Notion S3 URLs
-   - Caches images with proper headers
-   - Handles authentication and URL rewriting
-   - Preserves image quality and format
-
-#### Static Generation with ISR
-- Articles and case studies are statically generated at build time
-- On-demand revalidation via webhook (`/api/refresh-content`)
-- Content updates in Notion trigger immediate site updates
-- Fallback behavior for new content not yet generated
+#### Static Generation
+- Article and case-study pages are statically generated and read from the filesystem.
+- Revalidation is optional (existing `/api/refresh-content` endpoint can be triggered if on-demand regeneration is needed).
 
 ### 2. Daily Profile System
 
@@ -109,11 +85,11 @@ All data-fetching components are React Server Components:
 
 ### 4. API Routes
 
-All API routes use Edge Runtime for optimal performance:
+All API routes use Edge Runtime for optimal performance unless noted:
 
 - `/api/cron/update-profile`: Main data aggregation endpoint
-- `/api/refresh-content`: Webhook for Notion content updates
-- `/api/notion-image`: Image proxy for Notion assets
+- `/api/keystatic/[[...params]]`: GitHub-backed Keystatic proxy (Node.js runtime)
+- `/api/refresh-content`: Optional ISR helper for forcing page revalidation
 - `/api/debug/*`: Development endpoints for testing providers
 
 ### 5. Error Handling & Resilience
@@ -136,15 +112,16 @@ Each data provider implements independent error handling:
 ### Environment Variables
 Required environment variables:
 ```
-CRON_SECRET          - Authorization for cron endpoints
-NOTION_TOKEN         - Notion integration token
-NOTION_ARTICLES_DB   - Articles database ID
-NOTION_CASE_STUDIES_DB - Case studies database ID
-FEEDLY_ACCESS_TOKEN  - Feedly OAuth token
-SPOTIFY_CLIENT_ID    - Spotify app credentials
+CRON_SECRET                       - Authorization for cron endpoints
+KEYSTATIC_GITHUB_CLIENT_ID        - GitHub App client ID for Keystatic
+KEYSTATIC_GITHUB_CLIENT_SECRET    - GitHub App client secret
+KEYSTATIC_SECRET                  - Session secret for Keystatic auth
+NEXT_PUBLIC_KEYSTATIC_GITHUB_APP_SLUG - GitHub App slug for Keystatic UI
+FEEDLY_ACCESS_TOKEN               - Feedly OAuth token
+SPOTIFY_CLIENT_ID                 - Spotify app credentials
 SPOTIFY_CLIENT_SECRET
 SPOTIFY_REFRESH_TOKEN
-OPENAI_API_KEY       - OpenAI API key
+OPENAI_API_KEY                    - OpenAI API key
 ```
 
 ### Local Development
@@ -186,7 +163,7 @@ The site is deployed on Vercel with:
 
 ## Future Considerations
 
-1. **Webhook Security**: Add signature verification for Notion webhooks
+1. **Webhook Security**: Add signature verification for profile refresh webhook (if kept)
 2. **Cache Warming**: Pre-generate popular content
 3. **Analytics**: Add privacy-focused analytics
 4. **A/B Testing**: Experiment with different layouts

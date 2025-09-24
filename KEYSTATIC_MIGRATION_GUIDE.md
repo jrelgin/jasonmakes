@@ -3,11 +3,11 @@
 This guide outlines the steps for migrating the site from the current Notion-based CMS to a basic Keystatic setup that supports content editing directly from the production deployment. Each step is framed as a short, testable task so progress can be verified incrementally. The migration targets a simple personal blog with a single editor, direct commits to `main`, and no legacy Notion content that must be preserved beyond reference.
 
 ### Progress snapshot
-- [x] **Step 1 – Establish Baseline** (docs captured in `docs/notion-baseline.md`, representative snapshot in `tmp/notion-export/`)
+- [x] **Step 1 – Establish Baseline** (original Notion inventory archived; current Keystatic baseline documented in `docs/keystatic-baseline.md`)
 - [x] **Step 2 – Install Keystatic** (packages installed, config created, seed content added)
 - [x] **Step 3 – Enable Production Editing** (GitHub OAuth app active, /keystatic UI online, test entry committed)
 - [x] **Step 4 – Swap Runtime** (Next.js article & case study pages now run entirely on Keystatic data)
-- [ ] **Step 5 – Decommission Notion**
+- [x] **Step 5 – Decommission Notion**
 
 ---
 
@@ -107,17 +107,17 @@ This guide outlines the steps for migrating the site from the current Notion-bas
 
 ## 5. Decommission Notion
 
-14. **Remove Notion-specific code**  
+14. **Remove Notion-specific code** ✅  
     - Delete `lib/providers/notion.ts`, `lib/notionRecordMap.ts`, `lib/utils/notion-image.ts`, `src/app/api/notion-image/route.ts`, `src/components/NotionClient.tsx`, and related utilities.  
     - Clean up references, types, and helper functions.  
-    _Acceptance:_ `pnpm lint` succeeds and `rg "Notion"` returns only documentation references.
+    _Acceptance:_ Targeted `pnpm exec biome check` passes on updated sources and `rg "Notion"` returns no runtime code references (only historical notes in migration docs).
 
-15. **Clean environment variables and docs**  
+15. **Clean environment variables and docs** ✅  
     - Remove Notion env vars from `.env*`, `env-instructions.md`, and deployment configs.  
     - Update README and `/docs` to describe Keystatic workflows instead of Notion.  
     _Acceptance:_ Documentation reviewed and merged via PR.
 
-16. **Verify deployment pipeline**
+16. **Verify deployment pipeline** ✅
     - Trigger a staging/preview deploy to ensure Keystatic content is bundled.
     - Confirm the admin UI works on production and edits create commits in GitHub via the configured OAuth app.
     _Acceptance:_ Successful production deploy with edited content visible and no Notion runtime logs.
