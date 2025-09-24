@@ -1,6 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  experimental: {
+    outputFileTracingIncludes: {
+      "/articles": ["./content/articles/**/*"],
+      "/articles/[slug]": ["./content/articles/**/*"],
+      "/case-studies": ["./content/case-studies/**/*"],
+      "/case-studies/[slug]": ["./content/case-studies/**/*"],
+    },
+  },
   images: {
     remotePatterns: [
       {
