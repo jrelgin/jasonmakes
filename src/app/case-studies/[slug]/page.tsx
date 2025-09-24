@@ -1,76 +1,55 @@
-import { notFound } from 'next/navigation';
-import { cache } from 'react';
-import Image from 'next/image';
-import type { Metadata } from 'next';
-import { getPost, listPosts } from '../../../../lib/providers/notion';
-import NotionClient from '../../../components/NotionClient';
-import { getProxiedNotionImage } from '../../../../lib/utils/notion-image';
+import type { Metadata } from "next";
+import Image from "next/image";
+import { notFound } from "next/navigation";
 
-// Define params interface for this page component
-type Params = {
+import { getCaseStudy, listCaseStudies } from "../../../../lib/data/content";
+import Markdown from "../../../components/Markdown";
+
+interface Params {
   params: Promise<{
     slug: string;
   }>;
-  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
-};
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}
 
-// Cache the listPosts function to avoid duplicate DB queries during build
-const cachedListPosts = cache(listPosts);
+export async function generateStaticParams() {
+  const caseStudies = await listCaseStudies();
+  return caseStudies.map((caseStudy) => ({ slug: caseStudy.slug }));
+}
 
-// Generate metadata for SEO dynamically based on the case study
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
-  // Await params as it's a promise in Next.js 15
   const { slug } = await params;
-  const post = await getPost(slug);
-  
-  if (!post || post.meta.type !== 'Case Study') {
+  const caseStudy = await getCaseStudy(slug);
+
+  if (!caseStudy) {
     return {
-      title: 'Case Study Not Found | Jason Makes',
+      title: "Case Study Not Found | Jason Makes",
     };
   }
-  
+
   return {
-    title: `${post.meta.title} | Jason Makes`,
-    description: post.meta.excerpt || `View case study: ${post.meta.title} by Jason Elgin`,
+    title: `${caseStudy.title} | Jason Makes`,
+    description:
+      caseStudy.excerpt || `View case study: ${caseStudy.title} by Jason Elgin`,
   };
 }
 
-// Generate static paths for all published case studies at build time
-export async function generateStaticParams() {
-  // Use cached listPosts to avoid duplicate DB queries during build
-  const caseStudies = await cachedListPosts({ 
-    filter: { property: 'Type', select: { equals: 'Case Study' } } 
-  });
-  
-  return caseStudies.map((caseStudy) => ({ 
-    slug: caseStudy.slug 
-  }));
-}
-
 export default async function Page({ params }: Params) {
-  // Await params as it's a promise in Next.js 15
   const { slug } = await params;
-  
-  // In development, this will refetch every 60 seconds
-  // In production, this will be cached until manually revalidated
-  const post = await getPost(slug);
-  
-  // Combine the two notFound checks
-  if (!post || post.meta.type !== 'Case Study') {
+  const caseStudy = await getCaseStudy(slug);
+
+  if (!caseStudy) {
     notFound();
   }
-  
-  // Get proxied image URL to avoid 403 errors
-  const imageUrl = getProxiedNotionImage(post.meta.feature);
-  
+
   return (
     <article className="max-w-3xl mx-auto py-8 px-4">
       <header className="mb-8">
-        {imageUrl && (
+        {caseStudy.heroImage && (
           <div className="mb-6 aspect-video relative rounded-lg overflow-hidden">
             <Image
-              src={imageUrl}
-              alt={post.meta.title}
+              src={caseStudy.heroImage}
+              alt={caseStudy.title}
               fill
               priority
               sizes="(max-width: 768px) 100vw, 768px"
@@ -78,21 +57,22 @@ export default async function Page({ params }: Params) {
             />
           </div>
         )}
-        <h1 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900 dark:text-gray-100">{post.meta.title}</h1>
-        {post.meta.date && (
+        <h1 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900 dark:text-gray-100">
+          {caseStudy.title}
+        </h1>
+        {caseStudy.publishDate && (
           <p className="text-gray-600 dark:text-gray-400 mb-2">
-            {new Date(post.meta.date).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric'
+            {new Date(caseStudy.publishDate).toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
             })}
           </p>
         )}
       </header>
-      
+
       <div className="prose prose-lg max-w-none dark:prose-invert">
-        {/* Render the Notion content blocks using client component */}
-        <NotionClient recordMap={post.recordMap} />
+        <Markdown source={caseStudy.content} />
       </div>
     </article>
   );

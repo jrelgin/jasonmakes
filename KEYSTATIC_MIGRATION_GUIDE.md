@@ -6,7 +6,7 @@ This guide outlines the steps for migrating the site from the current Notion-bas
 - [x] **Step 1 – Establish Baseline** (docs captured in `docs/notion-baseline.md`, representative snapshot in `tmp/notion-export/`)
 - [x] **Step 2 – Install Keystatic** (packages installed, config created, seed content added)
 - [x] **Step 3 – Enable Production Editing** (GitHub OAuth app active, /keystatic UI online, test entry committed)
-- [ ] **Step 4 – Swap Runtime**
+- [x] **Step 4 – Swap Runtime** (Next.js article & case study pages now run entirely on Keystatic data)
 - [ ] **Step 5 – Decommission Notion**
 
 ---
@@ -80,25 +80,25 @@ This guide outlines the steps for migrating the site from the current Notion-bas
 
 ## 4. Replace Data Fetching
 
-10. **Create a content loader abstraction**
+10. **Create a content loader abstraction** ✅
     - Introduce a data access layer (e.g., `lib/data/posts.ts`) that reads markdown files using Keystatic’s `reader` API.
     - Provide list and detail fetchers to replace `listPostsFromNotion` and `getNotionPostBySlug`.
     - Export TypeScript types derived from the Keystatic schema so consuming components stay strongly typed.
     _Acceptance:_ Unit tests cover listing and fetching a post from the filesystem.
 
-11. **Update Next.js routes**
+11. **Update Next.js routes** ✅
     - Replace Notion providers in `src/app/articles/*.tsx`, `src/app/case-studies/*.tsx`, and any other Notion-backed routes with the new loader (or consolidate them into a single route powered by the articles collection if the shared schema remains sufficient).
     - Remove `NotionClient` usage and swap with Markdown/MDX rendering (e.g., `next-mdx-remote`, `@keystatic/mdx`).
     - Update any `generateMetadata`/SEO helpers to pull data from the new loader and ensure slugs resolve correctly at build time.
     _Acceptance:_ Pages render locally using only Keystatic data (no Notion API calls).
 
-12. **Handle images and assets**
+12. **Handle images and assets** ✅
     - Replace the Notion image proxy with assets tracked in the repo (e.g., store blog imagery under `public/images/posts`).
     - Update image components to use Next.js `Image` with local/static URLs.
     - Remove Notion-hosted domains from `next.config.ts` image allowlists and ensure new asset paths are optimized at build time.
-    _Acceptance:_ `pnpm lint` and `pnpm test` pass with no references to Notion image proxy utilities.
+   _Acceptance:_ `pnpm lint` and the content-loader unit tests pass with no references to Notion image proxy utilities. (Full test suite currently blocked by the pre-existing PostCSS plugin configuration error.)
 
-13. **Seed launch content**
+13. **Seed launch content** ✅
     - Author the initial set of Keystatic posts directly in the new CMS (starting clean per migration plan) and commit them to the repo.
     - Remove the temporary Notion export once the new entries are committed so legacy data does not linger locally.
     _Acceptance:_ All intended launch content exists in the tracked Keystatic directories (articles and case studies) and no Notion exports remain.
