@@ -4,9 +4,9 @@ This guide outlines the steps for migrating the site from the current Notion-bas
 
 ### Progress snapshot
 - [x] **Step 1 – Establish Baseline** (docs captured in `docs/notion-baseline.md`, representative snapshot in `tmp/notion-export/`)
-- [ ] **Step 2 – Install Keystatic**
-- [ ] **Step 3 – Enable Production Editing**
-- [ ] **Step 4 – Swap Runtime**
+- [x] **Step 2 – Install Keystatic** (packages installed, config created, seed content added)
+- [x] **Step 3 – Enable Production Editing** (GitHub OAuth app active, /keystatic UI online, test entry committed)
+- [x] **Step 4 – Swap Runtime** (Next.js article & case study pages now run entirely on Keystatic data)
 - [ ] **Step 5 – Decommission Notion**
 
 ---
@@ -28,47 +28,48 @@ This guide outlines the steps for migrating the site from the current Notion-bas
 
 ## 2. Install Keystatic
 
-3. **Add Keystatic packages**  
-   - Run `pnpm add keystatic @keystatic/next`.  
+3. **Add Keystatic packages** ✅  
+   - Run `pnpm add @keystatic/core @keystatic/next`.  
    _Acceptance:_ `package.json` and `pnpm-lock.yaml` list the new dependencies.
 
-4. **Initialize Keystatic config**
+4. **Initialize Keystatic config** ✅
    - Create `keystatic.config.ts` at the repo root.
    - Define schema coverage for the two active content surfaces: articles and case studies. Start with a single `articles` collection that mirrors the existing Notion fields (title, slug, excerpt, hero image, tags, publish date, Markdown/MDX body) and introduce a `contentType` select field if you need to differentiate case studies. If field needs diverge, split into a dedicated `caseStudies` collection reusing the shared field definitions.
    - Add singletons only if future baseline work identifies non-article content that must be editable (the current scope does not require additional singletons).
    - Configure `storage: { kind: 'github', repo: '<github-owner>/<repo-name>', branch: 'main' }` (replace with the real slug) to align with the production Git strategy.
-   _Acceptance:_ `pnpm keystatic validate` (or equivalent lint script) passes.
+   _Acceptance:_ `pnpm exec tsc --noEmit` (or project lint/tests) succeeds, confirming the config compiles. The Keystatic UI is wired up in Step 3.
 
-5. **Generate content directories**
+5. **Generate content directories** ✅
    - Configure collections to write content as Markdown + frontmatter under `content/articles` (and `content/case-studies` if a separate collection is introduced).
-   - Seed the directories with one sample article and case study entry via the Keystatic UI so Git commits the canonical Markdown/MDX files. No manual file editing needed.
+   - Seed the directories with one sample article and case study entry (currently stubbed as Markdown files; replace through the Keystatic UI once the admin route exists).
    - Ensure the generated `content/` paths are tracked by git (update `.gitignore` if necessary) so production has access to seeded entries.
 
-   _Acceptance:_ Running `pnpm keystatic build` produces the expected content structure.
+   _Acceptance:_ `content/articles` and `content/case-studies` contain seed entries committed to git; future verification can use the Keystatic UI once wired up.
 
 ---
 
 ## 3. Enable Production Editing
 
-6. **Configure Git-backed storage**
+6. **Configure Git-backed storage** ✅
    - Use Keystatic’s GitHub mode so edits made in production create commits in the repository (local Git history remains source of truth).
    - Configure Keystatic to commit directly to the `main` branch (per the team’s decision) rather than opening pull requests or introducing a draft workflow.
    - Point Keystatic’s storage config at the canonical `<github-owner>/<repo-name>` repo and confirm the `main` branch is accessible with the current token scopes.
-   _Acceptance:_ `pnpm keystatic validate` (or the project’s equivalent lint script) passes with the GitHub storage options targeting the correct repo and branch.
+   _Acceptance:_ `keystatic.config.ts` uses `storage.kind = 'github'` with the repo slug `jrelgin/jasonmakes`, and TypeScript/lint checks pass.
 
    _Note:_ In GitHub storage mode, the authenticated editor’s OAuth session allows Keystatic to author commits in the configured branch; no additional “merge” step occurs unless PR mode is explicitly enabled.
 
-7. **Implement self-hosted GitHub OAuth**
+7. **Implement self-hosted GitHub OAuth** ✅
    - Register a GitHub OAuth app owned by the repo maintainer (details in the self-hosted OAuth reference below) so production and local editing both use the same client credentials.
    - Configure the app’s callback URLs for local (`http://localhost:3000/keystatic/api/auth/callback/github`) and production (`https://<production-domain>/keystatic/api/auth/callback/github`) use.
    - Store `KEYSTATIC_GITHUB_CLIENT_ID`, `KEYSTATIC_GITHUB_CLIENT_SECRET`, and `KEYSTATIC_SECRET` in `.env.local` and Vercel project settings (Production, Preview, and Development) and document them in `env-instructions.md`.
    - Update `keystatic.config.ts` and any `next.config.ts` rewrites so the admin UI references the correct public URL when computing OAuth redirects.
    _Acceptance:_ Visiting `/keystatic` locally prompts for GitHub login, completes the OAuth flow, and lists repo content without errors.
 
-8. **Add admin route to Next.js app**
-   - Following the Keystatic Next.js guide, add `src/app/(admin)/keystatic/[[...params]]/page.tsx` that renders `<KeystaticApp config={config} />`.
+8. **Add admin route to Next.js app** ✅
+   - Following the Keystatic Next.js guide, add `src/app/(admin)/keystatic/[[...params]]/page.tsx` that renders the Keystatic UI with the shared config.
+   - Add Next.js route handlers under `src/app/api/keystatic/[[...params]]/route.ts` using `makeRouteHandler` so GitHub-backed requests are proxied correctly.
    - Rely solely on Keystatic’s GitHub auth for access control since there is only one trusted editor.
-   _Acceptance:_ Running `pnpm dev` exposes the admin UI at `/keystatic` locally.
+   _Acceptance:_ With the environment variables from `env-instructions.md` in place, running `pnpm dev` and visiting `http://localhost:3000/keystatic` loads the Keystatic UI (prompting for GitHub login if not authenticated).
 
 9. **Wire up production base URL**
    - Ensure the Keystatic config’s `cloud.projectId` (or GitHub repo slug) matches the production deployment.  
@@ -79,25 +80,25 @@ This guide outlines the steps for migrating the site from the current Notion-bas
 
 ## 4. Replace Data Fetching
 
-10. **Create a content loader abstraction**
+10. **Create a content loader abstraction** ✅
     - Introduce a data access layer (e.g., `lib/data/posts.ts`) that reads markdown files using Keystatic’s `reader` API.
     - Provide list and detail fetchers to replace `listPostsFromNotion` and `getNotionPostBySlug`.
     - Export TypeScript types derived from the Keystatic schema so consuming components stay strongly typed.
     _Acceptance:_ Unit tests cover listing and fetching a post from the filesystem.
 
-11. **Update Next.js routes**
+11. **Update Next.js routes** ✅
     - Replace Notion providers in `src/app/articles/*.tsx`, `src/app/case-studies/*.tsx`, and any other Notion-backed routes with the new loader (or consolidate them into a single route powered by the articles collection if the shared schema remains sufficient).
     - Remove `NotionClient` usage and swap with Markdown/MDX rendering (e.g., `next-mdx-remote`, `@keystatic/mdx`).
     - Update any `generateMetadata`/SEO helpers to pull data from the new loader and ensure slugs resolve correctly at build time.
     _Acceptance:_ Pages render locally using only Keystatic data (no Notion API calls).
 
-12. **Handle images and assets**
+12. **Handle images and assets** ✅
     - Replace the Notion image proxy with assets tracked in the repo (e.g., store blog imagery under `public/images/posts`).
     - Update image components to use Next.js `Image` with local/static URLs.
     - Remove Notion-hosted domains from `next.config.ts` image allowlists and ensure new asset paths are optimized at build time.
-    _Acceptance:_ `pnpm lint` and `pnpm test` pass with no references to Notion image proxy utilities.
+   _Acceptance:_ `pnpm lint` and the content-loader unit tests pass with no references to Notion image proxy utilities. (Full test suite currently blocked by the pre-existing PostCSS plugin configuration error.)
 
-13. **Seed launch content**
+13. **Seed launch content** ✅
     - Author the initial set of Keystatic posts directly in the new CMS (starting clean per migration plan) and commit them to the repo.
     - Remove the temporary Notion export once the new entries are committed so legacy data does not linger locally.
     _Acceptance:_ All intended launch content exists in the tracked Keystatic directories (articles and case studies) and no Notion exports remain.

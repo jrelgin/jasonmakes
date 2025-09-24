@@ -1,34 +1,24 @@
-import Link from 'next/link';
-import Image from 'next/image';
-import { listPosts, type PostMeta } from '../../../lib/providers/notion';
-import { getProxiedNotionImage } from '../../../lib/utils/notion-image';
+import Image from "next/image";
+import Link from "next/link";
 
-// Use the PostMeta type directly from the Notion provider
-type Article = PostMeta;
+import { type Article, listArticles } from "../../../lib/data/content";
 
 export const metadata = {
-  title: 'Articles | Jason Makes',
-  description: 'Articles and thoughts on design, development, and creativity',
+  title: "Articles | Jason Makes",
+  description: "Articles and thoughts on design, development, and creativity",
 };
 
-// Force static generation - only revalidate via webhook
-export const dynamic = 'force-static';
+export const dynamic = "force-static";
 
 export default async function ArticlesPage() {
-  // Fetch articles from Notion - this will be cached after build
-  const articles = await listPosts({ 
-    filter: {
-      and: [
-        { property: 'Type', select: { equals: 'Article' } },
-        { property: 'Status', select: { equals: 'Published' } }
-      ]
-    }
-  });
+  const articles = await listArticles();
 
   return (
     <main className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-gray-100">Articles</h1>
-      
+      <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-gray-100">
+        Articles
+      </h1>
+
       {articles.length === 0 ? (
         <p>No articles found. Check back soon!</p>
       ) : (
@@ -42,32 +32,21 @@ export default async function ArticlesPage() {
   );
 }
 
-// Article card component with prefetching
 function ArticleCard({ article }: { article: Article }) {
-  const { title, slug, date, excerpt, feature } = article;
-  
-  // Format the date in a human-readable format
-  const formattedDate = new Date(date).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
+  const { title, slug, publishDate, excerpt, heroImage } = article;
+  const formattedDate = new Date(publishDate).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
 
-  // Get proxied image URL to avoid 403 errors
-  const imageUrl = getProxiedNotionImage(feature);
-
   return (
-    <Link 
-      href={`/articles/${slug}`} 
-      className="block h-full"
-      // Prefetch the article on hover for instant navigation
-      prefetch={true}
-    >
+    <Link href={`/articles/${slug}`} className="block h-full" prefetch>
       <div className="border rounded-lg overflow-hidden h-full flex flex-col hover:shadow-lg transition-shadow duration-300">
-        {imageUrl ? (
+        {heroImage ? (
           <div className="h-48 relative overflow-hidden">
             <Image
-              src={imageUrl}
+              src={heroImage}
               alt={title}
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -80,12 +59,20 @@ function ArticleCard({ article }: { article: Article }) {
           </div>
         )}
         <div className="p-4 flex-1 flex flex-col">
-          <h2 className="text-xl font-semibold mb-2">{title}</h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">{formattedDate}</p>
-          {excerpt && <p className="mb-4 text-gray-700 dark:text-gray-300 flex-1">{excerpt}</p>}
-          
+          <h2 className="text-xl  font-semibold mb-2">{title}</h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+            {formattedDate}
+          </p>
+          {excerpt && (
+            <p className="mb-4 text-gray-700 dark:text-gray-300 flex-1">
+              {excerpt}
+            </p>
+          )}
+
           <div className="mt-auto pt-4">
-            <span className="text-sm font-medium text-blue-600 dark:text-blue-400">Read more →</span>
+            <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
+              Read more →
+            </span>
           </div>
         </div>
       </div>
