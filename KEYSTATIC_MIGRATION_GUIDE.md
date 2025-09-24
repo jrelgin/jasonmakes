@@ -5,7 +5,7 @@ This guide outlines the steps for migrating the site from the current Notion-bas
 ### Progress snapshot
 - [x] **Step 1 – Establish Baseline** (docs captured in `docs/notion-baseline.md`, representative snapshot in `tmp/notion-export/`)
 - [x] **Step 2 – Install Keystatic** (packages installed, config created, seed content added)
-- [ ] **Step 3 – Enable Production Editing**
+- [x] **Step 3 – Enable Production Editing** (GitHub OAuth app active, /keystatic UI online, test entry committed)
 - [ ] **Step 4 – Swap Runtime**
 - [ ] **Step 5 – Decommission Notion**
 
@@ -58,7 +58,7 @@ This guide outlines the steps for migrating the site from the current Notion-bas
 
    _Note:_ In GitHub storage mode, the authenticated editor’s OAuth session allows Keystatic to author commits in the configured branch; no additional “merge” step occurs unless PR mode is explicitly enabled.
 
-7. **Implement self-hosted GitHub OAuth**
+7. **Implement self-hosted GitHub OAuth** ✅
    - Register a GitHub OAuth app owned by the repo maintainer (details in the self-hosted OAuth reference below) so production and local editing both use the same client credentials.
    - Configure the app’s callback URLs for local (`http://localhost:3000/keystatic/api/auth/callback/github`) and production (`https://<production-domain>/keystatic/api/auth/callback/github`) use.
    - Store `KEYSTATIC_GITHUB_CLIENT_ID`, `KEYSTATIC_GITHUB_CLIENT_SECRET`, and `KEYSTATIC_SECRET` in `.env.local` and Vercel project settings (Production, Preview, and Development) and document them in `env-instructions.md`.
