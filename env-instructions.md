@@ -6,9 +6,6 @@
 # Cron Secret for secure API access
 CRON_SECRET=your-local-development-secret
 
-# Vercel Blob Storage (same token for local and production)
-BLOB_READ_WRITE_TOKEN=your-vercel-blob-token
-
 # Keystatic GitHub OAuth (populate once the OAuth app exists)
 KEYSTATIC_GITHUB_CLIENT_ID=your-github-oauth-client-id
 KEYSTATIC_GITHUB_CLIENT_SECRET=your-github-oauth-client-secret
@@ -25,10 +22,6 @@ NEXT_PUBLIC_KEYSTATIC_GITHUB_APP_SLUG=your-keystatic-github-app-slug
 - Name: `CRON_SECRET`
   - Value: `[generate a secure random string]`
   - Environment: Production (or all environments as needed)
-- Name: `BLOB_READ_WRITE_TOKEN`
-  - Value: `[your Vercel blob storage token]`
-  - Environment: Production (or all environments as needed)
-  - Note: Get this from Vercel dashboard > Storage > Blob > Settings
 - Name: `KEYSTATIC_GITHUB_CLIENT_ID`
   - Value: `[GitHub OAuth app client ID]`
   - Environment: Development, Preview, Production

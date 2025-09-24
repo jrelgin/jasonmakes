@@ -12,7 +12,7 @@ This site is built on:
 
 - **Framework**: [Next.js 15.3.2](https://nextjs.org) with the App Router
 - **React**: [React 19.0.0](https://react.dev)
-- **Content**: Markdown-based content system using gray-matter and remark
+- **Content**: Keystatic GitHub storage (Markdown/MDX committed in `content/`)
 - **Styling**: [Tailwind CSS 4](https://tailwindcss.com)
 - **Deployment**: [Vercel](https://vercel.com)
 
@@ -40,6 +40,7 @@ This site is built on:
     api/               # API routes (cron, debug, revalidate)
     articles/          # Article pages
     case-studies/      # Case study pages
+    (admin)/keystatic  # Keystatic admin UI
     components/        # Server components reading from KV
 ```
 
@@ -67,40 +68,19 @@ pnpm format
 
 ## Content Management
 
-### Notion Integration
+### Keystatic GitHub workflow
 
-The site also supports content management through Notion as a headless CMS:
+- Articles and case studies live in the repo under `content/`, edited through the Keystatic UI at `/keystatic`.
+- Keystatic commits changes directly to `main` using a GitHub App, so production and local edits stay in sync.
+- `lib/data/content.ts` exposes a tiny reader that hydrates frontmatter + MDX for the Next.js routes.
+- Hero images are stored alongside the site in `public/images`, keeping deployments fully static.
+- Required env vars: `KEYSTATIC_GITHUB_CLIENT_ID`, `KEYSTATIC_GITHUB_CLIENT_SECRET`, `KEYSTATIC_SECRET`, and `NEXT_PUBLIC_KEYSTATIC_GITHUB_APP_SLUG` (see `env-instructions.md`).
 
-- Uses the official Notion API with `@notionhq/client`
-- Articles are stored in a Notion database and rendered with `react-notion-x`
-- Custom block rendering and conversion from Notion API format to `react-notion-x` format
-- Handles rich text content with proper formatting (bold, italic, etc.)
-- Supports various block types including paragraphs, headings, lists, and todos
+#### Nice-to-haves
 
-For a deeper dive into how Notion data is fetched and rendered, see [docs/notion-guide.md](docs/notion-guide.md).
-
-#### Nice-to-Haves / Next Up
-
-- [x] **Case studies now use the same Notion workflow as articles**
-
-- [ ] **Finish the _Publish Site_ button flow**  
-  - Confirm the button posts to `/api/revalidate` with `X-Revalidate-Secret`  
-  - Verify page refreshes end-to-end after a click
-
-- [x] **Remove dev-only console logs**
-  - Guard logs with `if (process.env.NODE_ENV !== 'production')` or delete
-
-- [ ] **Add SEO & social meta**  
-  - `<title>` and `<meta name="description">` from Notion → Excerpt  
-  - `<meta property="og:image">` from Featured Image  
-  - Optional JSON-LD `Article` schema
-
-- [ ] **Fallback revalidation safety net**  
-  - Add `export const revalidate = 86_400` (24 h) to article & case-study pages
-
-- [ ] **Support custom / new Notion blocks**  
-  - Map unsupported block types in `components` prop inside `NotionClient`  
-  - Example: Notion "Button" → custom `<MyButton />`
+- [ ] Finish the "Publish Site" shortcut (trigger revalidate after commits land).
+- [ ] Add richer MDX rendering/embeds once new content needs it.
+- [ ] Expand SEO metadata (OG images, JSON-LD) based on the Keystatic fields.
 
 ## Daily Profile System
 
