@@ -114,7 +114,7 @@ export default function Markdown({ source }: MarkdownProps) {
       const HeadingTag = `h${Math.min(
         level,
         6,
-      )}` as keyof JSX.IntrinsicElements;
+      )}` as keyof HTMLElementTagNameMap;
       elements.push(
         <HeadingTag key={getKey("heading")}>
           {parseInline(headingMatch[2])}

@@ -41,7 +41,7 @@ async function toContent<T extends ArticleEntry | CaseStudyEntry>(
     excerpt: entry.excerpt ?? "",
     publishDate: entry.publishDate,
     heroImage: entry.heroImage ?? null,
-    tags: entry.tags ?? [],
+    tags: entry.tags ? [...entry.tags] : [],
     content: resolvedContent,
   };
 }
