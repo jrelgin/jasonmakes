@@ -1,7 +1,7 @@
-import WeatherWidget from './components/WeatherWidget';
-import AboutBlurb from './components/AboutBlurb';
-import FeedlyArticlesWidget from './components/FeedlyArticlesWidget';
-import SpotifyWidget from './components/SpotifyWidget';
+import WeatherWidget from "@/app/components/WeatherWidget";
+import AboutBlurb from "@/app/components/AboutBlurb";
+import FeedlyArticlesWidget from "@/app/components/FeedlyArticlesWidget";
+import SpotifyWidget from "@/app/components/SpotifyWidget";
 
 export default function Home() {
   return (

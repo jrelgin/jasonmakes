@@ -2,8 +2,12 @@ import type { Metadata } from "next";
 import { Geist_Mono, Instrument_Sans } from "next/font/google";
 import localFont from "next/font/local";
 import { Analytics } from "@vercel/analytics/react";
+
+import { siteMetadata } from "#lib/config/site";
+
+import Navigation from "@/components/Navigation";
+
 import "./globals.css";
-import Navigation from "../components/Navigation";
 
 // Load Apoc Normal Bold font from local file
 const apocFont = localFont({
@@ -28,10 +32,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Jason Makes | Design & Development",
-  description: "Jason Elgin's portfolio featuring articles and case studies about design and development",
-};
+export const metadata: Metadata = siteMetadata;
 
 export default function RootLayout({
   children,
