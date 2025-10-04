@@ -3,6 +3,7 @@ export const revalidate = 3600; // 1 hour (matches cron frequency)
 import type { Profile } from "#lib/profile";
 import { kv } from "#lib/kv";
 import type { Weather } from "#lib/providers/weather";
+import { formatUpdatedAt } from "@/lib/date";
 
 type WeatherProfile = Pick<Profile, "weather">;
 
@@ -66,6 +67,10 @@ export default async function WeatherWidget() {
           <dd className="font-medium">{weatherData.precipitation_prob}%</dd>
         </div>
       </dl>
+
+      <p className="mt-4 text-xs text-gray-500 dark:text-gray-400">
+        Updated {formatUpdatedAt(weatherData.lastUpdated)}
+      </p>
     </div>
   );
 }
