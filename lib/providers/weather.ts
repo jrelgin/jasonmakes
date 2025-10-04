@@ -8,7 +8,8 @@ export interface Weather {
   temperature: number;         // Current temperature
   condition: string;           // Weather condition description
   city: string;                // City name from environment variables
-  
+  lastUpdated: string;         // ISO timestamp for when the data was fetched
+
   // Enhanced data points
   temperature_high: number;    // Daily high temperature
   temperature_low: number;     // Daily low temperature
@@ -89,7 +90,8 @@ export async function fetchWeather(): Promise<Weather> {
       temperature: data.current.temperature_2m,
       condition,
       city: cityName,
-      
+      lastUpdated: new Date().toISOString(),
+
       // Enhanced data points
       temperature_high: data.daily.temperature_2m_max[0],
       temperature_low: data.daily.temperature_2m_min[0],
@@ -120,7 +122,8 @@ export async function fetchWeather(): Promise<Weather> {
       temperature: 75.5, // Fahrenheit fallback value
       condition: 'Unknown',
       city: cityName,
-      
+      lastUpdated: new Date().toISOString(),
+
       // Enhanced fallback data
       temperature_high: 80,
       temperature_low: 65,
