@@ -84,7 +84,8 @@ export async function createResilientProfile(timeoutMs = 5000) {
         temperature: 75.5, // Fahrenheit fallback value
         condition: 'Unknown',
         city: process.env.WEATHER_CITY || 'Atlanta',
-        
+        lastUpdated: new Date().toISOString(),
+
         // Enhanced fallback data
         temperature_high: 80,
         temperature_low: 65,

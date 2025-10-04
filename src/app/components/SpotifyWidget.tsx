@@ -3,15 +3,18 @@ export const revalidate = 3600; // 1 hour (matches cron frequency)
 import type { Profile } from "#lib/profile";
 import { kv } from "#lib/kv";
 import type { SpotifyTrack } from "#lib/providers/spotify";
+import { formatUpdatedAt } from "@/lib/date";
 
 type SpotifyProfile = Pick<Profile, "spotify">;
 
 export default async function SpotifyWidget() {
+  let spotifyData: SpotifyProfile["spotify"] | null = null;
   let trackData: SpotifyTrack | null = null;
 
   try {
     const profile = await kv.get<SpotifyProfile>("profile");
-    trackData = profile?.spotify.track ?? null;
+    spotifyData = profile?.spotify ?? null;
+    trackData = spotifyData?.track ?? null;
   } catch (error) {
     console.error("Failed to fetch Spotify data from KV:", error);
   }
@@ -19,7 +22,12 @@ export default async function SpotifyWidget() {
   if (!trackData) {
     return (
       <div className="spotify-widget rounded-lg border border-gray-200 bg-gray-100 p-4 text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
-        Music data unavailable
+        <p>Music data unavailable</p>
+        {spotifyData?.lastUpdated && (
+          <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+            Updated {formatUpdatedAt(spotifyData.lastUpdated)}
+          </p>
+        )}
       </div>
     );
   }
@@ -44,6 +52,11 @@ export default async function SpotifyWidget() {
           )}
         </div>
       </div>
+      {spotifyData?.lastUpdated && (
+        <p className="mt-4 text-xs text-gray-500 dark:text-gray-400">
+          Updated {formatUpdatedAt(spotifyData.lastUpdated)}
+        </p>
+      )}
     </div>
   );
 }

@@ -3,6 +3,7 @@ export const revalidate = 86_400; // 24 hours (daily refresh)
 import type { Profile } from "#lib/profile";
 import { kv } from "#lib/kv";
 import type { FeedlyArticle, FeedlyData } from "#lib/providers/feedly";
+import { formatUpdatedAt } from "@/lib/date";
 
 type FeedlyProfile = Pick<Profile, "feedly">;
 
@@ -32,7 +33,12 @@ export default async function FeedlyArticlesWidget() {
 
   return (
     <div className="feedly-widget mb-4">
-      <h3 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">Latest Reads</h3>
+      <div className="mb-3 flex flex-col gap-1 text-gray-500 dark:text-gray-400 sm:flex-row sm:items-center sm:justify-between">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Latest Reads</h3>
+        {feedlyData?.lastUpdated && (
+          <span className="text-xs">Updated {formatUpdatedAt(feedlyData.lastUpdated)}</span>
+        )}
+      </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
         {latestArticles.map((article) => (
