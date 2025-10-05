@@ -1,6 +1,7 @@
 // Import types and dependencies
 import type { Profile } from '../../../../../lib/profile';
 import type { Weather } from '../../../../../lib/providers/weather';
+import { ensureWeatherLastUpdated } from '../../../../../lib/providers/weather';
 import type { FeedlyData } from '../../../../../lib/providers/feedly';
 // Import just the types for Spotify
 import type { SpotifyTrack } from '../../../../../lib/providers/spotify';
@@ -77,6 +78,8 @@ async function createResilientProfile(logger: Logger, timeoutMs = 10000) {
   try {
     // Phase 1: Weather integration
     let weather: Weather;
+    const previousProfile = await kv.get('profile') as Profile | null;
+    const previousWeather = previousProfile?.weather ? ensureWeatherLastUpdated(previousProfile.weather) : null;
     try {
       const weatherPromise = import('../../../../../lib/providers/weather')
         .then(module => module.fetchWeather());
@@ -86,18 +89,18 @@ async function createResilientProfile(logger: Logger, timeoutMs = 10000) {
         setTimeout(() => reject(new Error('Weather API timeout')), timeoutMs);
       });
       
-      weather = await Promise.race([weatherPromise, timeoutPromise]) as Weather;
+      weather = ensureWeatherLastUpdated(await Promise.race([weatherPromise, timeoutPromise]) as Weather);
       logger.providerSuccess('weather');
     } catch (error) {
       logger.providerFailure('weather', error);
       // Try again - the weather provider will handle its own fallbacks
       try {
-        weather = await import('../../../../../lib/providers/weather').then(module => module.fetchWeather());
+        weather = ensureWeatherLastUpdated(await import('../../../../../lib/providers/weather').then(module => module.fetchWeather()));
         logger.info('Successfully used fallback weather data from provider');
       } catch (secondError) {
         logger.error('Failed even with fallback weather data', secondError);
         // Last resort fallback if everything else fails
-        weather = {
+        weather = previousWeather ?? ensureWeatherLastUpdated({
           temperature: 72,
           condition: 'Unknown',
           city: process.env.WEATHER_CITY || 'Atlanta',
@@ -105,9 +108,14 @@ async function createResilientProfile(logger: Logger, timeoutMs = 10000) {
           temperature_low: 60,
           precipitation_prob: 0,
           mean_humidity: 50,
-          humidity_classification: 'Unknown'
-        };
+          humidity_classification: 'Unknown',
+          lastUpdated: new Date().toISOString(),
+        });
       }
+    }
+
+    if (!weather.lastUpdated) {
+      weather = ensureWeatherLastUpdated(weather);
     }
     
     // Feedly integration (Phase 2)
@@ -197,7 +205,7 @@ export async function GET(req: Request) {
     // Pass the logger and custom timeout for consistent run IDs and configurability
     const timeoutMs = 10000; // Increase timeout to 10 seconds
     const { weather, feedly, spotify } = await createResilientProfile(logger, timeoutMs);
-    const profile: Profile = { weather, feedly, spotify };
+    const profile: Profile = { weather: ensureWeatherLastUpdated(weather), feedly, spotify };
     
     // If Feedly returned zero articles, try to preserve the last good data
     if (feedly.articles.length === 0) {
