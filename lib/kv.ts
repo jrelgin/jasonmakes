@@ -34,10 +34,11 @@ function seedMockData() {
       
       // Sample weather data
       const sampleWeather = {
-        temperature: 75.5, 
+        temperature: 75.5,
         condition: 'Partly Cloudy',
         city: process.env.WEATHER_CITY || 'Atlanta',
-        
+        lastUpdated: new Date().toISOString(),
+
         // Enhanced data fields
         temperature_high: 84.2,
         temperature_low: 62.8,

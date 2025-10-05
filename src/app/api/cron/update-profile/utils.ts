@@ -1,5 +1,6 @@
 import type { Profile } from '../../../../../lib/profile';
 import type { Weather } from '../../../../../lib/providers/weather';
+import { ensureWeatherLastUpdated } from '../../../../../lib/providers/weather';
 import { kv } from '../../../../../lib/kv';
 
 /**
@@ -57,10 +58,11 @@ export class Logger {
 export async function createResilientProfile(timeoutMs = 5000) {
   // Create a logger instance for this run
   const logger = new Logger();
-  
+
   try {
     // First, try to get the previous profile from KV for fallback purposes
-    const previousProfile = await kv.get('profile') as Profile | null || { weather: null };
+    const previousProfile = await kv.get('profile') as Profile | null;
+    const previousWeather = previousProfile?.weather ? ensureWeatherLastUpdated(previousProfile.weather) : null;
     
     // Individually try to fetch each provider with proper error handling
     let weather: Weather | undefined;
@@ -80,30 +82,31 @@ export async function createResilientProfile(timeoutMs = 5000) {
       logger.providerFailure('weather', error);
       // Fall back to previous day's weather data if available
       // Use the fallback data if previous weather data isn't available
-      const fallbackWeather: Weather = {
+      const fallbackWeather: Weather = ensureWeatherLastUpdated({
         temperature: 75.5, // Fahrenheit fallback value
         condition: 'Unknown',
         city: process.env.WEATHER_CITY || 'Atlanta',
-        
+        lastUpdated: new Date().toISOString(),
+
         // Enhanced fallback data
         temperature_high: 80,
         temperature_low: 65,
         mean_humidity: 50,
         precipitation_prob: 0,
         humidity_classification: 'Comfortable'
-      };
-      
-      weather = previousProfile.weather || fallbackWeather;
+      });
+
+      weather = previousWeather || fallbackWeather;
       logger.info('Using fallback weather data');
     }
-    
+
     // Future phases will add similar try/catch blocks for Feedly, Spotify, etc.
-    
+
     // Log summary of provider results
     logger.summary();
-    
+
     // Combine all provider data (currently just weather)
-    return { weather, logger };
+    return { weather: ensureWeatherLastUpdated(weather), logger };
   } catch (error) {
     const logger = new Logger();
     logger.error('Failed to create resilient profile', error);

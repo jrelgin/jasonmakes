@@ -29,6 +29,7 @@ function getFallbackWeather(): Weather {
     temperature: 75.5,
     condition: "Unknown",
     city: process.env.WEATHER_CITY || "Atlanta",
+    lastUpdated: new Date().toISOString(),
     temperature_high: 80,
     temperature_low: 65,
     mean_humidity: 50,

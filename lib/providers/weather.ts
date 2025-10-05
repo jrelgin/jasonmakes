@@ -8,13 +8,34 @@ export interface Weather {
   temperature: number;         // Current temperature
   condition: string;           // Weather condition description
   city: string;                // City name from environment variables
-  
+  lastUpdated: string;         // ISO timestamp for when the data was fetched
+
   // Enhanced data points
   temperature_high: number;    // Daily high temperature
   temperature_low: number;     // Daily low temperature
   mean_humidity: number;       // Mean relative humidity for the day (percentage)
   precipitation_prob: number;  // Probability of precipitation (percentage)
   humidity_classification: string; // Classification based on humidity (Dry, Comfortable, etc.)
+}
+
+/**
+ * Ensures the provided weather payload always includes a usable `lastUpdated` timestamp.
+ *
+ * When old cached data predating the timestamp field is read from KV, the value may be
+ * missing or invalid. This helper normalizes those instances so that downstream
+ * formatting logic never receives `undefined` and renders "Unknown" unexpectedly.
+ */
+export function ensureWeatherLastUpdated(weather: Weather): Weather {
+  const { lastUpdated } = weather;
+
+  if (lastUpdated && !Number.isNaN(new Date(lastUpdated).getTime())) {
+    return weather;
+  }
+
+  return {
+    ...weather,
+    lastUpdated: new Date().toISOString(),
+  };
 }
 
 /**
@@ -89,7 +110,8 @@ export async function fetchWeather(): Promise<Weather> {
       temperature: data.current.temperature_2m,
       condition,
       city: cityName,
-      
+      lastUpdated: new Date().toISOString(),
+
       // Enhanced data points
       temperature_high: data.daily.temperature_2m_max[0],
       temperature_low: data.daily.temperature_2m_min[0],
@@ -120,7 +142,8 @@ export async function fetchWeather(): Promise<Weather> {
       temperature: 75.5, // Fahrenheit fallback value
       condition: 'Unknown',
       city: cityName,
-      
+      lastUpdated: new Date().toISOString(),
+
       // Enhanced fallback data
       temperature_high: 80,
       temperature_low: 65,
