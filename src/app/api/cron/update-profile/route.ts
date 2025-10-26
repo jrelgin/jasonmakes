@@ -104,6 +104,7 @@ async function createResilientProfile(logger: Logger, timeoutMs = 10000) {
           temperature: 72,
           condition: 'Unknown',
           city: process.env.WEATHER_CITY || 'Atlanta',
+          lastUpdated: new Date().toISOString(),
           temperature_high: 80,
           temperature_low: 60,
           precipitation_prob: 0,
