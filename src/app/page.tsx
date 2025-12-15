@@ -12,10 +12,31 @@ export default function Home() {
         <div className="flex-grow" />
         
         {/* Professional Heading at left side - vertically centered */}
-        <h1 className="text-2xl md:text-3xl lg:text-4xl font-medium text-gray-800 dark:text-gray-200 leading-relaxed max-w-6xl">
-          Head of Product at Standard Education;
-          Product Design & Strategic Direction at Signal Lantern
-        </h1>
+        <div className="max-w-6xl">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-medium text-gray-800 dark:text-gray-200 leading-relaxed">
+            Head of Product at Standard Education
+          </h1>
+          <p className="font-body text-xl md:text-2xl lg:text-2xl font-normal text-[var(--color-gray-500)] dark:text-gray-400 leading-normal mt-2">
+            Previously product design and strategy at{" "}
+            <a
+              href="https://signallantern.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-gray-800 dark:hover:text-gray-300 transition-colors"
+            >
+              Signal Lantern
+            </a>{" "}
+            and{" "}
+            <a
+              href="https://fullstory.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-gray-800 dark:hover:text-gray-300 transition-colors"
+            >
+              FullStory
+            </a>
+          </p>
+        </div>
         
         {/* Spacer to push blurb to bottom */}
         <div className="flex-grow" />
