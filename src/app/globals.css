@@ -24,6 +24,16 @@ body {
   font-family: var(--font-instrument), serif;
 }
 
+.home-seascape {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #12203a;
+}
+
 /* Apply Apoc font to all heading elements */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-apoc), serif;
@@ -41,4 +51,3 @@ h1, h2, h3, h4, h5, h6 {
 .font-code {
   font-family: var(--font-geist-mono);
 }
-

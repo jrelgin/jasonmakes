@@ -43,10 +43,10 @@ export default async function Page({ params }: Params) {
   }
 
   return (
-    <article className="max-w-3xl mx-auto py-8 px-4">
-      <header className="mb-8">
+    <article className="mx-auto max-w-4xl px-4 py-10">
+      <header className="mb-10">
         {caseStudy.heroImage && (
-          <div className="mb-6 aspect-video relative rounded-lg overflow-hidden">
+          <div className="relative mb-8 aspect-video overflow-hidden rounded-lg">
             <Image
               src={caseStudy.heroImage}
               alt={caseStudy.title}
@@ -57,17 +57,59 @@ export default async function Page({ params }: Params) {
             />
           </div>
         )}
-        <h1 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900 dark:text-gray-100">
+        {caseStudy.client && (
+          <p className="mb-3 text-sm font-semibold uppercase text-gray-500 dark:text-gray-400">
+            {caseStudy.client}
+          </p>
+        )}
+        <h1 className="mb-5 text-4xl font-bold leading-tight text-gray-900 dark:text-gray-100 md:text-5xl">
           {caseStudy.title}
         </h1>
-        {caseStudy.publishDate && (
-          <p className="text-gray-600 dark:text-gray-400 mb-2">
-            {new Date(caseStudy.publishDate).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
-          </p>
+
+        <dl className="grid gap-4 border-y border-gray-200 py-5 text-sm dark:border-gray-800 sm:grid-cols-3">
+          {caseStudy.role && (
+            <div>
+              <dt className="font-semibold uppercase text-gray-500 dark:text-gray-400">
+                Role
+              </dt>
+              <dd className="mt-1 text-gray-900 dark:text-gray-100">
+                {caseStudy.role}
+              </dd>
+            </div>
+          )}
+          {caseStudy.scope && (
+            <div>
+              <dt className="font-semibold uppercase text-gray-500 dark:text-gray-400">
+                Scope
+              </dt>
+              <dd className="mt-1 text-gray-900 dark:text-gray-100">
+                {caseStudy.scope}
+              </dd>
+            </div>
+          )}
+          {caseStudy.industry && (
+            <div>
+              <dt className="font-semibold uppercase text-gray-500 dark:text-gray-400">
+                Industry
+              </dt>
+              <dd className="mt-1 text-gray-900 dark:text-gray-100">
+                {caseStudy.industry}
+              </dd>
+            </div>
+          )}
+        </dl>
+
+        {caseStudy.outcomes.length > 0 && (
+          <ul className="mt-6 grid gap-3 text-gray-700 dark:text-gray-300 md:grid-cols-2">
+            {caseStudy.outcomes.map((outcome) => (
+              <li
+                key={outcome}
+                className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-900"
+              >
+                {outcome}
+              </li>
+            ))}
+          </ul>
         )}
       </header>
 

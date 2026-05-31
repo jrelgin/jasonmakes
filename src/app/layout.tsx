@@ -1,7 +1,7 @@
+import { Analytics } from "@vercel/analytics/react";
 import type { Metadata } from "next";
 import { Geist_Mono, Instrument_Sans } from "next/font/google";
 import localFont from "next/font/local";
-import { Analytics } from "@vercel/analytics/react";
 
 import { siteMetadata } from "#lib/config/site";
 
@@ -21,8 +21,8 @@ const apocFont = localFont({
 // Load Instrument Sans with specific styles
 const instrumentSans = Instrument_Sans({
   subsets: ["latin"],
-  weight: ["400", "600", "700"],  // Regular, Semi-bold, Bold
-  style: ["normal", "italic"],    // Normal and Italic styles
+  weight: ["400", "600", "700"],
+  style: ["normal", "italic"],
   variable: "--font-instrument",
   display: "swap",
 });
@@ -45,9 +45,7 @@ export default function RootLayout({
         className={`${apocFont.variable} ${instrumentSans.variable} ${geistMono.variable} antialiased`}
       >
         <Navigation />
-        <main className="container mx-auto px-4">
-          {children}
-        </main>
+        <div className="min-h-screen pt-28">{children}</div>
         <Analytics />
       </body>
     </html>

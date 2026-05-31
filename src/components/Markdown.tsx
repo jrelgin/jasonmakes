@@ -52,16 +52,31 @@ function flushParagraph(paragraph: string[], elements: ReactNode[]) {
   paragraph.length = 0;
 }
 
-function flushList(listItems: string[], elements: ReactNode[]) {
+function flushList(
+  listItems: string[],
+  elements: ReactNode[],
+  ordered: boolean,
+) {
   if (listItems.length === 0) return;
+  const ListTag = ordered ? "ol" : "ul";
   elements.push(
-    <ul key={getKey("ul")}>
+    <ListTag key={getKey(ListTag)}>
       {listItems.map((item, index) => (
         <li key={getKey(`li-${index}`)}>{parseInline(item)}</li>
       ))}
-    </ul>,
+    </ListTag>,
   );
   listItems.length = 0;
+}
+
+function flushBlockquote(blockquote: string[], elements: ReactNode[]) {
+  if (blockquote.length === 0) return;
+  elements.push(
+    <blockquote key={getKey("blockquote")}>
+      <p>{parseInline(blockquote.join(" "))}</p>
+    </blockquote>,
+  );
+  blockquote.length = 0;
 }
 
 function flushCode(code: string[] | null, elements: ReactNode[]) {
@@ -78,6 +93,8 @@ export default function Markdown({ source }: MarkdownProps) {
   const elements: ReactNode[] = [];
   const paragraph: string[] = [];
   const listItems: string[] = [];
+  const blockquote: string[] = [];
+  let orderedList = false;
   let codeBlock: string[] | null = null;
 
   for (const line of lines) {
@@ -95,21 +112,24 @@ export default function Markdown({ source }: MarkdownProps) {
 
     if (trimmed.trim() === "```") {
       flushParagraph(paragraph, elements);
-      flushList(listItems, elements);
+      flushList(listItems, elements, orderedList);
+      flushBlockquote(blockquote, elements);
       codeBlock = [];
       continue;
     }
 
     if (trimmed === "") {
       flushParagraph(paragraph, elements);
-      flushList(listItems, elements);
+      flushList(listItems, elements, orderedList);
+      flushBlockquote(blockquote, elements);
       continue;
     }
 
     const headingMatch = trimmed.match(/^(#{1,6})\s+(.*)$/);
     if (headingMatch) {
       flushParagraph(paragraph, elements);
-      flushList(listItems, elements);
+      flushList(listItems, elements, orderedList);
+      flushBlockquote(blockquote, elements);
       const level = headingMatch[1].length;
       const HeadingTag = `h${Math.min(
         level,
@@ -125,16 +145,42 @@ export default function Markdown({ source }: MarkdownProps) {
 
     if (trimmed.startsWith("- ")) {
       flushParagraph(paragraph, elements);
+      flushBlockquote(blockquote, elements);
+      if (orderedList) {
+        flushList(listItems, elements, orderedList);
+        orderedList = false;
+      }
       listItems.push(trimmed.slice(2));
       continue;
     }
 
+    const orderedListMatch = trimmed.match(/^\d+\.\s+(.*)$/);
+    if (orderedListMatch) {
+      flushParagraph(paragraph, elements);
+      flushBlockquote(blockquote, elements);
+      if (!orderedList && listItems.length > 0) {
+        flushList(listItems, elements, orderedList);
+      }
+      orderedList = true;
+      listItems.push(orderedListMatch[1]);
+      continue;
+    }
+
+    if (trimmed.startsWith("> ")) {
+      flushParagraph(paragraph, elements);
+      flushList(listItems, elements, orderedList);
+      blockquote.push(trimmed.slice(2));
+      continue;
+    }
+
+    flushBlockquote(blockquote, elements);
     paragraph.push(trimmed);
   }
 
   flushCode(codeBlock, elements);
   flushParagraph(paragraph, elements);
-  flushList(listItems, elements);
+  flushList(listItems, elements, orderedList);
+  flushBlockquote(blockquote, elements);
 
   return <>{elements}</>;
 }

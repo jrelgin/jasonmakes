@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { getArticle, listArticles } from "../../lib/data/content";
+import {
+  getArticle,
+  getCaseStudy,
+  listArticles,
+  listCaseStudies,
+} from "../../../lib/data/content";
 
 describe("Keystatic content loader", () => {
   it("lists articles sorted by publish date", async () => {
@@ -16,5 +21,22 @@ describe("Keystatic content loader", () => {
     expect(article).not.toBeNull();
     expect(article?.title).toBe("New Article");
     expect(article?.content).toContain("Ok let's try this again");
+  });
+
+  it("lists real case studies by sort order", async () => {
+    const caseStudies = await listCaseStudies();
+    expect(caseStudies.map((caseStudy) => caseStudy.slug)).toEqual([
+      "standard-education-scale",
+      "glass-exports",
+      "fullstory-at-mentions",
+    ]);
+  });
+
+  it("reads case study metadata", async () => {
+    const caseStudy = await getCaseStudy("standard-education-scale");
+    expect(caseStudy).not.toBeNull();
+    expect(caseStudy?.client).toBe("Standard Education");
+    expect(caseStudy?.role).toContain("Principal Product Designer");
+    expect(caseStudy?.outcomes.length).toBeGreaterThan(0);
   });
 });
