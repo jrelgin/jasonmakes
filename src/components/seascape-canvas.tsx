@@ -27,7 +27,10 @@ import {
   setStoredSiteTheme,
 } from "@/lib/site-theme";
 
-const MAX_CANVAS_DPR = 2;
+const MAX_DAY_CANVAS_DPR = 2;
+const MAX_NIGHT_CANVAS_DPR = 1;
+const DAY_FRAME_INTERVAL = 1000 / 30;
+const NIGHT_FRAME_INTERVAL = 1000 / 20;
 const IS_DEV = process.env.NODE_ENV === "development";
 
 const THEME_PALETTES: Record<ThemeKey, Palette> = {
@@ -115,8 +118,14 @@ const PRODUCTION_SETTINGS: Record<
   },
 };
 
-function getCanvasDpr(): number {
-  return Math.min(window.devicePixelRatio || 1, MAX_CANVAS_DPR);
+function getCanvasDpr(skyMode: SkyMode): number {
+  const maxDpr =
+    skyMode === "night" ? MAX_NIGHT_CANVAS_DPR : MAX_DAY_CANVAS_DPR;
+  return Math.min(window.devicePixelRatio || 1, maxDpr);
+}
+
+function getFrameInterval(skyMode: SkyMode): number {
+  return skyMode === "night" ? NIGHT_FRAME_INTERVAL : DAY_FRAME_INTERVAL;
 }
 
 function skyModeFromTheme(key: ThemeKey): SkyMode {
@@ -190,6 +199,24 @@ export function SeascapeCanvas() {
       if (!canvas) return;
 
       const rect = canvas.getBoundingClientRect();
+      const dpr = getCanvasDpr(skyModeRef.current);
+      const nextWidth = Math.round(rect.width * dpr);
+      const nextHeight = Math.round(rect.height * dpr);
+      if (canvas.width !== nextWidth || canvas.height !== nextHeight) {
+        canvas.width = nextWidth;
+        canvas.height = nextHeight;
+      }
+
+      const ctx =
+        ctxRef.current ??
+        canvas.getContext("2d", {
+          alpha: false,
+          willReadFrequently: true,
+        });
+      if (!ctx) return;
+      ctxRef.current = ctx;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
       const seed = keepSeed ? sceneRef.current?.config.seed : undefined;
       sceneRef.current = createScene(
         { width: rect.width, height: rect.height },
@@ -197,7 +224,7 @@ export function SeascapeCanvas() {
         palette,
         settings.waveScale,
         skyModeRef.current,
-        getCanvasDpr(),
+        dpr,
       );
       preserveSunAnimations();
       attachTentacleGlitch();
@@ -212,7 +239,7 @@ export function SeascapeCanvas() {
     const rect = canvas.getBoundingClientRect();
     const width = rect.width;
     const height = rect.height;
-    const dpr = getCanvasDpr();
+    const dpr = getCanvasDpr(skyModeRef.current);
 
     const nextWidth = Math.round(width * dpr);
     const nextHeight = Math.round(height * dpr);
@@ -348,8 +375,6 @@ export function SeascapeCanvas() {
 
     window.addEventListener("resize", handleResize);
 
-    const frameInterval = 1000 / 30;
-
     const animate = (timestamp: number) => {
       if (document.hidden) {
         lastTimeRef.current = timestamp;
@@ -357,6 +382,7 @@ export function SeascapeCanvas() {
         return;
       }
 
+      const frameInterval = getFrameInterval(skyModeRef.current);
       if (
         lastTimeRef.current &&
         timestamp - lastTimeRef.current < frameInterval
@@ -382,7 +408,7 @@ export function SeascapeCanvas() {
 
       updateScene(scene, deltaTime);
 
-      const dpr = getCanvasDpr();
+      const dpr = getCanvasDpr(scene.config.skyMode);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       renderScene(ctx, scene);
 
