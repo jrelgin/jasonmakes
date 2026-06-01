@@ -4,8 +4,9 @@ import type { ReactNode } from "react";
 
 import { HOKUSAI, TWILIGHT } from "@/engine/palette";
 import type { Palette } from "@/engine/types";
+import type { SiteTheme } from "@/lib/site-theme";
 
-type ThemeKey = "hokusai" | "twilight";
+type ThemeKey = SiteTheme;
 
 interface ThemeSwitcherProps {
   activeTheme: ThemeKey;

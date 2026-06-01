@@ -16,10 +16,17 @@ import type {
   SkyMode,
   SunAnimationParams,
 } from "@/engine/types";
+import {
+  LEGACY_THEME_STORAGE_KEY,
+  SITE_THEME_CHANGE_EVENT,
+  SITE_THEME_STORAGE_KEY,
+  applySiteTheme,
+  isSiteTheme,
+  readStoredSiteTheme,
+  resolveSiteTheme,
+  setStoredSiteTheme,
+} from "@/lib/site-theme";
 
-type ThemePreference = "auto" | ThemeKey;
-
-const THEME_STORAGE_KEY = "jasonmakes:home-theme";
 const MAX_CANVAS_DPR = 2;
 const IS_DEV = process.env.NODE_ENV === "development";
 
@@ -116,25 +123,6 @@ function skyModeFromTheme(key: ThemeKey): SkyMode {
   return key === "twilight" ? "night" : "day";
 }
 
-function getSystemTheme(): ThemeKey {
-  if (
-    typeof window !== "undefined" &&
-    window.matchMedia("(prefers-color-scheme: dark)").matches
-  ) {
-    return "twilight";
-  }
-
-  return "hokusai";
-}
-
-function resolveTheme(preference: ThemePreference): ThemeKey {
-  return preference === "auto" ? getSystemTheme() : preference;
-}
-
-function isThemePreference(value: string | null): value is ThemePreference {
-  return value === "auto" || value === "hokusai" || value === "twilight";
-}
-
 export function SeascapeCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
@@ -151,8 +139,6 @@ export function SeascapeCanvas() {
   const glitchParamsRef = useRef<GlitchParams>(
     PRODUCTION_SETTINGS.hokusai.glitchParams,
   );
-  const [themePreference, setThemePreference] =
-    useState<ThemePreference>("auto");
   const [activeTheme, setActiveTheme] = useState<ThemeKey>("hokusai");
   const [waveScale, setWaveScale] = useState(
     PRODUCTION_SETTINGS.hokusai.waveScale,
@@ -262,21 +248,9 @@ export function SeascapeCanvas() {
     attachTentacleGlitch();
   }, [attachTentacleGlitch, preserveSunAnimations]);
 
-  const handleThemePreferenceChange = useCallback(
-    (preference: ThemePreference) => {
-      setThemePreference(preference);
-      window.localStorage.setItem(THEME_STORAGE_KEY, preference);
-      applyTheme(resolveTheme(preference));
-    },
-    [applyTheme],
-  );
-
-  const handleThemeChange = useCallback(
-    (_palette: Palette, key: ThemeKey) => {
-      handleThemePreferenceChange(key);
-    },
-    [handleThemePreferenceChange],
-  );
+  const handleThemeChange = useCallback((_palette: Palette, key: ThemeKey) => {
+    setStoredSiteTheme(key);
+  }, []);
 
   const handleWaveScaleChange = useCallback((value: number) => {
     waveScaleRef.current = value;
@@ -319,23 +293,48 @@ export function SeascapeCanvas() {
   }, [attachTentacleGlitch]);
 
   useEffect(() => {
-    const storedPreference = window.localStorage.getItem(THEME_STORAGE_KEY);
-    const nextPreference = isThemePreference(storedPreference)
-      ? storedPreference
-      : "auto";
-    setThemePreference(nextPreference);
-    applyTheme(resolveTheme(nextPreference), false);
+    const initialTheme = resolveSiteTheme();
+    applySiteTheme(initialTheme);
+    applyTheme(initialTheme, false);
+
+    const handleSiteThemeChange = (event: Event) => {
+      const nextTheme =
+        (event as CustomEvent<{ theme?: string }>).detail?.theme ?? null;
+      if (isSiteTheme(nextTheme)) {
+        applyTheme(nextTheme);
+      }
+    };
+
+    const handleStorage = (event: StorageEvent) => {
+      if (
+        event.key !== SITE_THEME_STORAGE_KEY &&
+        event.key !== LEGACY_THEME_STORAGE_KEY
+      ) {
+        return;
+      }
+
+      const nextTheme = resolveSiteTheme();
+      applySiteTheme(nextTheme);
+      applyTheme(nextTheme);
+    };
 
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
     const handleSystemThemeChange = () => {
-      const storedThemePreference =
-        window.localStorage.getItem(THEME_STORAGE_KEY);
-      if (storedThemePreference && storedThemePreference !== "auto") return;
-      applyTheme(getSystemTheme());
+      if (readStoredSiteTheme()) return;
+      const nextTheme = resolveSiteTheme();
+      applySiteTheme(nextTheme);
+      applyTheme(nextTheme);
     };
 
+    window.addEventListener(SITE_THEME_CHANGE_EVENT, handleSiteThemeChange);
+    window.addEventListener("storage", handleStorage);
     mediaQuery.addEventListener("change", handleSystemThemeChange);
     return () => {
+      window.removeEventListener(
+        SITE_THEME_CHANGE_EVENT,
+        handleSiteThemeChange,
+      );
+      window.removeEventListener("storage", handleStorage);
       mediaQuery.removeEventListener("change", handleSystemThemeChange);
     };
   }, [applyTheme]);
@@ -405,11 +404,6 @@ export function SeascapeCanvas() {
         aria-label="Animated ukiyo-e seascape"
         className="block h-full w-full cursor-default"
       />
-      <HomeThemeToggle
-        activeTheme={activeTheme}
-        preference={themePreference}
-        onPreferenceChange={handleThemePreferenceChange}
-      />
       {IS_DEV && (
         <ControlSidebar
           activeTheme={activeTheme}
@@ -423,47 +417,5 @@ export function SeascapeCanvas() {
         />
       )}
     </>
-  );
-}
-
-function HomeThemeToggle({
-  activeTheme,
-  preference,
-  onPreferenceChange,
-}: {
-  activeTheme: ThemeKey;
-  preference: ThemePreference;
-  onPreferenceChange: (preference: ThemePreference) => void;
-}) {
-  const options: Array<{ value: ThemePreference; label: string }> = [
-    { value: "auto", label: "Auto" },
-    { value: "hokusai", label: "Day" },
-    { value: "twilight", label: "Night" },
-  ];
-
-  return (
-    <div
-      className="fixed bottom-4 right-4 z-50 flex rounded border border-white/20 bg-slate-950/70 p-1 text-xs font-semibold uppercase text-white shadow-xl backdrop-blur-md"
-      aria-label={`Homepage theme, currently ${activeTheme}`}
-    >
-      {options.map((option) => {
-        const isActive = preference === option.value;
-        return (
-          <button
-            key={option.value}
-            type="button"
-            aria-pressed={isActive}
-            onClick={() => onPreferenceChange(option.value)}
-            className={`min-h-9 min-w-14 rounded px-3 transition ${
-              isActive
-                ? "bg-white text-slate-950"
-                : "text-white/70 hover:bg-white/10 hover:text-white"
-            }`}
-          >
-            {option.label}
-          </button>
-        );
-      })}
-    </div>
   );
 }
