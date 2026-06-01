@@ -251,30 +251,47 @@ function applySkyStatic(
   if (intensity <= 0 || burst < 0.4 || skyRows <= 0) return;
 
   const staticIntensity = ((burst - 0.4) / 0.6) * intensity * 2;
+  const bandFrame = Math.floor(time * 4);
+  const shiftFrame = Math.floor(time * 1.6);
+  const staticFrame = Math.floor(time * 60);
 
   for (let y = 0; y < skyRows; y++) {
     const fade = 1 - y / skyRows;
 
-    const isBand = hashInt(y + Math.floor(time * 30)) % 12 === 0;
+    const bandSeed = hashInt(y * 131 + bandFrame * 7919);
+    const isBand = bandSeed % 18 === 0;
     const bandShift = isBand
       ? Math.round(
-          ((hashInt(y * 7 + Math.floor(time * 8)) % 80) - 40) *
+          ((hashInt(y * 7 + shiftFrame * 149) % 80) - 40) *
             dpr *
             staticIntensity,
         )
       : 0;
+    const segmentWidth = Math.max(
+      24,
+      Math.round((70 + (bandSeed % 130)) * dpr),
+    );
+    const segmentOffset = bandSeed % segmentWidth;
 
     for (let x = 0; x < w; x++) {
       const di = (y * w + x) * 4;
       const prob = fade * staticIntensity * 0.12;
-      const hash = hashInt(x * 31 + y * 997 + Math.floor(time * 60));
+      const hash = hashInt(x * 31 + y * 997 + staticFrame);
 
       if (bandShift !== 0) {
-        const sx = Math.max(0, Math.min(w - 1, x + bandShift));
-        const si = (y * w + sx) * 4;
-        data[di] = data[si];
-        data[di + 1] = data[si + 1];
-        data[di + 2] = data[si + 2];
+        const segment = Math.floor((x + segmentOffset) / segmentWidth);
+        const segmentHash = hashInt(segment * 4099 + y * 113 + bandFrame * 271);
+        if (segmentHash % 100 < 58) {
+          const segmentJitter = ((segmentHash >>> 8) % 5) - 2;
+          const sx = Math.max(
+            0,
+            Math.min(w - 1, x + bandShift + Math.round(segmentJitter * dpr)),
+          );
+          const si = (y * w + sx) * 4;
+          data[di] = data[si];
+          data[di + 1] = data[si + 1];
+          data[di + 2] = data[si + 2];
+        }
       }
 
       if ((hash % 1000) / 1000 < prob) {

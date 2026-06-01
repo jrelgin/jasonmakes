@@ -76,6 +76,7 @@ export default function Navigation() {
   }, [theme]);
 
   const nextThemeLabel = theme === "twilight" ? "day" : "night";
+  const isTwilight = theme === "twilight";
 
   return (
     <nav className="pointer-events-none fixed inset-x-0 top-0 z-50 px-4 pt-4 md:px-10 md:pt-10">
@@ -83,7 +84,12 @@ export default function Navigation() {
         <Link
           href="/"
           aria-label="Jason Makes home"
-          className="pointer-events-auto flex shrink-0 items-center border border-white/20 bg-slate-950/70 p-2 shadow-xl backdrop-blur-md transition-opacity hover:opacity-85 md:p-3"
+          className={cn(
+            "pointer-events-auto flex shrink-0 items-center border p-2 shadow-xl backdrop-blur-sm transition-opacity hover:opacity-90 md:p-3",
+            isTwilight
+              ? "border-slate-950/15 bg-white/95"
+              : "border-white/15 bg-slate-950/95",
+          )}
         >
           <Image
             src="/images/logo-white.svg"
@@ -91,11 +97,11 @@ export default function Navigation() {
             width={132}
             height={72}
             priority
-            className="h-8 w-auto sm:h-10"
+            className={cn("h-8 w-auto sm:h-10", isTwilight && "invert")}
           />
         </Link>
 
-        <div className="pointer-events-auto flex items-center rounded border border-white/20 bg-slate-950/70 p-1 text-[10px] font-semibold uppercase text-white shadow-xl backdrop-blur-md sm:text-xs">
+        <div className="pointer-events-auto flex items-center rounded border border-white/15 bg-slate-950/95 p-1 text-[10px] font-semibold uppercase text-white shadow-xl backdrop-blur-sm sm:text-xs">
           <ul className="flex items-center">
             {NAVIGATION_ITEMS.map((item) => {
               const isActive = isNavItemActive(pathname, item);
@@ -124,7 +130,7 @@ export default function Navigation() {
             onClick={toggleTheme}
             className="flex min-h-8 min-w-8 cursor-pointer items-center justify-center rounded text-white/80 transition hover:bg-white/10 hover:text-white sm:min-h-9 sm:min-w-9"
           >
-            {theme === "twilight" ? <SunIcon /> : <TentacleIcon />}
+            {theme === "twilight" ? <SunIcon /> : <SeaCreatureIcon />}
           </button>
         </div>
       </div>
@@ -158,23 +164,14 @@ function SunIcon() {
   );
 }
 
-function TentacleIcon() {
+function SeaCreatureIcon() {
   return (
-    <svg
+    <span
       aria-hidden="true"
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="2.35"
-    >
-      <path d="M3.5 18.5c1.9-1.3 3.8-1.3 5.7 0s3.8 1.3 5.7 0 3.7-1.3 5.6 0" />
-      <path d="M8.2 18c-1.6-3.5-1.4-6.3.5-8.3 1.4-1.5 4.1-1.1 4.7.8.5 1.6-.7 3.1-2.3 2.9" />
-      <path d="M12.8 18c-.2-4 .8-7 3-8.8 1.5-1.2 3.8-.4 4.2 1.5.4 1.6-.8 2.8-2.3 2.7" />
-      <path d="M10.8 17.5c1.1-2.2 1.2-4.1.2-5.9" />
-    </svg>
+      className="block h-5 w-7 bg-contain bg-center bg-no-repeat"
+      style={{
+        backgroundImage: "url('/images/tentacles-icon-swapped.png')",
+      }}
+    />
   );
 }
