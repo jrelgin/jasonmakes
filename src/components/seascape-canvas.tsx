@@ -28,7 +28,7 @@ import {
 } from "@/lib/site-theme";
 
 const MAX_DAY_CANVAS_DPR = 2;
-const MAX_NIGHT_CANVAS_DPR = 1;
+const MAX_NIGHT_CANVAS_DPR = 2;
 const DAY_FRAME_INTERVAL = 1000 / 30;
 const NIGHT_FRAME_INTERVAL = 1000 / 20;
 const IS_DEV = process.env.NODE_ENV === "development";
