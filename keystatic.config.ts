@@ -67,6 +67,39 @@ const articleFields = {
 
 const caseStudyFields = {
   ...articleFields,
+  client: fields.text({
+    label: "Client",
+    description: "Company or organization featured in the case study.",
+  }),
+  role: fields.text({
+    label: "Role",
+    description: "Your role on the project.",
+  }),
+  scope: fields.text({
+    label: "Scope",
+    description: "Primary workstreams or responsibilities.",
+    multiline: true,
+  }),
+  industry: fields.text({
+    label: "Industry",
+    description: "Market, product category, or business context.",
+  }),
+  outcomes: fields.array(
+    fields.text({
+      label: "Outcome",
+      validation: { isRequired: true },
+    }),
+    {
+      label: "Outcomes",
+      description: "Short, scannable results for listings and page headers.",
+      itemLabel: ({ value }) => value ?? "Outcome",
+    },
+  ),
+  sortOrder: fields.integer({
+    label: "Sort order",
+    description:
+      "Lower numbers appear first on the case studies listing. Leave empty to fall back to publish date.",
+  }),
   heroImage: fields.image({
     label: "Hero image",
     directory: "public/images/case-studies",

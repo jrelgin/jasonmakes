@@ -22,7 +22,14 @@ type BaseContent = {
 };
 
 export type Article = BaseContent;
-export type CaseStudy = BaseContent;
+export type CaseStudy = BaseContent & {
+  client: string;
+  role: string;
+  scope: string;
+  industry: string;
+  outcomes: string[];
+  sortOrder: number | null;
+};
 
 async function toContent<T extends ArticleEntry | CaseStudyEntry>(
   slug: string,
@@ -63,13 +70,42 @@ export async function getArticle(slug: string): Promise<Article | null> {
 export async function listCaseStudies(): Promise<CaseStudy[]> {
   const items = await reader.collections.caseStudies.all();
   const mapped = await Promise.all(
-    items.map(({ slug, entry }) => toContent(slug, entry)),
+    items.map(async ({ slug, entry }) => {
+      const baseContent = await toContent(slug, entry);
+      return {
+        ...baseContent,
+        client: entry.client ?? "",
+        role: entry.role ?? "",
+        scope: entry.scope ?? "",
+        industry: entry.industry ?? "",
+        outcomes: entry.outcomes ? [...entry.outcomes] : [],
+        sortOrder: entry.sortOrder ?? null,
+      };
+    }),
   );
-  return mapped.sort((a, b) => (a.publishDate > b.publishDate ? -1 : 1));
+  return mapped.sort((a, b) => {
+    if (a.sortOrder !== null && b.sortOrder !== null) {
+      return a.sortOrder - b.sortOrder;
+    }
+
+    if (a.sortOrder !== null) return -1;
+    if (b.sortOrder !== null) return 1;
+
+    return a.publishDate > b.publishDate ? -1 : 1;
+  });
 }
 
 export async function getCaseStudy(slug: string): Promise<CaseStudy | null> {
   const entry = await reader.collections.caseStudies.read(slug);
   if (!entry) return null;
-  return toContent(slug, entry);
+  const baseContent = await toContent(slug, entry);
+  return {
+    ...baseContent,
+    client: entry.client ?? "",
+    role: entry.role ?? "",
+    scope: entry.scope ?? "",
+    industry: entry.industry ?? "",
+    outcomes: entry.outcomes ? [...entry.outcomes] : [],
+    sortOrder: entry.sortOrder ?? null,
+  };
 }

@@ -11,8 +11,21 @@
   color-scheme: light dark;
 }
 
+:root[data-theme="hokusai"] {
+  --background: #ffffff;
+  --foreground: #171717;
+  color-scheme: light;
+}
+
+:root[data-theme="twilight"],
+:root.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  color-scheme: dark;
+}
+
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme]) {
     --background: #0a0a0a;
     --foreground: #ededed;
   }
@@ -22,6 +35,16 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-instrument), serif;
+}
+
+.home-seascape {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #12203a;
 }
 
 /* Apply Apoc font to all heading elements */
@@ -41,4 +64,3 @@ h1, h2, h3, h4, h5, h6 {
 .font-code {
   font-family: var(--font-geist-mono);
 }
-
