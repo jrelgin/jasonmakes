@@ -83,7 +83,7 @@ export default function Navigation() {
         <Link
           href="/"
           aria-label="Jason Makes home"
-          className="pointer-events-auto flex shrink-0 items-center bg-[#12203A] p-2 shadow-[0_10px_40px_rgba(8,13,22,0.28)] transition-opacity hover:opacity-85 md:p-3"
+          className="pointer-events-auto flex shrink-0 items-center border border-white/20 bg-slate-950/70 p-2 shadow-xl backdrop-blur-md transition-opacity hover:opacity-85 md:p-3"
         >
           <Image
             src="/images/logo-white.svg"
@@ -122,9 +122,9 @@ export default function Navigation() {
             aria-label={`Switch to ${nextThemeLabel} theme`}
             title={`Switch to ${nextThemeLabel} theme`}
             onClick={toggleTheme}
-            className="flex min-h-8 min-w-8 items-center justify-center rounded text-white/80 transition hover:bg-white/10 hover:text-white sm:min-h-9 sm:min-w-9"
+            className="flex min-h-8 min-w-8 cursor-pointer items-center justify-center rounded text-white/80 transition hover:bg-white/10 hover:text-white sm:min-h-9 sm:min-w-9"
           >
-            {theme === "twilight" ? <SunIcon /> : <MoonIcon />}
+            {theme === "twilight" ? <SunIcon /> : <TentacleIcon />}
           </button>
         </div>
       </div>
@@ -158,20 +158,23 @@ function SunIcon() {
   );
 }
 
-function MoonIcon() {
+function TentacleIcon() {
   return (
     <svg
       aria-hidden="true"
-      width="16"
-      height="16"
+      width="18"
+      height="18"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
       strokeLinejoin="round"
-      strokeWidth="2"
+      strokeWidth="2.35"
     >
-      <path d="M20.99 12.79A9 9 0 1 1 11.21 3.01 7 7 0 0 0 20.99 12.79Z" />
+      <path d="M3.5 18.5c1.9-1.3 3.8-1.3 5.7 0s3.8 1.3 5.7 0 3.7-1.3 5.6 0" />
+      <path d="M8.2 18c-1.6-3.5-1.4-6.3.5-8.3 1.4-1.5 4.1-1.1 4.7.8.5 1.6-.7 3.1-2.3 2.9" />
+      <path d="M12.8 18c-.2-4 .8-7 3-8.8 1.5-1.2 3.8-.4 4.2 1.5.4 1.6-.8 2.8-2.3 2.7" />
+      <path d="M10.8 17.5c1.1-2.2 1.2-4.1.2-5.9" />
     </svg>
   );
 }
