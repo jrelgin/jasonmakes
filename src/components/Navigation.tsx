@@ -77,6 +77,7 @@ export default function Navigation() {
 
   const nextThemeLabel = theme === "twilight" ? "day" : "night";
   const isTwilight = theme === "twilight";
+  const shouldInvertLogo = isTwilight && pathname !== "/";
 
   return (
     <nav className="pointer-events-none fixed inset-x-0 top-0 z-50 px-4 pt-4 md:px-10 md:pt-10">
@@ -86,7 +87,7 @@ export default function Navigation() {
           aria-label="Jason Makes home"
           className={cn(
             "pointer-events-auto flex shrink-0 items-center border p-2 shadow-xl backdrop-blur-sm transition-opacity hover:opacity-90 md:p-3",
-            isTwilight
+            shouldInvertLogo
               ? "border-slate-950/15 bg-white/95"
               : "border-white/15 bg-slate-950/95",
           )}
@@ -97,7 +98,7 @@ export default function Navigation() {
             width={132}
             height={72}
             priority
-            className={cn("h-8 w-auto sm:h-10", isTwilight && "invert")}
+            className={cn("h-8 w-auto sm:h-10", shouldInvertLogo && "invert")}
           />
         </Link>
 
