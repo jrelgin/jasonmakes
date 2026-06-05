@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 
 import { getArticle, listArticles } from "../../../../lib/data/content";
 import Markdown from "../../../components/Markdown";
+import { PageIntro, SitePage } from "../../../components/site-page";
 
 interface Params {
   params: Promise<{
@@ -42,10 +43,26 @@ export default async function Page({ params }: Params) {
   }
 
   return (
-    <article className="max-w-3xl mx-auto py-8 px-4">
-      <header className="mb-8">
+    <SitePage width="narrow">
+      <article>
+        <PageIntro
+          eyebrow="Article"
+          title={article.title}
+          className="page-intro--detail"
+        >
+          {article.publishDate && (
+            <p className="detail-date">
+              {new Date(article.publishDate).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </p>
+          )}
+        </PageIntro>
+
         {article.heroImage && (
-          <div className="mb-6 aspect-video relative rounded-lg overflow-hidden">
+          <div className="detail-hero">
             <Image
               src={article.heroImage}
               alt={article.title}
@@ -56,23 +73,11 @@ export default async function Page({ params }: Params) {
             />
           </div>
         )}
-        <h1 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900 dark:text-gray-100">
-          {article.title}
-        </h1>
-        {article.publishDate && (
-          <p className="text-gray-600 dark:text-gray-400 mb-2">
-            {new Date(article.publishDate).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
-          </p>
-        )}
-      </header>
 
-      <div className="prose prose-lg max-w-none dark:prose-invert">
-        <Markdown source={article.content} />
-      </div>
-    </article>
+        <div className="tide-prose">
+          <Markdown source={article.content} />
+        </div>
+      </article>
+    </SitePage>
   );
 }

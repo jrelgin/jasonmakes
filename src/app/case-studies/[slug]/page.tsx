@@ -4,6 +4,12 @@ import { notFound } from "next/navigation";
 
 import { getCaseStudy, listCaseStudies } from "../../../../lib/data/content";
 import Markdown from "../../../components/Markdown";
+import {
+  MetaItem,
+  MetaRail,
+  PageIntro,
+  SitePage,
+} from "../../../components/site-page";
 
 interface Params {
   params: Promise<{
@@ -43,10 +49,17 @@ export default async function Page({ params }: Params) {
   }
 
   return (
-    <article className="mx-auto max-w-4xl px-4 py-10">
-      <header className="mb-10">
+    <SitePage width="standard">
+      <article>
+        <PageIntro
+          eyebrow={caseStudy.client || "Case study"}
+          title={caseStudy.title}
+          description={caseStudy.excerpt}
+          className="page-intro--detail"
+        />
+
         {caseStudy.heroImage && (
-          <div className="relative mb-8 aspect-video overflow-hidden rounded-lg">
+          <div className="detail-hero">
             <Image
               src={caseStudy.heroImage}
               alt={caseStudy.title}
@@ -57,65 +70,25 @@ export default async function Page({ params }: Params) {
             />
           </div>
         )}
-        {caseStudy.client && (
-          <p className="mb-3 text-sm font-semibold uppercase text-gray-500 dark:text-gray-400">
-            {caseStudy.client}
-          </p>
-        )}
-        <h1 className="mb-5 text-4xl font-bold leading-tight text-gray-900 dark:text-gray-100 md:text-5xl">
-          {caseStudy.title}
-        </h1>
 
-        <dl className="grid gap-4 border-y border-gray-200 py-5 text-sm dark:border-gray-800 sm:grid-cols-3">
-          {caseStudy.role && (
-            <div>
-              <dt className="font-semibold uppercase text-gray-500 dark:text-gray-400">
-                Role
-              </dt>
-              <dd className="mt-1 text-gray-900 dark:text-gray-100">
-                {caseStudy.role}
-              </dd>
-            </div>
-          )}
-          {caseStudy.scope && (
-            <div>
-              <dt className="font-semibold uppercase text-gray-500 dark:text-gray-400">
-                Scope
-              </dt>
-              <dd className="mt-1 text-gray-900 dark:text-gray-100">
-                {caseStudy.scope}
-              </dd>
-            </div>
-          )}
-          {caseStudy.industry && (
-            <div>
-              <dt className="font-semibold uppercase text-gray-500 dark:text-gray-400">
-                Industry
-              </dt>
-              <dd className="mt-1 text-gray-900 dark:text-gray-100">
-                {caseStudy.industry}
-              </dd>
-            </div>
-          )}
-        </dl>
+        <MetaRail>
+          <MetaItem label="Role" value={caseStudy.role} />
+          <MetaItem label="Scope" value={caseStudy.scope} />
+          <MetaItem label="Industry" value={caseStudy.industry} />
+        </MetaRail>
 
         {caseStudy.outcomes.length > 0 && (
-          <ul className="mt-6 grid gap-3 text-gray-700 dark:text-gray-300 md:grid-cols-2">
+          <ul className="outcome-grid">
             {caseStudy.outcomes.map((outcome) => (
-              <li
-                key={outcome}
-                className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-900"
-              >
-                {outcome}
-              </li>
+              <li key={outcome}>{outcome}</li>
             ))}
           </ul>
         )}
-      </header>
 
-      <div className="prose prose-lg max-w-none dark:prose-invert">
-        <Markdown source={caseStudy.content} />
-      </div>
-    </article>
+        <div className="tide-prose tide-prose--case-study">
+          <Markdown source={caseStudy.content} />
+        </div>
+      </article>
+    </SitePage>
   );
 }

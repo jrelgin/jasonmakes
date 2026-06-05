@@ -2,6 +2,7 @@ import AboutBlurb from "@/app/components/AboutBlurb";
 import FeedlyArticlesWidget from "@/app/components/FeedlyArticlesWidget";
 import SpotifyWidget from "@/app/components/SpotifyWidget";
 import WeatherWidget from "@/app/components/WeatherWidget";
+import { PageIntro, SitePage } from "@/components/site-page";
 
 export const metadata = {
   title: "About | Jason Makes",
@@ -11,68 +12,58 @@ export const metadata = {
 
 export default function AboutPage() {
   return (
-    <>
-      <section className="container mx-auto flex min-h-[calc(100vh-7rem)] flex-col px-4">
-        <div className="flex-grow" />
+    <SitePage width="wide" className="about-page">
+      <section className="about-hero">
+        <PageIntro
+          eyebrow="About"
+          title="Jason Elgin turns messy product systems into useful, memorable software."
+          description="Head of Product at Standard Education. Previously product design and strategy through Signal Lantern and FullStory."
+        />
 
-        <div className="max-w-6xl">
-          <h1 className="text-2xl font-medium leading-relaxed text-gray-800 dark:text-gray-200 md:text-3xl lg:text-4xl">
-            Head of Product at Standard Education
-          </h1>
-          <p className="font-body mt-2 text-xl font-normal leading-normal text-[var(--color-gray-500)] dark:text-gray-400 md:text-2xl lg:text-2xl">
-            Previously product design and strategy at{" "}
-            <a
-              href="https://signallantern.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline transition-colors hover:text-gray-800 dark:hover:text-gray-300"
-            >
-              Signal Lantern
-            </a>{" "}
-            and{" "}
-            <a
-              href="https://fullstory.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline transition-colors hover:text-gray-800 dark:hover:text-gray-300"
-            >
-              FullStory
-            </a>
+        <div className="about-bio-panel">
+          <p>
+            My work sits where product strategy, UX systems, analytics, and
+            creative engineering overlap. I have led design and product work for
+            education tools, research platforms, collaboration workflows, and
+            internal systems that needed clearer structure before they could
+            scale.
+          </p>
+          <p>
+            I still care about the older fundamentals that got me into this
+            work: well written code, beautiful design, and typography that
+            carries its weight.
           </p>
         </div>
 
-        <div className="flex-grow" />
-
-        <div className="ml-auto max-w-md pb-8">
+        <div className="about-signal-panel">
           <AboutBlurb />
         </div>
       </section>
 
-      <section className="w-full bg-gray-50 py-16 dark:bg-gray-900">
-        <div className="container mx-auto px-4">
-          <h2 className="mb-8 text-3xl font-bold text-gray-900 dark:text-gray-100 md:text-4xl">
-            Daily Profile
-          </h2>
+      <section className="daily-profile">
+        <div className="daily-profile__heading">
+          <p className="page-eyebrow">Daily profile</p>
+          <h2>Live signals, lightly framed.</h2>
+        </div>
 
-          <div className="mb-8 flex flex-col md:flex-row md:gap-6">
-            <div className="mb-6 w-full md:mb-0 md:w-1/2">
-              <WeatherWidget />
-            </div>
-
-            <div className="w-full md:w-1/2">
-              <SpotifyWidget />
-            </div>
+        <div className="profile-widget-grid">
+          <div>
+            <WeatherWidget />
           </div>
 
-          <div className="mt-8">
-            <FeedlyArticlesWidget />
+          <div>
+            <SpotifyWidget />
           </div>
+        </div>
+
+        <div className="profile-reading">
+          <FeedlyArticlesWidget />
         </div>
       </section>
 
-      <footer className="py-6 text-center">
-        <p>&copy; {new Date().getFullYear()}</p>
+      <footer className="site-footer">
+        <p>&copy; {new Date().getFullYear()} Jason Makes</p>
       </footer>
-    </>
+    </SitePage>
   );
 }

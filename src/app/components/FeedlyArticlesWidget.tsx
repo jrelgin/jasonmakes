@@ -1,9 +1,9 @@
 export const revalidate = 86_400; // 24 hours (daily refresh)
 
-import type { Profile } from "#lib/profile";
-import { kv } from "#lib/kv";
-import type { FeedlyArticle, FeedlyData } from "#lib/providers/feedly";
 import { formatUpdatedAt } from "@/lib/date";
+import { kv } from "#lib/kv";
+import type { Profile } from "#lib/profile";
+import type { FeedlyArticle, FeedlyData } from "#lib/providers/feedly";
 
 type FeedlyProfile = Pick<Profile, "feedly">;
 
@@ -25,32 +25,30 @@ export default async function FeedlyArticlesWidget() {
 
   if (latestArticles.length === 0) {
     return (
-      <div className="feedly-widget rounded-lg border border-gray-200 bg-gray-100 p-4 text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
-        No articles available
-      </div>
+      <div className="feedly-widget profile-widget">No articles available</div>
     );
   }
 
   return (
-    <div className="feedly-widget mb-4">
-      <div className="mb-3 flex flex-col gap-1 text-gray-500 dark:text-gray-400 sm:flex-row sm:items-center sm:justify-between">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Latest Reads</h3>
+    <div className="feedly-widget">
+      <div className="feedly-widget__heading">
+        <h3>Latest Reads</h3>
         {feedlyData?.lastUpdated && (
-          <span className="text-xs">Updated {formatUpdatedAt(feedlyData.lastUpdated)}</span>
+          <span>Updated {formatUpdatedAt(feedlyData.lastUpdated)}</span>
         )}
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+      <div className="feedly-grid">
         {latestArticles.map((article) => (
           <a
             key={article.url || `article-${article.date}-${article.title}`}
             href={article.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="article-card flex h-full flex-col overflow-hidden rounded-lg border border-gray-200 bg-white transition-all hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
+            className="feedly-card"
           >
             {article.imageUrl ? (
-              <div className="article-image h-40 overflow-hidden">
+              <div className="feedly-card__image">
                 <img
                   src={article.imageUrl}
                   alt={article.title}
@@ -58,19 +56,17 @@ export default async function FeedlyArticlesWidget() {
                 />
               </div>
             ) : (
-              <div className="article-image-placeholder flex h-40 items-center justify-center bg-gray-200 dark:bg-gray-700">
-                <span className="text-gray-400 dark:text-gray-500">No image</span>
+              <div className="feedly-card__image feedly-card__image--empty">
+                <span>No image</span>
               </div>
             )}
 
-            <div className="article-content flex flex-1 flex-col p-4">
-              <h4 className="mb-2 line-clamp-2 text-base font-medium text-gray-900 dark:text-white">{article.title}</h4>
+            <div className="feedly-card__content">
+              <h4>{article.title}</h4>
 
-              {article.excerpt && (
-                <p className="mb-3 line-clamp-3 text-sm text-gray-600 dark:text-gray-300">{article.excerpt}</p>
-              )}
+              {article.excerpt && <p>{article.excerpt}</p>}
 
-              <div className="article-meta mt-auto flex items-center justify-end text-xs text-gray-500 dark:text-gray-400">
+              <div className="feedly-card__meta">
                 {article.source && <span>{article.source}</span>}
               </div>
             </div>
