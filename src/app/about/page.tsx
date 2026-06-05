@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import AboutBlurb from "@/app/components/AboutBlurb";
 import FeedlyArticlesWidget from "@/app/components/FeedlyArticlesWidget";
 import SpotifyWidget from "@/app/components/SpotifyWidget";
@@ -17,6 +15,7 @@ const elsewhere = [
   { label: "GitHub", href: "https://github.com/jrelgin" },
   { label: "Email", href: "mailto:jason@signallantern.com" },
   { label: "Signal Lantern", href: "https://signallantern.com" },
+  { label: "FullStory", href: "https://fullstory.com" },
 ];
 
 export default function AboutPage() {
@@ -24,48 +23,62 @@ export default function AboutPage() {
     <PageShell>
       <section className="container mx-auto px-4 py-14 md:py-20">
         <div className="tide-rise max-w-3xl">
-          <p className="eyebrow mb-3">Atlanta · Product · Design</p>
+          <p className="eyebrow mb-3">Product builder</p>
           <h1 className="page-title text-4xl md:text-5xl lg:text-6xl">
             Jason Elgin
           </h1>
           <p className="lede mt-4 text-xl md:text-2xl">
-            Head of Product at Standard Education. Previously product design and
-            strategy at{" "}
-            <a
-              href="https://signallantern.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[var(--accent)] underline decoration-1 underline-offset-4 transition-colors hover:text-[var(--accent-strong)]"
-            >
-              Signal Lantern
-            </a>{" "}
-            and{" "}
-            <a
-              href="https://fullstory.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[var(--accent)] underline decoration-1 underline-offset-4 transition-colors hover:text-[var(--accent-strong)]"
-            >
-              FullStory
-            </a>
-            .
+            Head of Product at Standard Education, after fifteen years of
+            turning messy problems into software that works.
           </p>
 
           <WaveRule className="mt-8 max-w-[11rem] opacity-80" />
 
-          <div className="mt-8 space-y-5 text-lg leading-relaxed text-[var(--ink)]">
+          <div className="mt-8 max-w-2xl space-y-5 text-lg leading-relaxed text-[var(--ink)]">
             <p>
-              I'm an Atlanta-based product designer and builder with more than
-              15 years shaping software people actually understand. Today I lead
-              product at Standard Education, turning K–12 analytics into tools
-              that help educators reach students before they fall behind.
+              I've spent fifteen years making things, and for most of that time
+              the making was the hard part. It isn't anymore. What's hard now,
+              and what I find myself caring about most, is knowing what's worth
+              making, getting it in front of real people fast, and being honest
+              about whether it actually helped.
             </p>
             <p>
-              Before that I designed growth and collaboration at FullStory,
-              research tooling at Glass, and product strategy at Signal Lantern.
-              I care about mission-driven work, systems that stay simple as they
-              scale, and interfaces that respect the person on the other side of
-              the screen.
+              Today I'm Head of Product at Standard Education, where we turn
+              K–12 analytics into tools that help educators reach students
+              before they fall behind. Before that I led design for product-led
+              growth and collaboration at{" "}
+              <a
+                href="https://fullstory.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[var(--accent)] underline decoration-1 underline-offset-4 transition-colors hover:text-[var(--accent-strong)]"
+              >
+                FullStory
+              </a>
+              , rebuilt the survey-export experience at Glass for research teams
+              at brands like Unilever and Clorox, and shaped product strategy at{" "}
+              <a
+                href="https://signallantern.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[var(--accent)] underline decoration-1 underline-offset-4 transition-colors hover:text-[var(--accent-strong)]"
+              >
+                Signal Lantern
+              </a>
+              .
+            </p>
+            <p>
+              The craft underneath still matters to me. Heuristic evaluation,
+              information architecture, design systems, the quiet scaffolding
+              that makes the next decision easier. It's what lets me move fast
+              on the right things instead of just fast. Good work doesn't erase
+              complexity so much as organize it, so the people I build for can
+              make confident choices, and so I can see whether the choice was
+              right.
+            </p>
+            <p className="text-xl italic text-[var(--ink-strong)]">
+              This site is a small experiment in that idea: a calm surface over
+              a lot of moving water.
             </p>
           </div>
 
