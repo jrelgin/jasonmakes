@@ -37,101 +37,105 @@ export default function AboutPage() {
   return (
     <PageShell>
       <section className="container mx-auto max-w-4xl px-4 py-16 md:py-24">
-        <div className="u-rise max-w-3xl">
-          <p className="u-eyebrow text-lg">Designer &amp; Developer</p>
-          <h1 className="u-title mt-3 text-5xl md:text-6xl lg:text-7xl">
-            Jason Elgin
-          </h1>
-          <p className="u-lede mt-5 text-2xl">
-            Head of Product at Standard Education — a designer and developer of
-            fifteen years.
-          </p>
-          <DriftingWave className="mt-8 max-w-[16rem]" />
-        </div>
+        <div className="read-veil">
+          <div className="u-rise max-w-3xl">
+            <p className="u-eyebrow text-lg">
+              Atlanta · Designer &amp; Developer
+            </p>
+            <h1 className="u-title mt-3 text-5xl md:text-6xl lg:text-7xl">
+              Jason Elgin
+            </h1>
+            <p className="u-lede mt-5 text-2xl">
+              Head of Product at Standard Education — a designer and developer
+              of fifteen years.
+            </p>
+            <DriftingWave className="mt-8 max-w-[16rem]" />
+          </div>
 
-        <div className="u-rise u-rise-1 mt-10 max-w-2xl space-y-6 text-lg leading-relaxed text-[var(--u-ink)]">
-          <p>
-            I'm a product designer and developer, and I've spent more than
-            fifteen years making software that tries to disappear — interfaces
-            that respect your attention and systems that stay legible as they
-            grow.
-          </p>
-          <p>
-            Today I'm Head of Product at Standard Education, where we turn K–12
-            analytics into tools that help educators reach students before they
-            fall behind. Before that I led design for product-led growth and
-            collaboration at{" "}
-            <a
-              href="https://fullstory.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[var(--u-accent)] underline decoration-1 underline-offset-4 transition-colors hover:text-[var(--u-accent-strong)]"
-            >
-              FullStory
-            </a>
-            , rebuilt the survey-export experience at Glass for research teams
-            at brands like Unilever and Clorox, and shaped product strategy at{" "}
-            <a
-              href="https://signallantern.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[var(--u-accent)] underline decoration-1 underline-offset-4 transition-colors hover:text-[var(--u-accent-strong)]"
-            >
-              Signal Lantern
-            </a>
-            .
-          </p>
-          <p>
-            I'm drawn to mission-driven work and the quiet craft beneath it —
-            heuristic evaluation, information architecture, and design systems
-            that make the next decision easier. The best interfaces don't erase
-            complexity so much as organize it, so people can make confident
-            choices and reuse their work.
-          </p>
-          <p className="font-[family-name:var(--font-instrument-serif)] text-xl italic text-[var(--u-ink-strong)]">
-            This site is a small experiment in that idea: a calm surface over a
-            lot of moving water.
-          </p>
-        </div>
-
-        <ul className="u-rise u-rise-1 mt-12 grid max-w-3xl gap-4 sm:grid-cols-3">
-          {principles.map((principle) => (
-            <li key={principle.title} className="frost-panel p-5">
-              <p className="u-eyebrow text-base">{principle.title}</p>
-              <p className="mt-2 text-sm leading-relaxed text-[var(--u-ink-muted)]">
-                {principle.body}
-              </p>
-            </li>
-          ))}
-        </ul>
-
-        <ul className="u-rise u-rise-2 mt-10 flex flex-wrap gap-x-6 gap-y-2 font-mono text-xs uppercase tracking-wider">
-          {elsewhere.map((item) => (
-            <li key={item.label}>
+          <div className="u-rise u-rise-1 mt-10 max-w-2xl space-y-6 text-lg leading-relaxed text-[var(--u-ink)]">
+            <p>
+              I'm a product designer and developer based in Atlanta, and I've
+              spent more than fifteen years making software that tries to
+              disappear — interfaces that respect your attention and systems
+              that stay legible as they grow.
+            </p>
+            <p>
+              Today I'm Head of Product at Standard Education, where we turn
+              K–12 analytics into tools that help educators reach students
+              before they fall behind. Before that I led design for product-led
+              growth and collaboration at{" "}
               <a
-                href={item.href}
+                href="https://fullstory.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[var(--u-ink-muted)] transition-colors hover:text-[var(--u-accent)]"
+                className="text-[var(--u-accent)] underline decoration-1 underline-offset-4 transition-colors hover:text-[var(--u-accent-strong)]"
               >
-                {item.label}
+                FullStory
               </a>
-            </li>
-          ))}
-        </ul>
+              , rebuilt the survey-export experience at Glass for research teams
+              at brands like Unilever and Clorox, and shaped product strategy at{" "}
+              <a
+                href="https://signallantern.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[var(--u-accent)] underline decoration-1 underline-offset-4 transition-colors hover:text-[var(--u-accent-strong)]"
+              >
+                Signal Lantern
+              </a>
+              .
+            </p>
+            <p>
+              I'm drawn to mission-driven work and the quiet craft beneath it —
+              heuristic evaluation, information architecture, and design systems
+              that make the next decision easier. The best interfaces don't
+              erase complexity so much as organize it, so people can make
+              confident choices and reuse their work.
+            </p>
+            <p className="font-[family-name:var(--font-instrument-serif)] text-xl italic text-[var(--u-ink-strong)]">
+              This site is a small experiment in that idea: a calm surface over
+              a lot of moving water.
+            </p>
+          </div>
 
-        <div className="u-rise u-rise-2 mt-12 max-w-3xl">
-          <AboutBlurb />
+          <ul className="u-rise u-rise-1 mt-12 grid max-w-3xl gap-4 sm:grid-cols-3">
+            {principles.map((principle) => (
+              <li key={principle.title} className="frost-panel p-5">
+                <p className="u-eyebrow text-base">{principle.title}</p>
+                <p className="mt-2 text-sm leading-relaxed text-[var(--u-ink-muted)]">
+                  {principle.body}
+                </p>
+              </li>
+            ))}
+          </ul>
+
+          <ul className="u-rise u-rise-2 mt-10 flex flex-wrap gap-x-6 gap-y-2 font-mono text-xs uppercase tracking-wider">
+            {elsewhere.map((item) => (
+              <li key={item.label}>
+                <a
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[var(--u-ink-muted)] transition-colors hover:text-[var(--u-accent)]"
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+
+          <div className="u-rise u-rise-2 mt-12">
+            <AboutBlurb />
+          </div>
         </div>
       </section>
 
-      <section className="border-t border-[var(--u-hairline)]">
-        <div className="container mx-auto max-w-4xl px-4 py-16">
+      <section className="container mx-auto max-w-4xl px-4 pb-16">
+        <div className="read-veil">
           <p className="u-eyebrow text-lg">Right now</p>
           <h2 className="u-title mt-2 text-4xl md:text-5xl">Daily Profile</h2>
           <p className="u-lede mt-3 max-w-xl text-lg">
-            A small, automatically-updating snapshot — the local weather, what
-            I've been listening to, and what I've been reading.
+            A small, automatically-updating snapshot — the weather over Atlanta,
+            what I've been listening to, and what I've been reading.
           </p>
 
           <div className="mt-8 grid gap-6 md:grid-cols-2">

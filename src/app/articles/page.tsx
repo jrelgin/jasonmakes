@@ -17,23 +17,29 @@ export default async function ArticlesPage() {
   return (
     <PageShell>
       <main className="container mx-auto max-w-4xl px-4 py-16 md:py-24">
-        <PageHeader
-          eyebrow="Writing"
-          title="Articles"
-          subtitle="Notes on design, development, and the craft of making software."
-        />
+        <div className="read-veil">
+          <PageHeader
+            eyebrow="Writing"
+            title="Articles"
+            subtitle="Notes on design, development, and the craft of making software."
+          />
 
-        {articles.length === 0 ? (
-          <p className="u-lede mt-16 text-xl">
-            No articles yet — check back soon.
-          </p>
-        ) : (
-          <ul className="u-rise u-rise-1 mt-14 border-t border-[var(--u-hairline)]">
-            {articles.map((article, index) => (
-              <ArticleRow key={article.slug} article={article} index={index} />
-            ))}
-          </ul>
-        )}
+          {articles.length === 0 ? (
+            <p className="u-lede mt-16 text-xl">
+              No articles yet — check back soon.
+            </p>
+          ) : (
+            <ul className="u-rise u-rise-1 mt-14 border-t border-[var(--u-hairline)]">
+              {articles.map((article, index) => (
+                <ArticleRow
+                  key={article.slug}
+                  article={article}
+                  index={index}
+                />
+              ))}
+            </ul>
+          )}
+        </div>
       </main>
     </PageShell>
   );

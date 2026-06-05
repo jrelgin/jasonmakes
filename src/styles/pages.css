@@ -137,6 +137,18 @@
   backdrop-filter: blur(10px);
 }
 
+/* Soft reading sheet — a faint, blurred ground that lifts text off the
+ * atmospheric wave backdrop so long copy stays comfortably legible while the
+ * sea still shows through the page margins. */
+.read-veil {
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--u-bg-1) 74%, transparent);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 24px 70px -48px rgba(0, 0, 0, 0.55);
+  padding: clamp(1.5rem, 1rem + 3.2vw, 3rem);
+}
+
 /* =========================================================================
  * Drifting wave — the single animated flourish (CSS-masked, theme-aware)
  * ========================================================================= */

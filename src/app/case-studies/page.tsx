@@ -19,35 +19,37 @@ export default async function CaseStudiesPage() {
   return (
     <PageShell>
       <section className="container mx-auto max-w-5xl px-4 py-16 md:py-24">
-        <PageHeader
-          eyebrow="Selected Work"
-          title="Case Studies"
-          subtitle="Product strategy, UX systems, and interface design for teams building complex software."
-        />
+        <div className="read-veil">
+          <PageHeader
+            eyebrow="Selected Work"
+            title="Case Studies"
+            subtitle="Product strategy, UX systems, and interface design for teams building complex software."
+          />
 
-        {caseStudies.length === 0 ? (
-          <p className="u-lede mt-16 text-xl">
-            No case studies yet — check back soon.
-          </p>
-        ) : (
-          <>
-            <div className="u-rise u-rise-1 mt-14">
-              <FeaturedCaseStudy caseStudy={featured} />
-            </div>
+          {caseStudies.length === 0 ? (
+            <p className="u-lede mt-16 text-xl">
+              No case studies yet — check back soon.
+            </p>
+          ) : (
+            <>
+              <div className="u-rise u-rise-1 mt-14">
+                <FeaturedCaseStudy caseStudy={featured} />
+              </div>
 
-            {rest.length > 0 && (
-              <ul className="u-rise u-rise-2 mt-16 border-t border-[var(--u-hairline)]">
-                {rest.map((caseStudy, index) => (
-                  <CaseStudyRow
-                    key={caseStudy.slug}
-                    caseStudy={caseStudy}
-                    index={index + 1}
-                  />
-                ))}
-              </ul>
-            )}
-          </>
-        )}
+              {rest.length > 0 && (
+                <ul className="u-rise u-rise-2 mt-16 border-t border-[var(--u-hairline)]">
+                  {rest.map((caseStudy, index) => (
+                    <CaseStudyRow
+                      key={caseStudy.slug}
+                      caseStudy={caseStudy}
+                      index={index + 1}
+                    />
+                  ))}
+                </ul>
+              )}
+            </>
+          )}
+        </div>
       </section>
     </PageShell>
   );
@@ -75,7 +77,11 @@ function FeaturedCaseStudy({ caseStudy }: { caseStudy: CaseStudy }) {
             />
           </div>
         )}
-        <div className={heroImage ? "p-7 md:col-span-3 md:p-9" : "p-7 md:p-9"}>
+        <div
+          className={
+            heroImage ? "p-7 md:col-span-3 md:p-9" : "p-7 md:col-span-5 md:p-9"
+          }
+        >
           {eyebrow && <p className="u-eyebrow text-base">{eyebrow}</p>}
           <h2 className="u-title mt-2 text-3xl md:text-4xl">{title}</h2>
           {excerpt && (
