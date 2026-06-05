@@ -1,0 +1,288 @@
+/*
+ * Seascape inner-page design system — "Shoreline"
+ * --------------------------------------------------------------------------
+ * Carries the homepage ukiyo-e aesthetic (Hokusai indigo + cream/amber foam)
+ * across the articles, case-study, and about pages with a calm, editorial,
+ * readability-first treatment. No animated art scenes — just the palette,
+ * the display type, hairline wave motifs, and gentle on-load motion.
+ */
+
+/* =========================================================================
+ * Theme-aware tokens
+ * Light ("hokusai")  -> warm paper + deep indigo ink + bronze-amber accent
+ * Dark  ("twilight") -> deep-sea ground + cream-foam ink + warm-amber accent
+ * ========================================================================= */
+:root[data-theme="hokusai"] {
+  --page-bg: #faf7ef;
+  --page-bg-top: #eef1f7;
+  --ink-strong: #12203a;
+  --ink: #2a3447;
+  --ink-muted: #5b6577;
+  --panel: #ffffff;
+  --panel-2: #f4f1e8;
+  --panel-border: rgba(18, 32, 58, 0.12);
+  --panel-border-strong: rgba(18, 32, 58, 0.26);
+  --hairline: rgba(18, 32, 58, 0.12);
+  --accent: #a85f1a;
+  --accent-strong: #864a12;
+  --wave-stroke: rgba(18, 32, 58, 0.32);
+  --card-shadow: rgba(18, 32, 58, 0.5);
+}
+
+:root[data-theme="twilight"],
+:root.dark {
+  --page-bg: #0a0f1a;
+  --page-bg-top: #0d1526;
+  --ink-strong: #ede2ca;
+  --ink: #c6ccd9;
+  --ink-muted: #8a93a7;
+  --panel: rgba(255, 255, 255, 0.04);
+  --panel-2: rgba(255, 255, 255, 0.06);
+  --panel-border: rgba(208, 152, 92, 0.2);
+  --panel-border-strong: rgba(208, 152, 92, 0.4);
+  --hairline: rgba(237, 226, 202, 0.12);
+  --accent: #e0a565;
+  --accent-strong: #f0c99c;
+  --wave-stroke: rgba(208, 152, 92, 0.4);
+  --card-shadow: rgba(0, 0, 0, 0.7);
+}
+
+/* =========================================================================
+ * Page shell — a full-bleed themed ground behind inner pages only
+ * (the homepage keeps its animated canvas; it never renders this shell).
+ * ========================================================================= */
+.page-shell {
+  position: relative;
+  min-height: 100vh;
+  color: var(--ink);
+}
+
+.page-shell__bg {
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    var(--page-bg-top) 0%,
+    var(--page-bg) 36%,
+    var(--page-bg) 100%
+  );
+}
+
+/* =========================================================================
+ * Typographic primitives
+ * ========================================================================= */
+.eyebrow {
+  font-family: var(--font-geist-mono), monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--accent);
+}
+
+.page-title {
+  font-family: var(--font-apoc), serif;
+  color: var(--ink-strong);
+  line-height: 1.04;
+  letter-spacing: -0.01em;
+}
+
+.lede {
+  color: var(--ink-muted);
+  font-family: var(--font-instrument), serif;
+  line-height: 1.5;
+}
+
+/* =========================================================================
+ * Wave hairline divider (seamless, theme-aware, decorative)
+ * ========================================================================= */
+.wave-rule {
+  display: block;
+  width: 100%;
+  height: 16px;
+  color: var(--wave-stroke);
+}
+
+/* =========================================================================
+ * Cards & panels
+ * ========================================================================= */
+.tide-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: 4px;
+  overflow: hidden;
+  transition:
+    transform 0.35s cubic-bezier(0, 0, 0.2, 1),
+    border-color 0.35s ease,
+    box-shadow 0.35s ease;
+}
+
+.tide-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--panel-border-strong);
+  box-shadow: 0 18px 42px -26px var(--card-shadow);
+}
+
+.tide-panel {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: 6px;
+}
+
+/* =========================================================================
+ * Long-form content — replaces the (unconfigured) Tailwind `prose` classes
+ * with a themed reading experience tuned to the seascape palette.
+ * ========================================================================= */
+.ink-prose {
+  color: var(--ink);
+  font-family: var(--font-instrument), serif;
+  font-size: 1.1rem;
+  line-height: 1.78;
+}
+
+.ink-prose > * + * {
+  margin-top: 1.3em;
+}
+
+.ink-prose h2 {
+  font-family: var(--font-apoc), serif;
+  color: var(--ink-strong);
+  font-size: clamp(1.5rem, 1.2rem + 1.1vw, 1.9rem);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  margin-top: 2.4em;
+}
+
+.ink-prose h3 {
+  font-family: var(--font-instrument), serif;
+  color: var(--ink-strong);
+  font-weight: 600;
+  font-size: 1.28rem;
+  margin-top: 1.9em;
+}
+
+.ink-prose h2 + *,
+.ink-prose h3 + * {
+  margin-top: 0.8em;
+}
+
+.ink-prose a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: color 0.2s ease;
+}
+
+.ink-prose a:hover {
+  color: var(--accent-strong);
+}
+
+.ink-prose strong {
+  color: var(--ink-strong);
+  font-weight: 600;
+}
+
+.ink-prose em {
+  font-style: italic;
+}
+
+.ink-prose ul,
+.ink-prose ol {
+  padding-left: 1.4em;
+}
+
+.ink-prose li {
+  margin-top: 0.5em;
+}
+
+.ink-prose ul > li::marker {
+  color: var(--accent);
+}
+
+.ink-prose ol > li::marker {
+  color: var(--ink-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.ink-prose blockquote {
+  margin-left: 0;
+  padding: 0.2em 0 0.2em 1.4rem;
+  border-left: 2px solid var(--accent);
+  color: var(--ink-strong);
+  font-style: italic;
+  font-size: 1.2rem;
+  line-height: 1.6;
+}
+
+.ink-prose blockquote p {
+  margin: 0;
+}
+
+.ink-prose code {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.9em;
+  background: var(--panel-2);
+  border: 1px solid var(--hairline);
+  padding: 0.12em 0.4em;
+  border-radius: 3px;
+  color: var(--ink-strong);
+}
+
+.ink-prose pre {
+  background: var(--panel-2);
+  border: 1px solid var(--hairline);
+  border-radius: 6px;
+  padding: 1rem 1.1rem;
+  overflow-x: auto;
+}
+
+.ink-prose pre code {
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+/* =========================================================================
+ * Gentle on-load motion (respects reduced-motion)
+ * ========================================================================= */
+@keyframes tide-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.tide-rise {
+  animation: tide-rise 0.7s cubic-bezier(0, 0, 0.2, 1) both;
+}
+
+.tide-rise-1 {
+  animation-delay: 0.07s;
+}
+
+.tide-rise-2 {
+  animation-delay: 0.14s;
+}
+
+.tide-rise-3 {
+  animation-delay: 0.21s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tide-rise,
+  .tide-rise-1,
+  .tide-rise-2,
+  .tide-rise-3 {
+    animation: none;
+  }
+}

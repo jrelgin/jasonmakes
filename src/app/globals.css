@@ -4,6 +4,9 @@
 /* Import our comprehensive theme system */
 @import "../styles/theme.css";
 
+/* Inner-page seascape design system (articles, case studies, about) */
+@import "../styles/pages.css";
+
 /* Base dark/light mode variables */
 :root {
   --background: #ffffff;

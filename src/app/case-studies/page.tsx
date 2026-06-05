@@ -1,6 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import PageHeader from "@/components/PageHeader";
+import PageShell from "@/components/PageShell";
+import WaveRule from "@/components/WaveRule";
 import { type CaseStudy, listCaseStudies } from "../../../lib/data/content";
 
 export const metadata = {
@@ -14,27 +17,27 @@ export default async function CaseStudiesPage() {
   const caseStudies = await listCaseStudies();
 
   return (
-    <section className="container mx-auto px-4 py-10">
-      <div className="mb-10 max-w-3xl">
-        <h1 className="mb-3 text-4xl font-bold text-gray-900 dark:text-gray-100">
-          Case Studies
-        </h1>
-        <p className="text-lg leading-relaxed text-gray-600 dark:text-gray-300">
-          Product strategy, UX systems, and interface design work for teams
-          building complex software.
-        </p>
-      </div>
+    <PageShell>
+      <section className="container mx-auto px-4 py-14 md:py-20">
+        <PageHeader
+          eyebrow="Selected Work"
+          title="Case Studies"
+          subtitle="Product strategy, UX systems, and interface design for teams building complex software."
+        />
 
-      {caseStudies.length === 0 ? (
-        <p>No case studies found. Check back soon!</p>
-      ) : (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {caseStudies.map((caseStudy) => (
-            <CaseStudyCard key={caseStudy.slug} caseStudy={caseStudy} />
-          ))}
-        </div>
-      )}
-    </section>
+        {caseStudies.length === 0 ? (
+          <p className="lede mt-14 text-lg">
+            No case studies yet — check back soon.
+          </p>
+        ) : (
+          <div className="tide-rise tide-rise-1 mt-12 grid grid-cols-1 gap-7 md:grid-cols-2 xl:grid-cols-3">
+            {caseStudies.map((caseStudy) => (
+              <CaseStudyCard key={caseStudy.slug} caseStudy={caseStudy} />
+            ))}
+          </div>
+        )}
+      </section>
+    </PageShell>
   );
 }
 
@@ -54,59 +57,62 @@ function CaseStudyCard({ caseStudy }: { caseStudy: CaseStudy }) {
     month: "long",
     day: "numeric",
   });
+  const eyebrow = [client, role].filter(Boolean).join(" / ") || formattedDate;
 
   return (
-    <Link href={`/case-studies/${slug}`} className="block h-full" prefetch>
-      <article className="flex h-full flex-col overflow-hidden rounded-lg border border-gray-200 bg-white transition-shadow duration-300 hover:shadow-lg dark:border-gray-800 dark:bg-gray-950">
-        {heroImage ? (
-          <div className="relative h-48 overflow-hidden">
-            <Image
-              src={heroImage}
-              alt={title}
-              fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              className="object-cover transition-transform hover:scale-105 duration-300"
-            />
-          </div>
-        ) : (
-          <div className="flex h-48 items-center justify-center bg-gray-100 dark:bg-gray-900">
-            <span className="text-sm font-medium uppercase text-gray-400 dark:text-gray-500">
-              {client || "Case study"}
-            </span>
-          </div>
-        )}
-        <div className="flex flex-1 flex-col p-5">
-          <p className="mb-2 text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">
-            {[client, role].filter(Boolean).join(" / ") || formattedDate}
-          </p>
-          <h2 className="mb-3 text-2xl font-semibold leading-tight text-gray-950 dark:text-white">
-            {title}
-          </h2>
-          {excerpt && (
-            <p className="mb-4 flex-1 leading-relaxed text-gray-700 dark:text-gray-300">
-              {excerpt}
-            </p>
-          )}
-          {outcomes.length > 0 && (
-            <ul className="mb-4 space-y-2 text-sm text-gray-600 dark:text-gray-300">
-              {outcomes.slice(0, 2).map((outcome) => (
-                <li
-                  key={outcome}
-                  className="border-l border-gray-300 pl-3 dark:border-gray-700"
-                >
-                  {outcome}
-                </li>
-              ))}
-            </ul>
-          )}
-
-          <div className="mt-auto pt-2">
-            <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
-              Read more →
-            </span>
-          </div>
+    <Link href={`/case-studies/${slug}`} className="tide-card group" prefetch>
+      {heroImage ? (
+        <div className="relative h-48 overflow-hidden">
+          <Image
+            src={heroImage}
+            alt={title}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+          />
         </div>
-      </article>
+      ) : (
+        <div className="flex h-48 flex-col items-center justify-center gap-3 bg-[var(--panel-2)]">
+          <span className="font-mono text-xs uppercase tracking-wider text-[var(--ink-muted)]">
+            {client || "Case study"}
+          </span>
+          <WaveRule className="w-1/2 opacity-70" />
+        </div>
+      )}
+      <div className="flex flex-1 flex-col p-5">
+        <p className="font-mono text-[0.68rem] uppercase tracking-wider text-[var(--accent)]">
+          {eyebrow}
+        </p>
+        <h2 className="font-heading mt-2 text-2xl leading-tight text-[var(--ink-strong)]">
+          {title}
+        </h2>
+        {excerpt && (
+          <p className="mt-2 flex-1 leading-relaxed text-[var(--ink-muted)]">
+            {excerpt}
+          </p>
+        )}
+        {outcomes.length > 0 && (
+          <ul className="mt-4 space-y-2 text-sm text-[var(--ink)]">
+            {outcomes.slice(0, 2).map((outcome) => (
+              <li
+                key={outcome}
+                className="border-l border-[var(--panel-border-strong)] pl-3"
+              >
+                {outcome}
+              </li>
+            ))}
+          </ul>
+        )}
+        <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-[var(--accent)]">
+          Read case study
+          <span
+            aria-hidden="true"
+            className="transition-transform duration-300 group-hover:translate-x-1"
+          >
+            →
+          </span>
+        </span>
+      </div>
     </Link>
   );
 }
