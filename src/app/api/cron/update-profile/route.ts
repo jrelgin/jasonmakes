@@ -270,10 +270,13 @@ export async function GET(req: Request) {
     
     // Directly revalidate the homepage using Next.js built-in function
     try {
-      // Call revalidatePath directly instead of making a separate API call
-      logger.info('Directly revalidating homepage path');
+      // Call revalidatePath directly instead of making a separate API call.
+      // The Daily Profile widgets live on /about, so that path must be
+      // revalidated for the update to show; '/' is kept for safety.
+      logger.info('Directly revalidating profile paths');
       await revalidatePath('/');
-      logger.info('Homepage revalidated successfully');
+      await revalidatePath('/about');
+      logger.info('Profile paths revalidated successfully');
     } catch (revalidateError) {
       logger.error('Error during direct revalidation', revalidateError instanceof Error ? revalidateError.message : String(revalidateError));
       // Continue execution even if revalidation fails
