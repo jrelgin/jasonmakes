@@ -16,17 +16,19 @@ export default function AboutPage() {
       <section className="about-hero">
         <PageIntro
           eyebrow="About"
-          title="Jason Elgin turns messy product systems into useful, memorable software."
-          description="Head of Product at Standard Education. Previously product design and strategy through Signal Lantern and FullStory."
+          title="Jason Elgin builds product systems that make complicated work feel usable."
+          description="Head of Product at Standard Education, founder of Signal Lantern, and former product/design partner to FullStory teams."
         />
 
         <div className="about-bio-panel">
           <p>
-            My work sits where product strategy, UX systems, analytics, and
-            creative engineering overlap. I have led design and product work for
-            education tools, research platforms, collaboration workflows, and
-            internal systems that needed clearer structure before they could
-            scale.
+            My best work sits between product strategy, UX systems, analytics,
+            and creative engineering. At Standard Education, that means turning
+            dense school operations into software people can trust. Through
+            Signal Lantern, it has meant helping product-led companies find
+            friction, shape onboarding, and make important features easier to
+            discover. With FullStory, it meant working close to the places where
+            behavior data, customer understanding, and interface design meet.
           </p>
           <p>
             I still care about the older fundamentals that got me into this
