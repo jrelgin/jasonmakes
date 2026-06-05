@@ -1,0 +1,379 @@
+/*
+ * Seascape inner-page design system — "Undertow"
+ * --------------------------------------------------------------------------
+ * The bold, atmospheric counterpart to "Shoreline". Inner pages float over a
+ * faint, static field of ukiyo-e foam lines and distant swells; content sits
+ * in frosted panels so it stays readable. Titles are set in Gloock, with
+ * Instrument Serif italics for eyebrows, ledes, and pull quotes. A single
+ * animated flourish — a slowly drifting wave line — runs in each masthead.
+ * No new art scenes: the homepage's wave language, reused quietly and still.
+ */
+
+/* =========================================================================
+ * Theme-aware tokens
+ * ========================================================================= */
+:root[data-theme="hokusai"] {
+  --u-bg-0: #e8eef7;
+  --u-bg-1: #f5f2ea;
+  --u-ink-strong: #0e1b30;
+  --u-ink: #29354a;
+  --u-ink-muted: #5a6680;
+  --u-accent: #b3631a;
+  --u-accent-strong: #8c4c12;
+  --u-panel: rgba(255, 255, 255, 0.66);
+  --u-panel-border: rgba(14, 27, 48, 0.14);
+  --u-hairline: rgba(14, 27, 48, 0.14);
+  --u-wave: rgba(14, 27, 48, 0.1);
+  --u-wave-line: rgba(14, 27, 48, 0.55);
+  --u-swell-1: rgba(14, 27, 48, 0.045);
+  --u-swell-2: rgba(14, 27, 48, 0.075);
+}
+
+:root[data-theme="twilight"],
+:root.dark {
+  --u-bg-0: #0b1428;
+  --u-bg-1: #070d18;
+  --u-ink-strong: #f2e7d0;
+  --u-ink: #cdd3df;
+  --u-ink-muted: #8893a8;
+  --u-accent: #e8ad6a;
+  --u-accent-strong: #f4cd9d;
+  --u-panel: rgba(14, 24, 42, 0.55);
+  --u-panel-border: rgba(232, 173, 106, 0.22);
+  --u-hairline: rgba(242, 231, 208, 0.12);
+  --u-wave: rgba(232, 173, 106, 0.13);
+  --u-wave-line: rgba(232, 173, 106, 0.6);
+  --u-swell-1: rgba(4, 10, 22, 0.55);
+  --u-swell-2: rgba(2, 6, 16, 0.8);
+}
+
+/* =========================================================================
+ * Page shell + atmospheric backdrop (inner pages only)
+ * ========================================================================= */
+.page-shell {
+  position: relative;
+  min-height: 100vh;
+  color: var(--u-ink);
+}
+
+.sea-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+  overflow: hidden;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    var(--u-bg-0) 0%,
+    var(--u-bg-1) 55%,
+    var(--u-bg-1) 100%
+  );
+}
+
+.sea-backdrop__field {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  color: var(--u-wave);
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 22%,
+    #000 72%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 22%,
+    #000 72%,
+    transparent 100%
+  );
+}
+
+.sea-backdrop__swell {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 42vh;
+}
+
+/* =========================================================================
+ * Typographic primitives
+ * ========================================================================= */
+.u-eyebrow {
+  font-family: var(--font-instrument-serif), serif;
+  font-style: italic;
+  font-size: 1.1rem;
+  letter-spacing: 0.01em;
+  color: var(--u-accent);
+}
+
+.u-title {
+  font-family: var(--font-gloock), serif;
+  font-weight: 400;
+  color: var(--u-ink-strong);
+  line-height: 1;
+  letter-spacing: -0.015em;
+}
+
+.u-lede {
+  font-family: var(--font-instrument-serif), serif;
+  color: var(--u-ink-muted);
+  line-height: 1.45;
+}
+
+/* =========================================================================
+ * Frosted panels
+ * ========================================================================= */
+.frost-panel {
+  background: var(--u-panel);
+  border: 1px solid var(--u-panel-border);
+  border-radius: 10px;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+/* =========================================================================
+ * Drifting wave — the single animated flourish (CSS-masked, theme-aware)
+ * ========================================================================= */
+.drift-wave {
+  width: 100%;
+  height: 18px;
+  background-color: var(--u-wave-line);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='18'%3E%3Cpath d='M0 9 C 12 9 18 4 30 4 S 48 4 60 9 S 78 14 90 14 S 108 14 120 9' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='18'%3E%3Cpath d='M0 9 C 12 9 18 4 30 4 S 48 4 60 9 S 78 14 90 14 S 108 14 120 9' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E");
+  -webkit-mask-repeat: repeat-x;
+  mask-repeat: repeat-x;
+  -webkit-mask-size: 120px 18px;
+  mask-size: 120px 18px;
+  -webkit-mask-position: 0 50%;
+  mask-position: 0 50%;
+  animation: drift-wave 14s linear infinite;
+}
+
+@keyframes drift-wave {
+  to {
+    -webkit-mask-position: -120px 50%;
+    mask-position: -120px 50%;
+  }
+}
+
+/* =========================================================================
+ * Editorial index rows (listings)
+ * ========================================================================= */
+.index-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 1.25rem;
+  align-items: baseline;
+  padding: 1.85rem 0;
+  border-bottom: 1px solid var(--u-hairline);
+  transition: padding-left 0.3s cubic-bezier(0, 0, 0.2, 1);
+}
+
+.index-row:hover {
+  padding-left: 0.6rem;
+}
+
+.index-row__index {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.78rem;
+  color: var(--u-accent);
+}
+
+.index-row__title {
+  font-family: var(--font-gloock), serif;
+  font-weight: 400;
+  font-size: clamp(1.5rem, 1.1rem + 1.7vw, 2.35rem);
+  line-height: 1.06;
+  color: var(--u-ink-strong);
+  transition: color 0.25s ease;
+}
+
+.index-row:hover .index-row__title {
+  color: var(--u-accent);
+}
+
+.index-row__excerpt {
+  margin-top: 0.55rem;
+  max-width: 44rem;
+  color: var(--u-ink-muted);
+  line-height: 1.55;
+}
+
+.index-row__arrow {
+  align-self: center;
+  color: var(--u-accent);
+  transition: transform 0.25s ease;
+}
+
+.index-row:hover .index-row__arrow {
+  transform: translateX(6px);
+}
+
+/* =========================================================================
+ * Long-form content (themed; replaces the unconfigured Tailwind `prose`)
+ * ========================================================================= */
+.ink-prose {
+  color: var(--u-ink);
+  font-family: var(--font-instrument), serif;
+  font-size: 1.12rem;
+  line-height: 1.8;
+}
+
+.ink-prose > * + * {
+  margin-top: 1.35em;
+}
+
+.ink-prose h2 {
+  font-family: var(--font-gloock), serif;
+  font-weight: 400;
+  color: var(--u-ink-strong);
+  font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2rem);
+  line-height: 1.15;
+  margin-top: 2.2em;
+}
+
+.ink-prose h3 {
+  font-family: var(--font-instrument-serif), serif;
+  color: var(--u-ink-strong);
+  font-size: 1.4rem;
+  margin-top: 1.8em;
+}
+
+.ink-prose h2 + *,
+.ink-prose h3 + * {
+  margin-top: 0.8em;
+}
+
+.ink-prose a {
+  color: var(--u-accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: color 0.2s ease;
+}
+
+.ink-prose a:hover {
+  color: var(--u-accent-strong);
+}
+
+.ink-prose strong {
+  color: var(--u-ink-strong);
+  font-weight: 600;
+}
+
+.ink-prose em {
+  font-style: italic;
+}
+
+.ink-prose ul,
+.ink-prose ol {
+  padding-left: 1.4em;
+}
+
+.ink-prose li {
+  margin-top: 0.5em;
+}
+
+.ink-prose ul > li::marker {
+  color: var(--u-accent);
+}
+
+.ink-prose ol > li::marker {
+  color: var(--u-ink-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.ink-prose blockquote {
+  margin-left: 0;
+  padding: 0.1em 0 0.1em 1.4rem;
+  border-left: 2px solid var(--u-accent);
+  font-family: var(--font-instrument-serif), serif;
+  font-style: italic;
+  font-size: 1.4rem;
+  line-height: 1.5;
+  color: var(--u-ink-strong);
+}
+
+.ink-prose blockquote p {
+  margin: 0;
+}
+
+.ink-prose code {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.9em;
+  background: var(--u-panel);
+  border: 1px solid var(--u-hairline);
+  padding: 0.12em 0.4em;
+  border-radius: 3px;
+  color: var(--u-ink-strong);
+}
+
+.ink-prose pre {
+  background: var(--u-panel);
+  border: 1px solid var(--u-hairline);
+  border-radius: 8px;
+  padding: 1rem 1.1rem;
+  overflow-x: auto;
+}
+
+.ink-prose pre code {
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.ink-prose--dropcap > p:first-of-type::first-letter {
+  font-family: var(--font-gloock), serif;
+  float: left;
+  font-size: 3.6em;
+  line-height: 0.76;
+  padding-right: 0.09em;
+  margin-top: 0.04em;
+  color: var(--u-accent);
+}
+
+/* =========================================================================
+ * On-load motion (respects reduced-motion)
+ * ========================================================================= */
+@keyframes u-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.u-rise {
+  animation: u-rise 0.8s cubic-bezier(0, 0, 0.2, 1) both;
+}
+
+.u-rise-1 {
+  animation-delay: 0.1s;
+}
+
+.u-rise-2 {
+  animation-delay: 0.2s;
+}
+
+.u-rise-3 {
+  animation-delay: 0.3s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .u-rise,
+  .u-rise-1,
+  .u-rise-2,
+  .u-rise-3,
+  .drift-wave {
+    animation: none;
+  }
+}

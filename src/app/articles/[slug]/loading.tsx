@@ -1,34 +1,23 @@
+import PageShell from "@/components/PageShell";
+
 export default function ArticleLoading() {
-    return (
-      <article className="max-w-3xl mx-auto py-8 px-4 animate-pulse">
-        <header className="mb-8">
-          {/* Feature image skeleton */}
-          <div className="mb-6 aspect-video relative rounded-lg overflow-hidden bg-gray-200 dark:bg-gray-700" />
-          
-          {/* Title skeleton */}
-          <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-4" />
-          
-          {/* Date skeleton */}
-          <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-48 mb-2" />
-          
-          {/* Excerpt skeleton */}
-          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-full" />
-        </header>
-        
-        {/* Content skeleton */}
-        <div className="prose prose-lg max-w-none dark:prose-invert">
-          <div className="space-y-4">
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full" />
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6" />
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full" />
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-4/5" />
-            <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded w-full my-6" />
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full" />
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4" />
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6" />
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full" />
-          </div>
+  return (
+    <PageShell>
+      <article className="container mx-auto max-w-3xl animate-pulse px-4 py-16 md:py-24">
+        <div className="h-4 w-24 rounded bg-[var(--u-panel)]" />
+        <div className="mt-6 h-12 w-3/4 rounded bg-[var(--u-panel)]" />
+        <div className="mt-4 h-4 w-40 rounded bg-[var(--u-panel)]" />
+        <div className="mt-10 aspect-video w-full rounded-xl bg-[var(--u-panel)]" />
+        <div className="mt-12 space-y-4">
+          <div className="h-4 w-full rounded bg-[var(--u-panel)]" />
+          <div className="h-4 w-5/6 rounded bg-[var(--u-panel)]" />
+          <div className="h-4 w-full rounded bg-[var(--u-panel)]" />
+          <div className="h-4 w-4/5 rounded bg-[var(--u-panel)]" />
+          <div className="my-6 h-32 w-full rounded bg-[var(--u-panel)]" />
+          <div className="h-4 w-full rounded bg-[var(--u-panel)]" />
+          <div className="h-4 w-3/4 rounded bg-[var(--u-panel)]" />
         </div>
       </article>
-    );
-  }
+    </PageShell>
+  );
+}

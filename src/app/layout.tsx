@@ -22,6 +22,34 @@ const apocFont = localFont({
   display: "swap",
 });
 
+// Gloock — a high-contrast display serif used for inner-page titles in the
+// "Undertow" variation. Embedded locally (OFL) so the build is offline-safe.
+const gloockFont = localFont({
+  src: "../../public/fonts/Gloock-Regular.ttf",
+  weight: "400",
+  style: "normal",
+  variable: "--font-gloock",
+  display: "swap",
+});
+
+// Instrument Serif — used for italic eyebrows, ledes, and pull quotes.
+const instrumentSerifFont = localFont({
+  src: [
+    {
+      path: "../../public/fonts/InstrumentSerif-Regular.ttf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/InstrumentSerif-Italic.ttf",
+      weight: "400",
+      style: "italic",
+    },
+  ],
+  variable: "--font-instrument-serif",
+  display: "swap",
+});
+
 // Load Instrument Sans with specific styles
 const instrumentSans = Instrument_Sans({
   subsets: ["latin"],
@@ -62,7 +90,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${apocFont.variable} ${instrumentSans.variable} ${geistMono.variable} antialiased`}
+        className={`${apocFont.variable} ${gloockFont.variable} ${instrumentSerifFont.variable} ${instrumentSans.variable} ${geistMono.variable} antialiased`}
       >
         <script>{themeInitScript}</script>
         <Navigation />

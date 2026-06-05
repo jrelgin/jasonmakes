@@ -2,6 +2,8 @@ import AboutBlurb from "@/app/components/AboutBlurb";
 import FeedlyArticlesWidget from "@/app/components/FeedlyArticlesWidget";
 import SpotifyWidget from "@/app/components/SpotifyWidget";
 import WeatherWidget from "@/app/components/WeatherWidget";
+import DriftingWave from "@/components/DriftingWave";
+import PageShell from "@/components/PageShell";
 
 export const metadata = {
   title: "About | Jason Makes",
@@ -9,70 +11,145 @@ export const metadata = {
     "About Jason Elgin, product leader and designer building tools for education, analytics, and creative work.",
 };
 
+const principles = [
+  {
+    title: "Mission first",
+    body: "Designing for educators and students keeps the work grounded and consequential.",
+  },
+  {
+    title: "Simple scales",
+    body: "Clear systems outlast clever ones — especially as a product moves from service to software.",
+  },
+  {
+    title: "Respect attention",
+    body: "Organize complexity instead of hiding it, so people can choose with confidence.",
+  },
+];
+
+const elsewhere = [
+  { label: "GitHub", href: "https://github.com/jrelgin" },
+  { label: "Email", href: "mailto:jason@signallantern.com" },
+  { label: "Signal Lantern", href: "https://signallantern.com" },
+  { label: "FullStory", href: "https://fullstory.com" },
+];
+
 export default function AboutPage() {
   return (
-    <>
-      <section className="container mx-auto flex min-h-[calc(100vh-7rem)] flex-col px-4">
-        <div className="flex-grow" />
-
-        <div className="max-w-6xl">
-          <h1 className="text-2xl font-medium leading-relaxed text-gray-800 dark:text-gray-200 md:text-3xl lg:text-4xl">
-            Head of Product at Standard Education
+    <PageShell>
+      <section className="container mx-auto max-w-4xl px-4 py-16 md:py-24">
+        <div className="u-rise max-w-3xl">
+          <p className="u-eyebrow text-lg">Boston · Product &amp; Design</p>
+          <h1 className="u-title mt-3 text-5xl md:text-6xl lg:text-7xl">
+            Jason Elgin
           </h1>
-          <p className="font-body mt-2 text-xl font-normal leading-normal text-[var(--color-gray-500)] dark:text-gray-400 md:text-2xl lg:text-2xl">
-            Previously product design and strategy at{" "}
-            <a
-              href="https://signallantern.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline transition-colors hover:text-gray-800 dark:hover:text-gray-300"
-            >
-              Signal Lantern
-            </a>{" "}
-            and{" "}
+          <p className="u-lede mt-5 text-2xl">
+            Head of Product at Standard Education — a designer and developer of
+            fifteen years.
+          </p>
+          <DriftingWave className="mt-8 max-w-[16rem]" />
+        </div>
+
+        <div className="u-rise u-rise-1 mt-10 max-w-2xl space-y-6 text-lg leading-relaxed text-[var(--u-ink)]">
+          <p>
+            I'm a product designer and developer based in Boston, and I've spent
+            more than fifteen years making software that tries to disappear —
+            interfaces that respect your attention and systems that stay legible
+            as they grow.
+          </p>
+          <p>
+            Today I'm Head of Product at Standard Education, where we turn K–12
+            analytics into tools that help educators reach students before they
+            fall behind. Before that I led design for product-led growth and
+            collaboration at{" "}
             <a
               href="https://fullstory.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="underline transition-colors hover:text-gray-800 dark:hover:text-gray-300"
+              className="text-[var(--u-accent)] underline decoration-1 underline-offset-4 transition-colors hover:text-[var(--u-accent-strong)]"
             >
               FullStory
             </a>
+            , rebuilt the survey-export experience at Glass for research teams
+            at brands like Unilever and Clorox, and shaped product strategy at{" "}
+            <a
+              href="https://signallantern.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[var(--u-accent)] underline decoration-1 underline-offset-4 transition-colors hover:text-[var(--u-accent-strong)]"
+            >
+              Signal Lantern
+            </a>
+            .
+          </p>
+          <p>
+            I'm drawn to mission-driven work and the quiet craft beneath it —
+            heuristic evaluation, information architecture, and design systems
+            that make the next decision easier. The best interfaces don't erase
+            complexity so much as organize it, so people can make confident
+            choices and reuse their work.
+          </p>
+          <p className="font-[family-name:var(--font-instrument-serif)] text-xl italic text-[var(--u-ink-strong)]">
+            This site is a small experiment in that idea: a calm surface over a
+            lot of moving water.
           </p>
         </div>
 
-        <div className="flex-grow" />
+        <ul className="u-rise u-rise-1 mt-12 grid max-w-3xl gap-4 sm:grid-cols-3">
+          {principles.map((principle) => (
+            <li key={principle.title} className="frost-panel p-5">
+              <p className="u-eyebrow text-base">{principle.title}</p>
+              <p className="mt-2 text-sm leading-relaxed text-[var(--u-ink-muted)]">
+                {principle.body}
+              </p>
+            </li>
+          ))}
+        </ul>
 
-        <div className="ml-auto max-w-md pb-8">
+        <ul className="u-rise u-rise-2 mt-10 flex flex-wrap gap-x-6 gap-y-2 font-mono text-xs uppercase tracking-wider">
+          {elsewhere.map((item) => (
+            <li key={item.label}>
+              <a
+                href={item.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[var(--u-ink-muted)] transition-colors hover:text-[var(--u-accent)]"
+              >
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+
+        <div className="u-rise u-rise-2 mt-12 max-w-3xl">
           <AboutBlurb />
         </div>
       </section>
 
-      <section className="w-full bg-gray-50 py-16 dark:bg-gray-900">
-        <div className="container mx-auto px-4">
-          <h2 className="mb-8 text-3xl font-bold text-gray-900 dark:text-gray-100 md:text-4xl">
-            Daily Profile
-          </h2>
+      <section className="border-t border-[var(--u-hairline)]">
+        <div className="container mx-auto max-w-4xl px-4 py-16">
+          <p className="u-eyebrow text-lg">Right now</p>
+          <h2 className="u-title mt-2 text-4xl md:text-5xl">Daily Profile</h2>
+          <p className="u-lede mt-3 max-w-xl text-lg">
+            A small, automatically-updating snapshot — the weather over Boston,
+            what I've been listening to, and what I've been reading.
+          </p>
 
-          <div className="mb-8 flex flex-col md:flex-row md:gap-6">
-            <div className="mb-6 w-full md:mb-0 md:w-1/2">
-              <WeatherWidget />
-            </div>
-
-            <div className="w-full md:w-1/2">
-              <SpotifyWidget />
-            </div>
+          <div className="mt-8 grid gap-6 md:grid-cols-2">
+            <WeatherWidget />
+            <SpotifyWidget />
           </div>
 
-          <div className="mt-8">
+          <div className="mt-6">
             <FeedlyArticlesWidget />
           </div>
         </div>
       </section>
 
-      <footer className="py-6 text-center">
-        <p>&copy; {new Date().getFullYear()}</p>
+      <footer className="container mx-auto max-w-4xl px-4 py-10">
+        <p className="font-mono text-xs uppercase tracking-wider text-[var(--u-ink-muted)]">
+          © {new Date().getFullYear()} Jason Elgin
+        </p>
       </footer>
-    </>
+    </PageShell>
   );
 }
