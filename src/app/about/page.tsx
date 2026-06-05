@@ -2,6 +2,7 @@ import AboutBlurb from "@/app/components/AboutBlurb";
 import FeedlyArticlesWidget from "@/app/components/FeedlyArticlesWidget";
 import SpotifyWidget from "@/app/components/SpotifyWidget";
 import WeatherWidget from "@/app/components/WeatherWidget";
+import { InstrumentHeader, InstrumentPage } from "@/components/instrument-page";
 
 export const metadata = {
   title: "About | Jason Makes",
@@ -11,68 +12,58 @@ export const metadata = {
 
 export default function AboutPage() {
   return (
-    <>
-      <section className="container mx-auto flex min-h-[calc(100vh-7rem)] flex-col px-4">
-        <div className="flex-grow" />
+    <InstrumentPage width="wide" className="about-instrument-page">
+      <section className="about-instrument">
+        <InstrumentHeader
+          eyebrow="About"
+          readout="Product / systems / making"
+          title="Jason Elgin builds calm paths through complicated software."
+          description="Head of Product at Standard Education. Previously product design and strategy through Signal Lantern and FullStory."
+        />
 
-        <div className="max-w-6xl">
-          <h1 className="text-2xl font-medium leading-relaxed text-gray-800 dark:text-gray-200 md:text-3xl lg:text-4xl">
-            Head of Product at Standard Education
-          </h1>
-          <p className="font-body mt-2 text-xl font-normal leading-normal text-[var(--color-gray-500)] dark:text-gray-400 md:text-2xl lg:text-2xl">
-            Previously product design and strategy at{" "}
-            <a
-              href="https://signallantern.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline transition-colors hover:text-gray-800 dark:hover:text-gray-300"
-            >
-              Signal Lantern
-            </a>{" "}
-            and{" "}
-            <a
-              href="https://fullstory.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline transition-colors hover:text-gray-800 dark:hover:text-gray-300"
-            >
-              FullStory
-            </a>
-          </p>
-        </div>
-
-        <div className="flex-grow" />
-
-        <div className="ml-auto max-w-md pb-8">
-          <AboutBlurb />
-        </div>
-      </section>
-
-      <section className="w-full bg-gray-50 py-16 dark:bg-gray-900">
-        <div className="container mx-auto px-4">
-          <h2 className="mb-8 text-3xl font-bold text-gray-900 dark:text-gray-100 md:text-4xl">
-            Daily Profile
-          </h2>
-
-          <div className="mb-8 flex flex-col md:flex-row md:gap-6">
-            <div className="mb-6 w-full md:mb-0 md:w-1/2">
-              <WeatherWidget />
-            </div>
-
-            <div className="w-full md:w-1/2">
-              <SpotifyWidget />
-            </div>
+        <div className="about-instrument__grid">
+          <div className="about-instrument__bio">
+            <p>
+              I work between product strategy, UX systems, analytics, and
+              creative engineering. The pattern is usually the same: find the
+              shape inside a messy tool, make the important paths visible, and
+              give teams a system they can keep using after the first launch.
+            </p>
+            <p>
+              The older thread is still there too: clean code, beautiful design,
+              and a persistent interest in typography.
+            </p>
           </div>
 
-          <div className="mt-8">
-            <FeedlyArticlesWidget />
+          <div className="about-instrument__signal">
+            <p className="instrument-label">Current signal</p>
+            <AboutBlurb />
           </div>
         </div>
       </section>
 
-      <footer className="py-6 text-center">
-        <p>&copy; {new Date().getFullYear()}</p>
+      <section className="signal-section">
+        <div className="signal-section__heading">
+          <p className="instrument-label">Daily profile</p>
+          <h2>Small live readouts.</h2>
+        </div>
+
+        <div className="signal-grid">
+          <div>
+            <WeatherWidget />
+          </div>
+
+          <div>
+            <SpotifyWidget />
+          </div>
+        </div>
+
+        <FeedlyArticlesWidget />
+      </section>
+
+      <footer className="instrument-footer">
+        <p>&copy; {new Date().getFullYear()} Jason Makes</p>
       </footer>
-    </>
+    </InstrumentPage>
   );
 }

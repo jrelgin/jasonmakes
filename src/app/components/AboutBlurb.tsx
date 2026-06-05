@@ -7,19 +7,15 @@ export default async function AboutBlurb() {
     const blurb = await kv.get<string>("blurb");
 
     return (
-      <div className="about-blurb my-6">
-        <p className="prose max-w-xl text-xl italic leading-relaxed text-gray-900 dark:text-gray-100">
-          {blurb ?? "Loading..."}
-        </p>
+      <div className="about-blurb">
+        <p>{blurb ?? "Loading..."}</p>
       </div>
     );
   } catch (error) {
     console.error("Failed to fetch blurb from KV:", error);
     return (
-      <div className="about-blurb my-6">
-        <p className="prose max-w-xl text-xl italic leading-relaxed text-gray-900 dark:text-gray-100">
-          Loading...
-        </p>
+      <div className="about-blurb">
+        <p>Loading...</p>
       </div>
     );
   }

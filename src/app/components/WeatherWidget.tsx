@@ -1,18 +1,26 @@
 export const revalidate = 3600; // 1 hour (matches cron frequency)
 
-import type { Profile } from "#lib/profile";
-import { kv } from "#lib/kv";
-import type { Weather } from "#lib/providers/weather";
 import { formatUpdatedAt } from "@/lib/date";
+import { kv } from "#lib/kv";
+import type { Profile } from "#lib/profile";
+import type { Weather } from "#lib/providers/weather";
 
 type WeatherProfile = Pick<Profile, "weather">;
 
 function getWeatherIcon(condition: string): string {
   const normalizedCondition = condition.toLowerCase();
 
-  if (normalizedCondition.includes("clear") || normalizedCondition.includes("sun")) return "☀️";
+  if (
+    normalizedCondition.includes("clear") ||
+    normalizedCondition.includes("sun")
+  )
+    return "☀️";
   if (normalizedCondition.includes("cloud")) return "☁️";
-  if (normalizedCondition.includes("rain") || normalizedCondition.includes("drizzle")) return "🌧️";
+  if (
+    normalizedCondition.includes("rain") ||
+    normalizedCondition.includes("drizzle")
+  )
+    return "🌧️";
   if (normalizedCondition.includes("snow")) return "❄️";
   if (normalizedCondition.includes("fog")) return "🌫️";
   if (normalizedCondition.includes("thunder")) return "⚡";
@@ -21,7 +29,9 @@ function getWeatherIcon(condition: string): string {
 }
 
 function formatTemperatureRange(weather: Weather): string {
-  return `${Math.round(weather.temperature_low)}° - ${Math.round(weather.temperature_high)}°F`;
+  return `${Math.round(weather.temperature_low)}° - ${Math.round(
+    weather.temperature_high,
+  )}°F`;
 }
 
 export default async function WeatherWidget() {
@@ -36,39 +46,43 @@ export default async function WeatherWidget() {
 
   if (!weatherData) {
     return (
-      <div className="weather-widget rounded-lg border border-gray-200 bg-gray-100 p-4 text-gray-900 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+      <div className="signal-widget weather-widget">
         Weather data unavailable
       </div>
     );
   }
 
   return (
-    <div className="weather-widget rounded-lg border border-gray-200 bg-gray-100 p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Weather in {weatherData.city}</h3>
-      <div className="mt-2 flex items-center">
-        <span className="mr-3 text-3xl">{getWeatherIcon(weatherData.condition)}</span>
-        <div className="flex-1">
-          <p className="text-lg font-medium text-gray-900 dark:text-white">
+    <div className="signal-widget weather-widget">
+      <h3>Weather in {weatherData.city}</h3>
+      <div className="signal-widget__main">
+        <span className="signal-widget__icon">
+          {getWeatherIcon(weatherData.condition)}
+        </span>
+        <div>
+          <p className="signal-widget__value">
             {Math.round(weatherData.temperature)}°F • {weatherData.condition}
           </p>
-          <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">Today: {formatTemperatureRange(weatherData)}</p>
+          <p className="signal-widget__note">
+            Today: {formatTemperatureRange(weatherData)}
+          </p>
         </div>
       </div>
 
-      <dl className="mt-3 space-y-1 text-sm text-gray-700 dark:text-gray-300">
-        <div className="flex justify-between">
+      <dl className="signal-widget__list">
+        <div>
           <dt>Humidity:</dt>
-          <dd className="font-medium">
+          <dd>
             {weatherData.mean_humidity}% ({weatherData.humidity_classification})
           </dd>
         </div>
-        <div className="flex justify-between">
+        <div>
           <dt>Precipitation:</dt>
-          <dd className="font-medium">{weatherData.precipitation_prob}%</dd>
+          <dd>{weatherData.precipitation_prob}%</dd>
         </div>
       </dl>
 
-      <p className="mt-4 text-xs text-gray-500 dark:text-gray-400">
+      <p className="signal-widget__updated">
         Updated {formatUpdatedAt(weatherData.lastUpdated)}
       </p>
     </div>

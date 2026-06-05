@@ -2,6 +2,10 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { type Article, listArticles } from "../../../lib/data/content";
+import {
+  InstrumentHeader,
+  InstrumentPage,
+} from "../../components/instrument-page";
 
 export const metadata = {
   title: "Articles | Jason Makes",
@@ -14,25 +18,32 @@ export default async function ArticlesPage() {
   const articles = await listArticles();
 
   return (
-    <main className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-gray-100">
-        Articles
-      </h1>
+    <InstrumentPage width="wide">
+      <InstrumentHeader
+        eyebrow="Articles"
+        readout={`${articles.length.toString().padStart(2, "0")} entries`}
+        title="Notes from the instruments."
+        description="Short writing on product, design, development, and the odd connective tissue between those systems."
+      />
 
       {articles.length === 0 ? (
-        <p>No articles found. Check back soon!</p>
+        <p className="instrument-empty">No articles found. Check back soon.</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {articles.map((article) => (
-            <ArticleCard key={article.slug} article={article} />
+        <div className="instrument-list">
+          {articles.map((article, index) => (
+            <ArticleCard
+              key={article.slug}
+              article={article}
+              index={index + 1}
+            />
           ))}
         </div>
       )}
-    </main>
+    </InstrumentPage>
   );
 }
 
-function ArticleCard({ article }: { article: Article }) {
+function ArticleCard({ article, index }: { article: Article; index: number }) {
   const { title, slug, publishDate, excerpt, heroImage } = article;
   const formattedDate = new Date(publishDate).toLocaleDateString("en-US", {
     year: "numeric",
@@ -41,41 +52,33 @@ function ArticleCard({ article }: { article: Article }) {
   });
 
   return (
-    <Link href={`/articles/${slug}`} className="block h-full" prefetch>
-      <div className="border rounded-lg overflow-hidden h-full flex flex-col hover:shadow-lg transition-shadow duration-300">
-        {heroImage ? (
-          <div className="h-48 relative overflow-hidden">
+    <Link href={`/articles/${slug}`} className="instrument-row" prefetch>
+      <article>
+        <div className="instrument-row__index">
+          <span>{index.toString().padStart(2, "0")}</span>
+          <small>{formattedDate}</small>
+        </div>
+
+        <div className="instrument-row__body">
+          <h2>{title}</h2>
+          {excerpt && <p>{excerpt}</p>}
+        </div>
+
+        <div className="instrument-row__signal">
+          {heroImage ? (
             <Image
               src={heroImage}
-              alt={title}
-              fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              className="object-cover transition-transform hover:scale-105 duration-300"
+              alt=""
+              width={72}
+              height={72}
+              className="instrument-row__thumb"
             />
-          </div>
-        ) : (
-          <div className="h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-            <span className="text-gray-400 dark:text-gray-500">No image</span>
-          </div>
-        )}
-        <div className="p-4 flex-1 flex flex-col">
-          <h2 className="text-xl  font-semibold mb-2">{title}</h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-            {formattedDate}
-          </p>
-          {excerpt && (
-            <p className="mb-4 text-gray-700 dark:text-gray-300 flex-1">
-              {excerpt}
-            </p>
+          ) : (
+            <span />
           )}
-
-          <div className="mt-auto pt-4">
-            <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
-              Read more →
-            </span>
-          </div>
+          <strong>Open</strong>
         </div>
-      </div>
+      </article>
     </Link>
   );
 }
