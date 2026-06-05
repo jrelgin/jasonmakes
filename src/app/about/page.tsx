@@ -24,7 +24,7 @@ export default function AboutPage() {
     <PageShell>
       <section className="container mx-auto px-4 py-14 md:py-20">
         <div className="tide-rise max-w-3xl">
-          <p className="eyebrow mb-3">Product · Design · Code</p>
+          <p className="eyebrow mb-3">Atlanta · Product · Design</p>
           <h1 className="page-title text-4xl md:text-5xl lg:text-6xl">
             Jason Elgin
           </h1>
@@ -55,10 +55,10 @@ export default function AboutPage() {
 
           <div className="mt-8 space-y-5 text-lg leading-relaxed text-[var(--ink)]">
             <p>
-              I'm a product designer and builder with more than 15 years shaping
-              software people actually understand. Today I lead product at
-              Standard Education, turning K–12 analytics into tools that help
-              educators reach students before they fall behind.
+              I'm an Atlanta-based product designer and builder with more than
+              15 years shaping software people actually understand. Today I lead
+              product at Standard Education, turning K–12 analytics into tools
+              that help educators reach students before they fall behind.
             </p>
             <p>
               Before that I designed growth and collaboration at FullStory,
@@ -97,8 +97,8 @@ export default function AboutPage() {
             Daily Profile
           </h2>
           <p className="lede mt-2 max-w-xl">
-            A small, automatically-updating snapshot — the local weather, what
-            I've been listening to, and what I've been reading.
+            A small, automatically-updating snapshot — the weather over Atlanta,
+            what I've been listening to, and what I've been reading.
           </p>
 
           <div className="mt-8 grid gap-6 md:grid-cols-2">
