@@ -52,6 +52,10 @@
  * ========================================================================= */
 .page-shell {
   position: relative;
+  /* Own stacking context so the fixed, negative-z .sea-backdrop renders
+     reliably above the page background, instead of depending on body-background
+     propagating to the canvas (which silently breaks if html ever gets a bg). */
+  isolation: isolate;
   min-height: 100vh;
   color: var(--u-ink);
 }

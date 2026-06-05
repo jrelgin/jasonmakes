@@ -11,6 +11,11 @@ export const metadata = {
     "About Jason Elgin, product leader and designer building tools for education, analytics, and creative work.",
 };
 
+// The KV-backed Daily Profile widgets below are the only live data on this
+// page. Revalidate hourly so they stay fresh even between cron runs; the cron
+// job also calls revalidatePath('/about') right after each profile update.
+export const revalidate = 3600;
+
 const principles = [
   {
     title: "Mission first",
