@@ -38,7 +38,7 @@ export default function AboutPage() {
     <PageShell>
       <section className="container mx-auto max-w-4xl px-4 py-16 md:py-24">
         <div className="u-rise max-w-3xl">
-          <p className="u-eyebrow text-lg">Boston · Product &amp; Design</p>
+          <p className="u-eyebrow text-lg">Designer &amp; Developer</p>
           <h1 className="u-title mt-3 text-5xl md:text-6xl lg:text-7xl">
             Jason Elgin
           </h1>
@@ -51,10 +51,10 @@ export default function AboutPage() {
 
         <div className="u-rise u-rise-1 mt-10 max-w-2xl space-y-6 text-lg leading-relaxed text-[var(--u-ink)]">
           <p>
-            I'm a product designer and developer based in Boston, and I've spent
-            more than fifteen years making software that tries to disappear —
-            interfaces that respect your attention and systems that stay legible
-            as they grow.
+            I'm a product designer and developer, and I've spent more than
+            fifteen years making software that tries to disappear — interfaces
+            that respect your attention and systems that stay legible as they
+            grow.
           </p>
           <p>
             Today I'm Head of Product at Standard Education, where we turn K–12
@@ -130,8 +130,8 @@ export default function AboutPage() {
           <p className="u-eyebrow text-lg">Right now</p>
           <h2 className="u-title mt-2 text-4xl md:text-5xl">Daily Profile</h2>
           <p className="u-lede mt-3 max-w-xl text-lg">
-            A small, automatically-updating snapshot — the weather over Boston,
-            what I've been listening to, and what I've been reading.
+            A small, automatically-updating snapshot — the local weather, what
+            I've been listening to, and what I've been reading.
           </p>
 
           <div className="mt-8 grid gap-6 md:grid-cols-2">
