@@ -10,7 +10,7 @@ export function formatUpdatedAt(isoString: string | null | undefined): string {
   }
 
   try {
-    return new Intl.DateTimeFormat(undefined, {
+    return new Intl.DateTimeFormat("en-US", {
       month: "short",
       day: "numeric",
       hour: "numeric",
