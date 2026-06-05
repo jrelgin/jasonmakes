@@ -16,18 +16,29 @@ export default function AboutPage() {
       <section className="about-instrument">
         <InstrumentHeader
           eyebrow="About"
-          readout="Product / systems / making"
-          title="Jason Elgin builds calm paths through complicated software."
-          description="Head of Product at Standard Education. Previously product design and strategy through Signal Lantern and FullStory."
+          readout="Field notes / product signals / soft machines"
+          title="Jason Elgin keeps a lantern lit at the edge of complicated software."
+          description="Head of Product at Standard Education, founder of Signal Lantern, and former product/design partner to FullStory teams."
         />
 
         <div className="about-instrument__grid">
           <div className="about-instrument__bio">
             <p>
-              I work between product strategy, UX systems, analytics, and
-              creative engineering. The pattern is usually the same: find the
-              shape inside a messy tool, make the important paths visible, and
-              give teams a system they can keep using after the first launch.
+              Most of my work starts in the room where the map has stopped
+              matching the terrain. Someone has a tool with too much gravity: a
+              school system full of hidden operational weight, an analytics
+              product where a useful behavior has not become a habit yet, or a
+              young company that can feel the friction but cannot quite name it.
+              I like that room.
+            </p>
+            <p>
+              Standard Education is the heavy machine: policy, data, educators,
+              dashboards, and the problem of making the next district easier to
+              serve than the last one. FullStory is the signal chamber: watching
+              behavior, finding the collaborative spark, and shaping product
+              loops that make insight travel. Signal Lantern is the practice
+              around both: interviews, usage data, onboarding, feature
+              discovery, and enough design taste to make the system feel alive.
             </p>
             <p>
               The older thread is still there too: clean code, beautiful design,

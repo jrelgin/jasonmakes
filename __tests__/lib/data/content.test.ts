@@ -27,8 +27,8 @@ describe("Keystatic content loader", () => {
     const caseStudies = await listCaseStudies();
     expect(caseStudies.map((caseStudy) => caseStudy.slug)).toEqual([
       "standard-education-scale",
-      "glass-exports",
       "fullstory-at-mentions",
+      "glass-exports",
     ]);
   });
 
