@@ -39,25 +39,24 @@ export default function AboutPage() {
       <section className="container mx-auto max-w-4xl px-4 py-16 md:py-24">
         <div className="read-veil">
           <div className="u-rise max-w-3xl">
-            <p className="u-eyebrow text-lg">
-              Atlanta · Designer &amp; Developer
-            </p>
+            <p className="u-eyebrow text-lg">Product builder</p>
             <h1 className="u-title mt-3 text-5xl md:text-6xl lg:text-7xl">
               Jason Elgin
             </h1>
             <p className="u-lede mt-5 text-2xl">
-              Head of Product at Standard Education — a designer and developer
-              of fifteen years.
+              Head of Product at Standard Education, after fifteen years of
+              turning messy problems into software that works.
             </p>
             <DriftingWave className="mt-8 max-w-[16rem]" />
           </div>
 
           <div className="u-rise u-rise-1 mt-10 max-w-2xl space-y-6 text-lg leading-relaxed text-[var(--u-ink)]">
             <p>
-              I'm a product designer and developer based in Atlanta, and I've
-              spent more than fifteen years making software that tries to
-              disappear — interfaces that respect your attention and systems
-              that stay legible as they grow.
+              I've spent fifteen years making things, and for most of that time
+              the making was the hard part. It isn't anymore. What's hard now,
+              and what I find myself caring about most, is knowing what's worth
+              making, getting it in front of real people fast, and being honest
+              about whether it actually helped.
             </p>
             <p>
               Today I'm Head of Product at Standard Education, where we turn
@@ -85,11 +84,13 @@ export default function AboutPage() {
               .
             </p>
             <p>
-              I'm drawn to mission-driven work and the quiet craft beneath it —
-              heuristic evaluation, information architecture, and design systems
-              that make the next decision easier. The best interfaces don't
-              erase complexity so much as organize it, so people can make
-              confident choices and reuse their work.
+              The craft underneath still matters to me. Heuristic evaluation,
+              information architecture, design systems, the quiet scaffolding
+              that makes the next decision easier. It's what lets me move fast
+              on the right things instead of just fast. Good work doesn't erase
+              complexity so much as organize it, so the people I build for can
+              make confident choices, and so I can see whether the choice was
+              right.
             </p>
             <p className="font-[family-name:var(--font-instrument-serif)] text-xl italic text-[var(--u-ink-strong)]">
               This site is a small experiment in that idea: a calm surface over
