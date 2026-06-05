@@ -24,7 +24,7 @@ export default function AboutPage() {
     <PageShell>
       <section className="container mx-auto px-4 py-14 md:py-20">
         <div className="tide-rise max-w-3xl">
-          <p className="eyebrow mb-3">Boston · Product &amp; Design</p>
+          <p className="eyebrow mb-3">Product · Design · Code</p>
           <h1 className="page-title text-4xl md:text-5xl lg:text-6xl">
             Jason Elgin
           </h1>
@@ -97,8 +97,8 @@ export default function AboutPage() {
             Daily Profile
           </h2>
           <p className="lede mt-2 max-w-xl">
-            A small, automatically-updating snapshot — the weather over Boston,
-            what I've been listening to, and what I've been reading.
+            A small, automatically-updating snapshot — the local weather, what
+            I've been listening to, and what I've been reading.
           </p>
 
           <div className="mt-8 grid gap-6 md:grid-cols-2">
