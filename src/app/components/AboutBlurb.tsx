@@ -16,9 +16,6 @@ export default async function AboutBlurb() {
       <p className="font-[family-name:var(--font-instrument-serif)] text-2xl italic leading-relaxed text-[var(--u-ink-strong)] md:text-3xl">
         {blurb ?? "Loading..."}
       </p>
-      <figcaption className="mt-4 font-mono text-[0.7rem] uppercase tracking-[0.18em] text-[var(--u-accent)]">
-        Today, in brief
-      </figcaption>
     </figure>
   );
 }

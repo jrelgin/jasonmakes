@@ -393,3 +393,35 @@
     animation: none;
   }
 }
+
+/* =========================================================================
+ * Inline disclosure ("Wait, what is this?"). The panel height animates to the
+ * content's natural size via grid-template-rows, so there is no magic
+ * max-height to maintain; the inner wrapper fades in for polish.
+ * ========================================================================= */
+.disclosure-region {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.4s cubic-bezier(0, 0, 0.2, 1);
+}
+
+.disclosure-region[data-open="true"] {
+  grid-template-rows: 1fr;
+}
+
+.disclosure-region__inner {
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.3s ease 0.05s;
+}
+
+.disclosure-region[data-open="true"] .disclosure-region__inner {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .disclosure-region,
+  .disclosure-region__inner {
+    transition: none;
+  }
+}
