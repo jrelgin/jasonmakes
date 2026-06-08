@@ -4,17 +4,17 @@ export default function CaseStudyLoading() {
       <header className="mb-8">
         {/* Feature image skeleton */}
         <div className="mb-6 aspect-video relative rounded-lg overflow-hidden bg-gray-200 dark:bg-gray-700" />
-        
+
         {/* Title skeleton */}
         <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-4" />
-        
+
         {/* Date skeleton */}
         <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-48 mb-2" />
-        
+
         {/* Excerpt skeleton */}
         <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-full" />
       </header>
-      
+
       {/* Content skeleton */}
       <div className="prose prose-lg max-w-none dark:prose-invert">
         <div className="space-y-4">

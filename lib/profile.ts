@@ -21,7 +21,9 @@ const DEFAULT_CACHE_DURATION_MS = 5 * 60 * 1000;
 const CACHE_DURATION_MS = (() => {
   const rawValue = process.env.DEV_CACHE_MS;
   const parsed = rawValue ? Number.parseInt(rawValue, 10) : Number.NaN;
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_CACHE_DURATION_MS;
+  return Number.isFinite(parsed) && parsed > 0
+    ? parsed
+    : DEFAULT_CACHE_DURATION_MS;
 })();
 
 function getFallbackWeather(): Weather {
@@ -63,6 +65,15 @@ function logProviderError(provider: string, error: unknown) {
   console.error(`[profile] ${provider} fetch failed:`, error);
 }
 
+function fallbackAfterLog<T>(
+  provider: string,
+  error: unknown,
+  getFallback: () => T,
+): T {
+  logProviderError(provider, error);
+  return getFallback();
+}
+
 function readCache(cacheKey: string): Profile | null {
   const cacheEntry = memoryCache[cacheKey];
   if (!cacheEntry) {
@@ -94,23 +105,24 @@ export async function buildProfile(): Promise<Profile> {
     }
   }
 
-  const [weatherResult, feedlyResult, spotifyResult] = await Promise.allSettled([
-    fetchWeather(),
-    fetchFeedly(),
-    fetchSpotify(),
-  ]);
+  const [weatherResult, feedlyResult, spotifyResult] = await Promise.allSettled(
+    [fetchWeather(), fetchFeedly(), fetchSpotify()],
+  );
 
-  const weather = weatherResult.status === "fulfilled"
-    ? weatherResult.value
-    : (logProviderError("weather", weatherResult.reason), getFallbackWeather());
+  const weather =
+    weatherResult.status === "fulfilled"
+      ? weatherResult.value
+      : fallbackAfterLog("weather", weatherResult.reason, getFallbackWeather);
 
-  const feedly = feedlyResult.status === "fulfilled"
-    ? feedlyResult.value
-    : (logProviderError("feedly", feedlyResult.reason), getFallbackFeedly());
+  const feedly =
+    feedlyResult.status === "fulfilled"
+      ? feedlyResult.value
+      : fallbackAfterLog("feedly", feedlyResult.reason, getFallbackFeedly);
 
-  const spotify = spotifyResult.status === "fulfilled"
-    ? spotifyResult.value
-    : (logProviderError("spotify", spotifyResult.reason), getFallbackSpotify());
+  const spotify =
+    spotifyResult.status === "fulfilled"
+      ? spotifyResult.value
+      : fallbackAfterLog("spotify", spotifyResult.reason, getFallbackSpotify);
 
   const profileData: Profile = {
     weather,
