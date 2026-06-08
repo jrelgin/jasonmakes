@@ -51,19 +51,17 @@ function createDotSkyConfig(
   const outerRadius = Math.ceil(
     Math.sqrt(Math.max(cx, width - cx) ** 2 + cy ** 2),
   );
-  // On mobile the sun scales down with the canvas and reads as a small,
-  // washed-out cluster. Enlarge the warm focal core + glow on phones WITHOUT
-  // changing dot density: ringCount/ringSpacing below are derived from the
-  // UNSCALED base radius so the ring pitch (and the dotSize*1.2 dot pitch in
-  // drawNoisyRingSun) is pixel-identical to desktop.
-  const SUN_MOBILE_SCALE = 2.2;
-  const baseInnerRadius = Math.max(14, horizonY * 0.02);
-  const innerRadius = isMobileWidth(width)
-    ? baseInnerRadius * SUN_MOBILE_SCALE
-    : baseInnerRadius;
+  const innerRadius = Math.max(14, horizonY * 0.02);
   // ~14px spacing — between the original 20px and the denser 10px
-  const ringCount = Math.round((outerRadius - baseInnerRadius) / 14);
-  const ringSpacing = (outerRadius - baseInnerRadius) / ringCount;
+  const ringCount = Math.round((outerRadius - innerRadius) / 14);
+  const ringSpacing = (outerRadius - innerRadius) / ringCount;
+
+  // On mobile the sun has far fewer rings (the sky is smaller), so its dots
+  // never grow to the bold sizes they reach on desktop and the sun reads
+  // washed-out. Start from the desktop dot scale and bump it up — large dots
+  // give solid coverage so the sky no longer shows through. Ring count/spacing
+  // are unchanged.
+  const dotScale = isMobileWidth(width) ? 2.0 : 1;
 
   // Map the sun gradient evenly across ringCount
   const gradientLen = DOT_EARTH_TONES.sunRingGradient.length;
@@ -79,6 +77,7 @@ function createDotSkyConfig(
     innerRadius,
     ringSpacing,
     dotSize: 2.5, // base; grows per ring in the draw function
+    dotScale,
     colors,
   };
 
@@ -245,7 +244,14 @@ export function drawNoisyRingSun(
   rng: RNG,
   rotationAngle = 0,
 ) {
-  const { center, ringCount, innerRadius, ringSpacing, colors } = config;
+  const {
+    center,
+    ringCount,
+    innerRadius,
+    ringSpacing,
+    colors,
+    dotScale = 1,
+  } = config;
   const { x: cx, y: cy } = center;
 
   // Soft center glow — blends into the dot field, no hard edges
@@ -280,8 +286,9 @@ export function drawNoisyRingSun(
 
     const color = colors[Math.min(ringIdx, colors.length - 1)];
 
-    // Dot size grows linearly with ring index; outer rings have larger, bolder dots
-    const dotSize = 2.5 + ringIdx * 0.28;
+    // Dot size grows linearly with ring index; outer rings have larger, bolder
+    // dots. dotScale (>1 on mobile) keeps the dots bold on small viewports.
+    const dotSize = (2.5 + ringIdx * 0.28) * dotScale;
     const dotRadius = dotSize / 2;
 
     // Moderate density — background will show through outer rings naturally
