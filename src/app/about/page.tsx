@@ -82,8 +82,7 @@ export default function AboutPage() {
             </p>
             <p className="font-[family-name:var(--font-instrument-serif)] text-xl italic text-[var(--u-ink-strong)]">
               This site is a small experiment in that idea: a calm surface over
-              a lot of moving water. Below is some of that water, the parts of
-              my days that move on their own.
+              a lot of moving water.
             </p>
           </div>
 
@@ -101,16 +100,17 @@ export default function AboutPage() {
               </li>
             ))}
           </ul>
-        </div>
-      </section>
 
-      <section className="container mx-auto max-w-4xl px-4 pb-16">
-        <div className="read-veil">
-          <h2 className="u-title text-4xl md:text-5xl">Right now</h2>
+          <h2 className="u-title mt-16 text-4xl md:text-5xl">Right now</h2>
+
+          <div className="u-rise u-rise-1 mt-8">
+            <AboutBlurb />
+          </div>
 
           <Disclosure
-            className="u-rise u-rise-1 mt-4"
+            className="u-rise u-rise-1 mt-3"
             label="Wait, what is this?"
+            align="right"
           >
             <p>
               This part runs on its own. The weather over Atlanta, the last
@@ -120,10 +120,6 @@ export default function AboutPage() {
               It's the moving water from the line above, made literal.
             </p>
           </Disclosure>
-
-          <div className="u-rise u-rise-1 mt-8">
-            <AboutBlurb />
-          </div>
 
           <div className="u-rise u-rise-2 mt-8 grid gap-6 md:grid-cols-2">
             <WeatherWidget />
