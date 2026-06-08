@@ -152,6 +152,15 @@ export interface TentacleGlitchState {
   params: GlitchParams;
 }
 
+/** Daytime floating whale (day-mode counterpart to the tentacle glitch) */
+export interface WhaleState {
+  img: HTMLImageElement;
+  width: number;
+  height: number;
+  canvasWidth: number;
+  driftDir: number;
+}
+
 export interface SeaPatternCacheRow {
   tile: HTMLCanvasElement;
   centerX: number;
@@ -182,4 +191,5 @@ export interface SceneState {
   vignetteCache: HTMLCanvasElement | null;
   seaPatternCache: SeaPatternCache | null;
   tentacleGlitch: TentacleGlitchState | null;
+  whale: WhaleState | null;
 }

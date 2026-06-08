@@ -172,6 +172,7 @@ export function createScene(
     vignetteCache,
     seaPatternCache,
     tentacleGlitch: null,
+    whale: null,
   };
 }
 
