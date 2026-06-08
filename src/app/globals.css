@@ -49,20 +49,26 @@ body {
 
 .home-seascape {
   position: fixed;
-  inset: 0; /* fills the viewport; avoids the 100vw + scrollbar-gutter overflow */
+  inset: 0;
   z-index: 0;
+  /* Span the FULL viewport width, including the reserved scrollbar gutter, so
+     no empty gutter strip shows on the right of the (non-scrolling) homepage.
+     The overflow lock below clips the gutter-width overhang so 100vw can't
+     create a horizontal scrollbar. */
+  width: 100vw;
   overflow: hidden;
   background: #12203a;
 }
 
-/* The homepage is a single fixed canvas that never scrolls. On mobile, 100dvh
-   transitions during URL-bar show/hide can otherwise leak a few px of scroll,
-   so lock it. Inner pages (no .home-seascape) are unaffected. */
-@media (max-width: 639.98px) {
-  html:has(.home-seascape),
-  html:has(.home-seascape) body {
-    overflow: hidden;
-  }
+/* The homepage is a single fixed canvas that never scrolls. Lock overflow at
+   all widths so the 100vw scene can't create a scrollbar (and so mobile 100dvh
+   transitions don't leak a few px of scroll). overflow:hidden keeps <html> a
+   scroll container, so scrollbar-gutter:stable still reserves the gutter and
+   the nav stays aligned with inner pages. Inner pages (no .home-seascape) are
+   unaffected. */
+html:has(.home-seascape),
+html:has(.home-seascape) body {
+  overflow: hidden;
 }
 
 /* Apply Apoc font to all heading elements */
