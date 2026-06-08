@@ -94,7 +94,7 @@ export default function RootLayout({
       >
         <script>{themeInitScript}</script>
         <Navigation />
-        <div className="min-h-screen pt-28">{children}</div>
+        <div className="min-h-[100dvh] pt-28">{children}</div>
         <Analytics />
       </body>
     </html>

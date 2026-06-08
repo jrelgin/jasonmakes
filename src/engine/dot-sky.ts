@@ -1,6 +1,7 @@
 import { getCanvas2DContext } from "./canvas";
 import { DOT_EARTH_TONES } from "./dot-palette";
 import { createNoiseGenerators } from "./noise";
+import { isMobileWidth } from "./responsive";
 import {
   Dimensions,
   DotCircleFormation,
@@ -50,10 +51,19 @@ function createDotSkyConfig(
   const outerRadius = Math.ceil(
     Math.sqrt(Math.max(cx, width - cx) ** 2 + cy ** 2),
   );
-  const innerRadius = Math.max(14, horizonY * 0.02);
+  // On mobile the sun scales down with the canvas and reads as a small,
+  // washed-out cluster. Enlarge the warm focal core + glow on phones WITHOUT
+  // changing dot density: ringCount/ringSpacing below are derived from the
+  // UNSCALED base radius so the ring pitch (and the dotSize*1.2 dot pitch in
+  // drawNoisyRingSun) is pixel-identical to desktop.
+  const SUN_MOBILE_SCALE = 2.2;
+  const baseInnerRadius = Math.max(14, horizonY * 0.02);
+  const innerRadius = isMobileWidth(width)
+    ? baseInnerRadius * SUN_MOBILE_SCALE
+    : baseInnerRadius;
   // ~14px spacing — between the original 20px and the denser 10px
-  const ringCount = Math.round((outerRadius - innerRadius) / 14);
-  const ringSpacing = (outerRadius - innerRadius) / ringCount;
+  const ringCount = Math.round((outerRadius - baseInnerRadius) / 14);
+  const ringSpacing = (outerRadius - baseInnerRadius) / ringCount;
 
   // Map the sun gradient evenly across ringCount
   const gradientLen = DOT_EARTH_TONES.sunRingGradient.length;

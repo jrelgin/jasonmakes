@@ -15,6 +15,7 @@
  */
 
 import { getCanvas2DContext } from "./canvas";
+import { isMobileWidth } from "./responsive";
 import {
   GlitchParams,
   TentacleGlitchState,
@@ -42,7 +43,10 @@ export function getTentaclesRenderSize(
   canvasWidth: number,
   canvasHeight: number,
 ): { width: number; height: number } {
-  const targetWidth = canvasWidth * 0.63;
+  // Mobile: the creature should dominate the scene, so go slightly past the
+  // viewport width (it's anchored right and bleeds off-canvas in placement).
+  // Desktop unchanged at 0.63.
+  const targetWidth = canvasWidth * (isMobileWidth(canvasWidth) ? 1.1 : 0.63);
   const aspectRatio = 1024 / 1536;
   const targetHeight = targetWidth * aspectRatio;
   return { width: Math.round(targetWidth), height: Math.round(targetHeight) };
@@ -54,7 +58,14 @@ function getTentaclePlacement(
   horizonBaseY: number,
 ): { width: number; height: number; x: number; y: number } {
   const size = getTentaclesRenderSize(canvasWidth, canvasHeight);
-  const x = canvasWidth - size.width - canvasWidth * 0.05;
+  // Mobile: oversized and anchored right so ~25% bleeds off the right edge.
+  // Keep the left edge on-screen (x >= 0) so the glitch renderer's
+  // `maskPx = max(0, x*dpr)` clamp stays valid — pushing the left edge
+  // off-screen (x < 0) would misalign the mask and is intentionally avoided.
+  // Desktop: fully on-screen, inset 5% from the right.
+  const x = isMobileWidth(canvasWidth)
+    ? canvasWidth - size.width * 0.75
+    : canvasWidth - size.width - canvasWidth * 0.05;
 
   const seaHeight = canvasHeight - horizonBaseY;
   const ROW_COUNT = 12;

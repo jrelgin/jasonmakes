@@ -34,6 +34,13 @@
   }
 }
 
+/* Reserve the vertical scrollbar gutter on every page so the content-box width
+   (and the fixed nav) stays put when navigating between scrollable and
+   non-scrollable routes. */
+html {
+  scrollbar-gutter: stable;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
@@ -42,12 +49,20 @@ body {
 
 .home-seascape {
   position: fixed;
-  inset: 0;
+  inset: 0; /* fills the viewport; avoids the 100vw + scrollbar-gutter overflow */
   z-index: 0;
-  width: 100vw;
-  height: 100vh;
   overflow: hidden;
   background: #12203a;
+}
+
+/* The homepage is a single fixed canvas that never scrolls. On mobile, 100dvh
+   transitions during URL-bar show/hide can otherwise leak a few px of scroll,
+   so lock it. Inner pages (no .home-seascape) are unaffected. */
+@media (max-width: 639.98px) {
+  html:has(.home-seascape),
+  html:has(.home-seascape) body {
+    overflow: hidden;
+  }
 }
 
 /* Apply Apoc font to all heading elements */
