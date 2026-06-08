@@ -23,7 +23,7 @@ describe("getTentaclesRenderSize", () => {
   it("oversizes the creature past the viewport on mobile (issue #87)", () => {
     const mobileWidth = 390;
     const { width } = getTentaclesRenderSize(mobileWidth, canvasHeight);
-    expect(width).toBe(Math.round(mobileWidth * 1.1));
+    expect(width).toBe(Math.round(mobileWidth * 1.32));
     // Wider than the viewport so it bleeds off-canvas when right-anchored.
     expect(width).toBeGreaterThan(mobileWidth);
   });

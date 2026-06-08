@@ -43,10 +43,11 @@ export function getTentaclesRenderSize(
   canvasWidth: number,
   canvasHeight: number,
 ): { width: number; height: number } {
-  // Mobile: the creature should dominate the scene, so go slightly past the
-  // viewport width (it's anchored right and bleeds off-canvas in placement).
+  // Mobile: the creature should dominate the scene and reach high into the
+  // sky. Aspect ratio is fixed, so width drives height — go well past the
+  // viewport width (anchored right, bleeds off-canvas in placement below).
   // Desktop unchanged at 0.63.
-  const targetWidth = canvasWidth * (isMobileWidth(canvasWidth) ? 1.1 : 0.63);
+  const targetWidth = canvasWidth * (isMobileWidth(canvasWidth) ? 1.32 : 0.63);
   const aspectRatio = 1024 / 1536;
   const targetHeight = targetWidth * aspectRatio;
   return { width: Math.round(targetWidth), height: Math.round(targetHeight) };
