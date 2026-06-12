@@ -113,7 +113,7 @@ export async function createResilientProfile(timeoutMs = 5000) {
       logger.info("Using fallback weather data");
     }
 
-    // Future phases will add similar try/catch blocks for Feedly, Spotify, etc.
+    // Future phases will add similar try/catch blocks for Readwise, Spotify, etc.
 
     // Log summary of provider results
     logger.summary();

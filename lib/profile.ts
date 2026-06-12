@@ -1,12 +1,11 @@
-import type { FeedlyData } from "./providers/feedly";
-import { fetchFeedly } from "./providers/feedly";
+import { type ReadingData, fetchReadwise } from "./providers/readwise";
 import { fetchSpotify } from "./providers/spotify";
 import type { Weather } from "./providers/weather";
 import { fetchWeather } from "./providers/weather";
 
 export type Profile = {
   weather: Weather;
-  feedly: FeedlyData;
+  reading: ReadingData;
   spotify: Awaited<ReturnType<typeof fetchSpotify>>;
 };
 
@@ -40,17 +39,12 @@ function getFallbackWeather(): Weather {
   };
 }
 
-function getFallbackFeedly(): FeedlyData {
+function getFallbackReading(): ReadingData {
   return {
-    articles: [
-      {
-        title: "Fallback Article",
-        url: "https://example.com/article",
-        date: Date.now() - 86_400_000,
-        source: "Example Source",
-      },
-    ],
+    articles: [],
     lastUpdated: new Date().toISOString(),
+    provider: "readwise",
+    tag: process.env.READWISE_POST_TAG || "jasonmakes",
   };
 }
 
@@ -105,19 +99,18 @@ export async function buildProfile(): Promise<Profile> {
     }
   }
 
-  const [weatherResult, feedlyResult, spotifyResult] = await Promise.allSettled(
-    [fetchWeather(), fetchFeedly(), fetchSpotify()],
-  );
+  const [weatherResult, readingResult, spotifyResult] =
+    await Promise.allSettled([fetchWeather(), fetchReadwise(), fetchSpotify()]);
 
   const weather =
     weatherResult.status === "fulfilled"
       ? weatherResult.value
       : fallbackAfterLog("weather", weatherResult.reason, getFallbackWeather);
 
-  const feedly =
-    feedlyResult.status === "fulfilled"
-      ? feedlyResult.value
-      : fallbackAfterLog("feedly", feedlyResult.reason, getFallbackFeedly);
+  const reading =
+    readingResult.status === "fulfilled"
+      ? readingResult.value
+      : fallbackAfterLog("readwise", readingResult.reason, getFallbackReading);
 
   const spotify =
     spotifyResult.status === "fulfilled"
@@ -126,7 +119,7 @@ export async function buildProfile(): Promise<Profile> {
 
   const profileData: Profile = {
     weather,
-    feedly,
+    reading,
     spotify,
   };
 

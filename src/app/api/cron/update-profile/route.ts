@@ -2,9 +2,9 @@ import { revalidatePath } from "next/cache";
 import { kv } from "../../../../../lib/kv";
 // Import types and dependencies
 import type { Profile } from "../../../../../lib/profile";
-import type { FeedlyData } from "../../../../../lib/providers/feedly";
 // Import OpenAI provider
 import { generateBlurb } from "../../../../../lib/providers/openai";
+import type { ReadingData } from "../../../../../lib/providers/readwise";
 // Import just the types for Spotify
 import type { SpotifyTrack } from "../../../../../lib/providers/spotify";
 import type { Weather } from "../../../../../lib/providers/weather";
@@ -15,6 +15,10 @@ export const runtime = "nodejs";
 
 // Profile expiration time in seconds
 const EXPIRATION_SECONDS = Number(process.env.PROFILE_TTL ?? 60 * 60 * 48); // default 48h
+
+type LegacyProfile = Partial<Profile> & {
+  feedly?: ReadingData;
+};
 
 /**
  * Simple logger utility with provider failure counting
@@ -135,37 +139,39 @@ async function createResilientProfile(logger: Logger, timeoutMs = 10000) {
       weather = ensureWeatherLastUpdated(weather);
     }
 
-    // Feedly integration (Phase 2)
-    let feedly: FeedlyData;
+    // Readwise Reader integration (Phase 2)
+    let reading: ReadingData;
     try {
-      const feedlyPromise = import("../../../../../lib/providers/feedly").then(
-        (module) => module.fetchFeedly(),
-      );
+      const readingPromise = import(
+        "../../../../../lib/providers/readwise"
+      ).then((module) => module.fetchReadwise());
 
       // Set a timeout to prevent hanging if the API is slow
       const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error("Feedly API timeout")), timeoutMs);
+        setTimeout(() => reject(new Error("Readwise API timeout")), timeoutMs);
       });
 
-      feedly = (await Promise.race([
-        feedlyPromise,
+      reading = (await Promise.race([
+        readingPromise,
         timeoutPromise,
-      ])) as FeedlyData;
-      logger.providerSuccess("feedly");
+      ])) as ReadingData;
+      logger.providerSuccess("readwise");
     } catch (error) {
-      logger.providerFailure("feedly", error);
-      // Try again - the feedly provider will handle its own fallbacks
+      logger.providerFailure("readwise", error);
+      // Try again - the Readwise provider will handle its own fallbacks
       try {
-        feedly = await import("../../../../../lib/providers/feedly").then(
-          (module) => module.fetchFeedly(),
+        reading = await import("../../../../../lib/providers/readwise").then(
+          (module) => module.fetchReadwise(),
         );
-        logger.info("Successfully used fallback Feedly data from provider");
+        logger.info("Successfully used fallback Readwise data from provider");
       } catch (secondError) {
-        logger.error("Failed even with fallback Feedly data", secondError);
+        logger.error("Failed even with fallback Readwise data", secondError);
         // Last resort fallback if everything else fails
-        feedly = {
+        reading = {
           articles: [],
           lastUpdated: new Date().toISOString(),
+          provider: "readwise",
+          tag: process.env.READWISE_POST_TAG || "jasonmakes",
         };
       }
     }
@@ -208,8 +214,8 @@ async function createResilientProfile(logger: Logger, timeoutMs = 10000) {
     // Log summary of provider results
     logger.summary();
 
-    // Combine all provider data (weather, feedly, and spotify)
-    return { weather, feedly, spotify, logger };
+    // Combine all provider data (weather, reading, and spotify)
+    return { weather, reading, spotify, logger };
   } catch (error) {
     const logger = new Logger();
     logger.error("Failed to create resilient profile", error);
@@ -237,35 +243,46 @@ export async function GET(req: Request) {
     // Build a resilient profile that handles individual provider failures
     // Pass the logger and custom timeout for consistent run IDs and configurability
     const timeoutMs = 10000; // Increase timeout to 10 seconds
-    const { weather, feedly, spotify } = await createResilientProfile(
+    const { weather, reading, spotify } = await createResilientProfile(
       logger,
       timeoutMs,
     );
     const profile: Profile = {
       weather: ensureWeatherLastUpdated(weather),
-      feedly,
+      reading,
       spotify,
     };
 
-    // If Feedly returned zero articles, try to preserve the last good data
-    if (feedly.articles.length === 0) {
+    // If Readwise returned zero articles, try to preserve the last good data.
+    if (reading.articles.length === 0) {
       try {
-        // Get the current profile to check if there's existing Feedly data
-        const currentProfile = (await kv.get("profile")) as Profile | null;
+        const currentProfile = (await kv.get(
+          "profile",
+        )) as LegacyProfile | null;
 
-        if (currentProfile?.feedly?.articles?.length) {
-          // Keep the previous Feedly data that had articles
+        if (currentProfile?.reading?.articles?.length) {
           logger.info(
-            `Preserving previous Feedly data with ${currentProfile.feedly.articles.length} articles`,
+            `Preserving previous reading data with ${currentProfile.reading.articles.length} articles`,
           );
-          profile.feedly = currentProfile.feedly;
+          profile.reading = currentProfile.reading;
+        } else if (currentProfile?.feedly?.articles?.length) {
+          logger.info(
+            `Preserving previous legacy Feedly data with ${currentProfile.feedly.articles.length} articles`,
+          );
+          profile.reading = {
+            ...currentProfile.feedly,
+            provider: currentProfile.feedly.provider ?? "feedly",
+            tag:
+              currentProfile.feedly.tag ??
+              (process.env.READWISE_POST_TAG || "jasonmakes"),
+          };
         } else {
           logger.warn(
-            "Feedly returned 0 articles, no previous data to preserve",
+            "Readwise returned 0 articles, no previous data to preserve",
           );
         }
       } catch (error) {
-        logger.error("Error checking previous Feedly data", error);
+        logger.error("Error checking previous reading data", error);
       }
     }
 
@@ -289,7 +306,7 @@ export async function GET(req: Request) {
 
       // Fallback to a manually constructed blurb if OpenAI fails
       const w = profile.weather;
-      const latestArticle = profile.feedly?.articles?.[0];
+      const latestArticle = profile.reading?.articles?.[0];
       const lastTrack = profile.spotify?.track;
 
       blurb = "Jason is currently vibing somewhere on Earth.";

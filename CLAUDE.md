@@ -42,11 +42,11 @@ The Daily Profile system runs via an hourly cron job (`/api/cron/update-profile`
    - Includes temperature, conditions, humidity, wind speed
    - No API key required (open API)
 
-2. **Feedly Integration** (`lib/providers/feedly.ts`):
-   - Requires OAuth access token
-   - Fetches recently saved articles
-   - Extracts title, URL, and engagement metrics
-   - Handles empty responses gracefully
+2. **Readwise Reader Integration** (`lib/providers/readwise.ts`):
+   - Requires a Readwise API access token
+   - Fetches Reader articles and forwarded emails tagged with `READWISE_POST_TAG` (defaults to `jasonmakes`)
+   - Extracts title, URL, source, image, summary/excerpt, and date
+   - Preserves previous good reading data when the tag is empty or the API fails
 
 3. **Spotify Integration** (`lib/providers/spotify.ts`):
    - Uses refresh token for persistent access
@@ -62,7 +62,7 @@ The Daily Profile system runs via an hourly cron job (`/api/cron/update-profile`
 #### Data Storage Strategy
 - All profile data stored in Vercel KV
 - 48-hour TTL for automatic cleanup
-- Key structure: `profile:weather`, `profile:feedly`, etc.
+- Key structure: `profile.weather`, `profile.reading`, etc.
 - Atomic updates to prevent partial data states
 
 ### 3. Frontend Architecture
@@ -71,7 +71,7 @@ The Daily Profile system runs via an hourly cron job (`/api/cron/update-profile`
 All data-fetching components are React Server Components:
 - `WeatherWidget.tsx`: Displays current weather
 - `SpotifyWidget.tsx`: Shows recent tracks
-- `FeedlyArticlesWidget.tsx`: Lists saved articles
+- `LatestReadsWidget.tsx`: Lists tagged Readwise Reader articles
 - `AboutBlurb.tsx`: Renders AI-generated summary
 
 #### Routing Structure
@@ -117,7 +117,8 @@ KEYSTATIC_GITHUB_CLIENT_ID        - GitHub App client ID for Keystatic
 KEYSTATIC_GITHUB_CLIENT_SECRET    - GitHub App client secret
 KEYSTATIC_SECRET                  - Session secret for Keystatic auth
 NEXT_PUBLIC_KEYSTATIC_GITHUB_APP_SLUG - GitHub App slug for Keystatic UI
-FEEDLY_ACCESS_TOKEN               - Feedly OAuth token
+READWISE_ACCESS_TOKEN             - Readwise API access token
+READWISE_POST_TAG                 - Reader tag for public latest reads (defaults to jasonmakes)
 SPOTIFY_CLIENT_ID                 - Spotify app credentials
 SPOTIFY_CLIENT_SECRET
 SPOTIFY_REFRESH_TOKEN

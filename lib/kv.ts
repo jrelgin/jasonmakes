@@ -47,8 +47,18 @@ function seedMockData() {
         humidity_classification: "Somewhat Humid",
       };
 
+      const sampleReading = {
+        articles: [],
+        lastUpdated: new Date().toISOString(),
+        provider: "readwise",
+        tag: process.env.READWISE_POST_TAG || "jasonmakes",
+      };
+
       // Sample profile
-      mockStore.set("profile", { weather: sampleWeather });
+      mockStore.set("profile", {
+        weather: sampleWeather,
+        reading: sampleReading,
+      });
 
       // Sample blurb
       mockStore.set(

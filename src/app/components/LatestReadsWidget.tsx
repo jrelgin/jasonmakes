@@ -3,43 +3,43 @@ export const revalidate = 86_400; // 24 hours (daily refresh)
 import { formatUpdatedAt } from "@/lib/date";
 import { kv } from "#lib/kv";
 import type { Profile } from "#lib/profile";
-import type { FeedlyArticle, FeedlyData } from "#lib/providers/feedly";
+import type { ReadingArticle, ReadingData } from "#lib/providers/readwise";
 
-type FeedlyProfile = Pick<Profile, "feedly">;
+type ReadingProfile = Pick<Profile, "reading">;
 
-function selectLatestArticles(data: FeedlyData): FeedlyArticle[] {
+function selectLatestArticles(data: ReadingData): ReadingArticle[] {
   return data.articles.slice(0, 3);
 }
 
-export default async function FeedlyArticlesWidget() {
-  let feedlyData: FeedlyData | null = null;
+export default async function LatestReadsWidget() {
+  let readingData: ReadingData | null = null;
 
   try {
-    const profile = await kv.get<FeedlyProfile>("profile");
-    feedlyData = profile?.feedly ?? null;
+    const profile = await kv.get<ReadingProfile>("profile");
+    readingData = profile?.reading ?? null;
   } catch (error) {
-    console.error("Failed to fetch Feedly data from KV:", error);
+    console.error("Failed to fetch reading data from KV:", error);
   }
 
-  const latestArticles = feedlyData ? selectLatestArticles(feedlyData) : [];
+  const latestArticles = readingData ? selectLatestArticles(readingData) : [];
 
   if (latestArticles.length === 0) {
     return (
-      <div className="feedly-widget frost-panel p-5 text-[var(--u-ink-muted)]">
+      <div className="latest-reads-widget frost-panel p-5 text-[var(--u-ink-muted)]">
         No articles available
       </div>
     );
   }
 
   return (
-    <div className="feedly-widget">
+    <div className="latest-reads-widget">
       <div className="mb-3 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
         <h3 className="font-[family-name:var(--font-instrument-serif)] text-xl italic text-[var(--u-ink-strong)]">
           Latest Reads
         </h3>
-        {feedlyData?.lastUpdated && (
+        {readingData?.lastUpdated && (
           <span className="font-mono text-[0.68rem] uppercase tracking-wider text-[var(--u-ink-muted)]">
-            Updated {formatUpdatedAt(feedlyData.lastUpdated)}
+            Updated {formatUpdatedAt(readingData.lastUpdated)}
           </span>
         )}
       </div>

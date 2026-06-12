@@ -16,7 +16,7 @@ that feels natural and conversational. Don't use bullet points or lists.`;
 
 /**
  * Generate a blurb about Jason based on his profile data
- * @param profile The user profile containing weather, feedly, and spotify data
+ * @param profile The user profile containing weather, reading, and spotify data
  * @param timeoutMs Timeout in milliseconds (default: 12000ms)
  */
 export async function generateBlurb(
@@ -44,7 +44,7 @@ export async function generateBlurb(
 
     // Extract data for the prompt
     const weather = profile.weather;
-    const latestArticle = profile.feedly?.articles?.[0];
+    const latestArticle = profile.reading?.articles?.[0];
     const lastTrack = profile.spotify?.track;
 
     // Prepare user message with profile data
