@@ -85,7 +85,7 @@ pnpm format
 ## Daily Profile System
 
 The homepage shows a daily profile built from external data sources. A Vercel Cron job calls `/api/cron/update-profile` hourly (see `vercel.json`). This endpoint:
-1. Fetches weather and Readwise Reader data via modules in `lib/providers`.
+1. Fetches weather and tagged Readwise Reader article/email data via modules in `lib/providers`.
 2. Stores the profile and a short blurb in Vercel KV using `lib/kv.ts`.
 3. Revalidates the homepage so new data appears quickly.
 

@@ -44,7 +44,7 @@ The Daily Profile system runs via an hourly cron job (`/api/cron/update-profile`
 
 2. **Readwise Reader Integration** (`lib/providers/readwise.ts`):
    - Requires a Readwise API access token
-   - Fetches Reader articles tagged with `READWISE_POST_TAG` (defaults to `jasonmakes`)
+   - Fetches Reader articles and forwarded emails tagged with `READWISE_POST_TAG` (defaults to `jasonmakes`)
    - Extracts title, URL, source, image, summary/excerpt, and date
    - Preserves previous good reading data when the tag is empty or the API fails
 

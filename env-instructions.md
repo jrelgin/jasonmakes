@@ -6,7 +6,7 @@
 # Cron Secret for secure API access
 CRON_SECRET=your-local-development-secret
 
-# Readwise Reader latest reads
+# Readwise Reader latest reads; publishes tagged articles and forwarded emails
 READWISE_ACCESS_TOKEN=your-readwise-access-token
 READWISE_POST_TAG=jasonmakes
 

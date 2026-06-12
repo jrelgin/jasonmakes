@@ -39,6 +39,8 @@ interface ReadwiseListResponse {
   results?: ReadwiseDocument[];
 }
 
+type ReadwisePublishCategory = "article" | "email";
+
 interface CacheEntry<T> {
   data: T;
   timestamp: number;
@@ -53,6 +55,7 @@ const READWISE_API_URL = "https://readwise.io/api/v3/list/";
 const DEFAULT_POST_TAG = "jasonmakes";
 const DEFAULT_FETCH_LIMIT = 10;
 const CACHE_DURATION_MS = 15 * 60 * 1000;
+const PUBLISH_CATEGORIES: ReadwisePublishCategory[] = ["article", "email"];
 
 const memoryCache: Record<string, CacheEntry<ReadingData>> = {};
 
@@ -102,6 +105,29 @@ function firstText(
   return undefined;
 }
 
+function isHttpUrl(value?: string): boolean {
+  if (!value) {
+    return false;
+  }
+
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === "http:" || parsed.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+function firstUrl(
+  ...values: Array<string | null | undefined>
+): string | undefined {
+  const cleanedValues = values
+    .map((value) => firstText(value))
+    .filter((value): value is string => Boolean(value));
+
+  return cleanedValues.find(isHttpUrl) ?? cleanedValues[0];
+}
+
 function parseTimestamp(...values: Array<string | null | undefined>): number {
   for (const value of values) {
     if (!value) {
@@ -130,12 +156,78 @@ function hasArticles(data?: ReadingData | null): data is ReadingData {
   return Array.isArray(data?.articles) && data.articles.length > 0;
 }
 
-function buildReadwiseUrl(tag: string): string {
+function buildReadwiseUrl(
+  tag: string,
+  category: ReadwisePublishCategory,
+): string {
   const url = new URL(READWISE_API_URL);
   url.searchParams.set("tag", tag);
-  url.searchParams.set("category", "article");
+  url.searchParams.set("category", category);
   url.searchParams.set("limit", String(DEFAULT_FETCH_LIMIT));
   return url.toString();
+}
+
+async function fetchReadwiseCategory(
+  tag: string,
+  token: string,
+  category: ReadwisePublishCategory,
+): Promise<ReadwiseDocument[]> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 5000);
+
+  try {
+    const response = await fetch(buildReadwiseUrl(tag, category), {
+      cache: "no-store",
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Readwise ${category} API error: ${response.status}`);
+    }
+
+    const data = (await response.json()) as ReadwiseListResponse;
+    return data.results ?? [];
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+function getDocumentSortTimestamp(document: ReadwiseDocument): number {
+  return parseTimestamp(
+    document.saved_at,
+    document.created_at,
+    document.updated_at,
+    document.published_date,
+  );
+}
+
+function normalizeReadwiseDocuments(
+  documents: ReadwiseDocument[],
+): ReadingArticle[] {
+  const articlesByUrl = new Map<
+    string,
+    { article: ReadingArticle; sortTimestamp: number }
+  >();
+
+  for (const document of documents) {
+    const article = normalizeReadwiseDocument(document);
+    if (!article) {
+      continue;
+    }
+
+    const sortTimestamp = getDocumentSortTimestamp(document);
+    const existing = articlesByUrl.get(article.url);
+    if (!existing || sortTimestamp > existing.sortTimestamp) {
+      articlesByUrl.set(article.url, { article, sortTimestamp });
+    }
+  }
+
+  return Array.from(articlesByUrl.values())
+    .sort((left, right) => right.sortTimestamp - left.sortTimestamp)
+    .map(({ article }) => article);
 }
 
 async function getStoredReadingFallback(
@@ -166,7 +258,7 @@ export function normalizeReadwiseDocument(
   document: ReadwiseDocument,
 ): ReadingArticle | null {
   const title = firstText(document.title);
-  const url = firstText(document.source_url, document.url);
+  const url = firstUrl(document.source_url, document.url);
 
   if (!title || !url) {
     return null;
@@ -212,25 +304,31 @@ export async function fetchReadwise(): Promise<ReadingData> {
   }
 
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 5000);
-    const response = await fetch(buildReadwiseUrl(tag), {
-      cache: "no-store",
-      headers: {
-        Authorization: `Token ${token}`,
-      },
-      signal: controller.signal,
-    });
-    clearTimeout(timeout);
+    const categoryResults = await Promise.allSettled(
+      PUBLISH_CATEGORIES.map((category) =>
+        fetchReadwiseCategory(tag, token, category),
+      ),
+    );
+    const documents: ReadwiseDocument[] = [];
+    const errors: unknown[] = [];
 
-    if (!response.ok) {
-      throw new Error(`Readwise API error: ${response.status}`);
+    for (const result of categoryResults) {
+      if (result.status === "fulfilled") {
+        documents.push(...result.value);
+      } else {
+        errors.push(result.reason);
+      }
     }
 
-    const data = (await response.json()) as ReadwiseListResponse;
-    const articles = (data.results ?? [])
-      .map(normalizeReadwiseDocument)
-      .filter((article): article is ReadingArticle => Boolean(article));
+    if (errors.length === PUBLISH_CATEGORIES.length) {
+      throw new AggregateError(errors, "All Readwise category requests failed");
+    }
+
+    for (const error of errors) {
+      console.warn("A Readwise category request failed:", error);
+    }
+
+    const articles = normalizeReadwiseDocuments(documents);
 
     const readingData: ReadingData = {
       articles,

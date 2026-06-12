@@ -29,7 +29,7 @@ Vercel Cron (hourly) ──▶  /api/cron/update-profile  ──▶  Vercel KV
 /lib
   /providers
     weather.ts         # ✅ Open-Meteo API (no auth required)
-    readwise.ts        # ✅ Readwise Reader tagged-article parser
+    readwise.ts        # ✅ Readwise Reader tagged article/email parser
     spotify.ts         # ✅ Spotify API with refresh token flow
     openai.ts          # ✅ GPT-4 blurb generation
   profile.ts           # ✅ Combines all providers
@@ -58,7 +58,7 @@ vercel.json           # ✅ Cron schedule: "0 * * * *" (every hour)
 | Component | Status | Update Frequency | Notes |
 |-----------|--------|------------------|-------|
 | **Weather** | ✅ Working | Hourly | Open-Meteo API, no auth needed |
-| **Readwise Reader** | ✅ Working | Daily (24h) | Tagged article publishing |
+| **Readwise Reader** | ✅ Working | Daily (24h) | Tagged article/email publishing |
 | **Spotify** | ✅ Working | Hourly | Refresh token flow |
 | **OpenAI Blurb** | ✅ Working | Hourly | GPT-4, 12s timeout |
 | **Homepage Updates** | ✅ Working | Hourly | Via revalidatePath('/') |

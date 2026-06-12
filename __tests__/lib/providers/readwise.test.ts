@@ -52,6 +52,100 @@ describe("Readwise provider", () => {
     });
   });
 
+  it("uses the Reader URL for forwarded email documents without a web source URL", () => {
+    const article = normalizeReadwiseDocument({
+      title: "Forwarded Newsletter",
+      url: "https://read.readwise.io/read/email-123",
+      source_url: "mailto:reader-forwarded-email/example",
+      site_name: "Example Newsletter",
+      category: "email",
+      summary: "A useful forwarded newsletter.",
+      saved_at: "2026-06-03T12:00:00.000Z",
+    });
+
+    expect(article).toMatchObject({
+      title: "Forwarded Newsletter",
+      url: "https://read.readwise.io/read/email-123",
+      source: "Example Newsletter",
+      excerpt: "A useful forwarded newsletter.",
+    });
+  });
+
+  it("fetches tagged Reader articles and emails", async () => {
+    process.env.READWISE_ACCESS_TOKEN = "test-token";
+    vi.mocked(fetch).mockImplementation((input) => {
+      const url = new URL(String(input));
+      const category = url.searchParams.get("category");
+
+      if (category === "article") {
+        return Promise.resolve(
+          Response.json({
+            results: [
+              {
+                title: "Older Article",
+                source_url: "https://example.com/older",
+                site_name: "Example",
+                category: "article",
+                published_date: "2026-05-30T12:00:00.000Z",
+                saved_at: "2026-06-01T12:00:00.000Z",
+              },
+              {
+                title: "Newest Article",
+                source_url: "https://example.com/newest",
+                site_name: "Example",
+                category: "article",
+                published_date: "2026-05-31T12:00:00.000Z",
+                saved_at: "2026-06-03T12:00:00.000Z",
+              },
+            ],
+          }),
+        );
+      }
+
+      if (category === "email") {
+        return Promise.resolve(
+          Response.json({
+            results: [
+              {
+                title: "Newsletter",
+                url: "https://read.readwise.io/read/newsletter",
+                source_url: "mailto:reader-forwarded-email/newsletter",
+                site_name: "Newsletter Site",
+                category: "email",
+                published_date: "2026-05-29T12:00:00.000Z",
+                saved_at: "2026-06-02T12:00:00.000Z",
+              },
+            ],
+          }),
+        );
+      }
+
+      return Promise.resolve(new Response(null, { status: 500 }));
+    });
+    vi.mocked(kv.get).mockResolvedValue(null);
+
+    const result = await fetchReadwise();
+    const requestUrls = vi
+      .mocked(fetch)
+      .mock.calls.map(([input]) => new URL(String(input)));
+
+    expect(requestUrls).toHaveLength(2);
+    expect(
+      requestUrls.map((url) => url.searchParams.get("category")).sort(),
+    ).toEqual(["article", "email"]);
+    expect(
+      requestUrls.every((url) => url.searchParams.get("tag") === "jasonmakes"),
+    ).toBe(true);
+    expect(result.articles.map((article) => article.title)).toEqual([
+      "Newest Article",
+      "Newsletter",
+      "Older Article",
+    ]);
+    expect(result.articles[1].url).toBe(
+      "https://read.readwise.io/read/newsletter",
+    );
+  });
+
   it("uses stored reading data when the Readwise token is missing", async () => {
     const previousReading: ReadingData = {
       articles: [
