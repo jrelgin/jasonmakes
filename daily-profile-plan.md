@@ -1,7 +1,7 @@
 # Daily Profile Builder - Actual Implementation Guide
 *Next.js (App Router) / Vercel-native architecture*
 
-> **Current Status:** ✅ **Fully implemented and working** - Weather, Feedly, Spotify, and OpenAI blurb generation with hourly updates via Vercel Cron.
+> **Current Status:** ✅ **Fully implemented and working** - Weather, Readwise Reader, Spotify, and OpenAI blurb generation with hourly updates via Vercel Cron.
 
 ---
 
@@ -11,7 +11,7 @@
 ```
 Vercel Cron (hourly) ──▶  /api/cron/update-profile  ──▶  Vercel KV
                               ├─ fetchWeather()     // Open-Meteo API
-                              ├─ fetchFeedly()      // RSS/JSON feed
+                              ├─ fetchReadwise()    // Readwise Reader API
                               ├─ fetchSpotify()     // Spotify API
                               ├─ generateBlurb()    // OpenAI GPT-4
                               ├─ kv.set('profile')  // Store data
@@ -29,7 +29,7 @@ Vercel Cron (hourly) ──▶  /api/cron/update-profile  ──▶  Vercel KV
 /lib
   /providers
     weather.ts         # ✅ Open-Meteo API (no auth required)
-    feedly.ts          # ✅ RSS/JSON feed parser
+    readwise.ts        # ✅ Readwise Reader tagged-article parser
     spotify.ts         # ✅ Spotify API with refresh token flow
     openai.ts          # ✅ GPT-4 blurb generation
   profile.ts           # ✅ Combines all providers
@@ -39,7 +39,7 @@ Vercel Cron (hourly) ──▶  /api/cron/update-profile  ──▶  Vercel KV
   /components
     AboutBlurb.tsx     # ✅ Renders kv.get('blurb') - updates hourly
     WeatherWidget.tsx  # ✅ Renders kv.get('profile').weather - updates hourly
-    FeedlyArticlesWidget.tsx # ✅ Renders kv.get('profile').feedly - updates daily
+    LatestReadsWidget.tsx # ✅ Renders kv.get('profile').reading - updates daily
     SpotifyWidget.tsx  # ✅ Renders kv.get('profile').spotify.track - updates hourly
   /api
     /cron
@@ -58,7 +58,7 @@ vercel.json           # ✅ Cron schedule: "0 * * * *" (every hour)
 | Component | Status | Update Frequency | Notes |
 |-----------|--------|------------------|-------|
 | **Weather** | ✅ Working | Hourly | Open-Meteo API, no auth needed |
-| **Feedly** | ✅ Working | Daily (24h) | RSS/JSON feed parsing |
+| **Readwise Reader** | ✅ Working | Daily (24h) | Tagged article publishing |
 | **Spotify** | ✅ Working | Hourly | Refresh token flow |
 | **OpenAI Blurb** | ✅ Working | Hourly | GPT-4, 12s timeout |
 | **Homepage Updates** | ✅ Working | Hourly | Via revalidatePath('/') |
@@ -81,7 +81,7 @@ export const runtime = 'nodejs';  // ✅ revalidatePath() works
 // Weather, Spotify, Blurb: Update hourly with cron
 export const revalidate = 3600; // 1 hour
 
-// Feedly: Update daily (less frequent)
+// Latest Reads: Update daily (less frequent)
 export const revalidate = 86_400; // 24 hours
 ```
 
@@ -90,9 +90,8 @@ export const revalidate = 86_400; // 24 hours
 ### 3. Authentication Strategy
 ```typescript
 // Cron accepts multiple auth methods:
-// 1. Vercel Cron header: x-vercel-cron: 1
-// 2. Bearer token: Authorization: Bearer <CRON_SECRET>
-// 3. Query param: ?secret=<CRON_SECRET> (for local testing)
+// 1. Bearer token: Authorization: Bearer <CRON_SECRET>
+// 2. Vercel Cron supplies the configured bearer token in production
 ```
 
 ---
@@ -106,12 +105,12 @@ export const revalidate = 86_400; // 24 hours
 ### Local Development
 ```bash
 # Test the cron endpoint locally
-curl "http://localhost:3000/api/cron/update-profile?secret=$CRON_SECRET"
+curl -H "Authorization: Bearer $CRON_SECRET" "http://localhost:3000/api/cron/update-profile"
 
 # Check current data
 curl "http://localhost:3000/api/debug/profile"
 curl "http://localhost:3000/api/debug/weather"
-curl "http://localhost:3000/api/debug/feedly"
+curl "http://localhost:3000/api/debug/readwise"
 ```
 
 ---
@@ -130,8 +129,7 @@ curl "http://localhost:3000/api/debug/feedly"
 ### Debug Endpoints
 - `/api/debug/profile` - View current KV data
 - `/api/debug/weather` - Test weather provider
-- `/api/debug/feedly` - Test Feedly provider
-- `/api/debug/spotify` - Test Spotify provider
+- `/api/debug/readwise` - Test Readwise provider
 
 ---
 
@@ -145,7 +143,8 @@ KV_REST_API_TOKEN=your-vercel-kv-token
 OPENAI_API_KEY=your-openai-key
 
 # Provider-specific
-FEEDLY_FEED_URL=your-rss-feed-url
+READWISE_ACCESS_TOKEN=your-readwise-access-token
+READWISE_POST_TAG=jasonmakes
 SPOTIFY_CLIENT_ID=your-spotify-client-id
 SPOTIFY_CLIENT_SECRET=your-spotify-client-secret
 SPOTIFY_REFRESH_TOKEN=your-spotify-refresh-token
@@ -173,7 +172,7 @@ WEATHER_CITY=Atlanta
 ```
 1. Server components read from KV on each request
 2. Weather/Spotify/Blurb refresh every hour
-3. Feedly refreshes every 24 hours
+3. Latest Reads refresh every 24 hours
 4. Data is always fresh (no stale cache issues)
 ```
 
@@ -207,7 +206,7 @@ WEATHER_CITY=Atlanta
 ## 🚧 Future Enhancements
 
 ### Phase 8: Advanced Features
-- [ ] **Article summaries:** Background queue for Feedly articles
+- [ ] **Article summaries:** Background queue for Readwise articles
 - [ ] **Rephrase button:** Client-side blurb regeneration
 - [ ] **Analytics:** Track which data sources are most reliable
 - [ ] **Health monitoring:** Alert when providers fail repeatedly

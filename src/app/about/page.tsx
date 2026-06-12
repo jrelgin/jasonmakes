@@ -1,5 +1,5 @@
 import AboutBlurb from "@/app/components/AboutBlurb";
-import FeedlyArticlesWidget from "@/app/components/FeedlyArticlesWidget";
+import LatestReadsWidget from "@/app/components/LatestReadsWidget";
 import SpotifyWidget from "@/app/components/SpotifyWidget";
 import WeatherWidget from "@/app/components/WeatherWidget";
 import Disclosure from "@/components/Disclosure";
@@ -127,7 +127,7 @@ export default function AboutPage() {
           </div>
 
           <div className="u-rise u-rise-2 mt-6">
-            <FeedlyArticlesWidget />
+            <LatestReadsWidget />
           </div>
         </div>
       </section>

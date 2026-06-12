@@ -4,7 +4,7 @@
 - **Articles** (`src/app/articles/page.tsx`, `src/app/articles/[slug]/page.tsx`) – rendered from Markdown/MDX stored under `content/articles`. Data is loaded through `lib/data/content.ts` using the Keystatic reader.
 - **Case Studies** (`src/app/case-studies/page.tsx`, `src/app/case-studies/[slug]/page.tsx`) – share the same loader and schema, reading from `content/case-studies`.
 - **Admin UI** – `/keystatic` exposes the GitHub-backed Keystatic editor for creating and updating entries directly in the repo.
-- **Other site features** (Daily profile widgets, homepage, etc.) rely on KV/Feedly/Spotify providers and are unrelated to Keystatic.
+- **Other site features** (Daily profile widgets, homepage, etc.) rely on KV/Readwise/Spotify providers and are unrelated to Keystatic.
 
 ## Integration touchpoints (code level)
 - `keystatic.config.ts` – defines the `articles` and `caseStudies` collections, GitHub storage configuration, and image field destinations.
