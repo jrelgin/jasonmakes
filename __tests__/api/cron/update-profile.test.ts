@@ -54,7 +54,9 @@ describe("Cron profile utils", () => {
   describe("createResilientProfile", () => {
     it("uses fallback weather data when the API times out", async () => {
       vi.mocked(kv.get).mockResolvedValue(null);
-      vi.mocked(fetchWeather).mockImplementation(() => new Promise(() => {}));
+      vi.mocked(fetchWeather).mockImplementation(
+        () => new Promise<Weather>(() => {}),
+      );
       process.env.WEATHER_CITY = "Atlanta";
 
       const result = await createResilientProfile(10);

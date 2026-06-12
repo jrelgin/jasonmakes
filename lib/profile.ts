@@ -59,6 +59,15 @@ function logProviderError(provider: string, error: unknown) {
   console.error(`[profile] ${provider} fetch failed:`, error);
 }
 
+function fallbackAfterLog<T>(
+  provider: string,
+  error: unknown,
+  getFallback: () => T,
+): T {
+  logProviderError(provider, error);
+  return getFallback();
+}
+
 function readCache(cacheKey: string): Profile | null {
   const cacheEntry = memoryCache[cacheKey];
   if (!cacheEntry) {
@@ -96,26 +105,17 @@ export async function buildProfile(): Promise<Profile> {
   const weather =
     weatherResult.status === "fulfilled"
       ? weatherResult.value
-      : getFallbackWeather();
-  if (weatherResult.status === "rejected") {
-    logProviderError("weather", weatherResult.reason);
-  }
+      : fallbackAfterLog("weather", weatherResult.reason, getFallbackWeather);
 
   const reading =
     readingResult.status === "fulfilled"
       ? readingResult.value
-      : getFallbackReading();
-  if (readingResult.status === "rejected") {
-    logProviderError("readwise", readingResult.reason);
-  }
+      : fallbackAfterLog("readwise", readingResult.reason, getFallbackReading);
 
   const spotify =
     spotifyResult.status === "fulfilled"
       ? spotifyResult.value
-      : getFallbackSpotify();
-  if (spotifyResult.status === "rejected") {
-    logProviderError("spotify", spotifyResult.reason);
-  }
+      : fallbackAfterLog("spotify", spotifyResult.reason, getFallbackSpotify);
 
   const profileData: Profile = {
     weather,
