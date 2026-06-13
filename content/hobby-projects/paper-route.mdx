@@ -1,0 +1,46 @@
+---
+title: "Paper Route"
+slug: paper-route
+excerpt: "A personal reading curator that scans a focused source spine, applies editorial judgment, and publishes a quiet digest built for my taste."
+publishDate: 2026-06-13
+heroImage: /images/hobby-projects/paper-route/hero.jpg
+projectType: "Reading system"
+status: "Active"
+builtWith:
+  - Python
+  - Claude Code
+  - RSS
+  - Exa
+  - Readwise
+  - Resend
+  - Vercel
+highlights:
+  - "Replaces generic feed triage with a twice-weekly digest tuned to a written taste profile."
+  - "Combines mechanical filtering with an agentic editorial pass instead of asking automation to do every judgment task."
+  - "Publishes to a static Vercel page with one-click Readwise save links and optional email delivery."
+liveUrl: "https://paper-route-dusky.vercel.app"
+sortOrder: 2
+tags:
+  - Reading
+  - Automation
+  - Claude Code
+  - Personal Infrastructure
+---
+
+## Why I Built It
+
+Paper Route is an attempt to make the internet feel smaller and better. I did not want another infinite feed or a higher-throughput inbox. I wanted a reading list that understood the kinds of things I am actually glad to have read.
+
+The core idea is simple: write down my taste clearly, gather a manageable candidate pool, and let an agent do a slow editorial pass against those preferences. The point is not to stay informed about everything. The point is to find the 10 to 15 pieces that are worth carrying into a week.
+
+## How It Works
+
+The pipeline has four stages. First, it discovers candidates from a small RSS spine, Exa semantic searches, and a few targeted web searches. Then Python scripts dedupe against a committed seen-state, apply hard excludes, and produce a compact candidate file.
+
+The interesting step is the judgment pass. A scheduled Claude Code session reads the runbook and my `preferences.md` file, fetches finalist text where it can, and writes a digest issue with short "why you care" notes. A build script turns that digest into a static site. Another endpoint can save items to Readwise, and an optional email can send the top three.
+
+The system is intentionally boring at the infrastructure layer: static files, committed history, and Vercel deployment. The taste profile is where the product lives.
+
+## What I Like About It
+
+Paper Route is a good example of using agents as judgment amplifiers rather than just task runners. The machine is not deciding what I value from scratch. It is operating inside a set of preferences I can inspect, edit, and improve over time.

@@ -6,6 +6,7 @@ import localFont from "next/font/local";
 import { siteMetadata } from "#lib/config/site";
 
 import Navigation from "@/components/Navigation";
+import PostHogAnalytics from "@/components/posthog-analytics";
 import {
   LEGACY_THEME_STORAGE_KEY,
   SITE_THEME_STORAGE_KEY,
@@ -95,6 +96,7 @@ export default function RootLayout({
         <script>{themeInitScript}</script>
         <Navigation />
         <div className="min-h-[100dvh] pt-28">{children}</div>
+        <PostHogAnalytics />
         <Analytics />
       </body>
     </html>

@@ -3,8 +3,10 @@ import { describe, expect, it } from "vitest";
 import {
   getArticle,
   getCaseStudy,
+  getHobbyProject,
   listArticles,
   listCaseStudies,
+  listHobbyProjects,
 } from "../../../lib/data/content";
 
 describe("Keystatic content loader", () => {
@@ -38,5 +40,25 @@ describe("Keystatic content loader", () => {
     expect(caseStudy?.client).toBe("Standard Education");
     expect(caseStudy?.role).toContain("Principal Product Designer");
     expect(caseStudy?.outcomes.length).toBeGreaterThan(0);
+  });
+
+  it("lists hobby projects by sort order", async () => {
+    const hobbyProjects = await listHobbyProjects();
+    expect(hobbyProjects.map((hobbyProject) => hobbyProject.slug)).toEqual([
+      "boulevard-run",
+      "paper-route",
+      "jason-makes",
+      "pixoo-timer",
+      "little-broomstick-tales",
+      "inkscribe",
+    ]);
+  });
+
+  it("reads hobby project metadata", async () => {
+    const hobbyProject = await getHobbyProject("paper-route");
+    expect(hobbyProject).not.toBeNull();
+    expect(hobbyProject?.projectType).toBe("Reading system");
+    expect(hobbyProject?.liveUrl).toBe("https://paper-route-dusky.vercel.app");
+    expect(hobbyProject?.highlights.length).toBeGreaterThan(0);
   });
 });
