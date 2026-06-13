@@ -1,0 +1,40 @@
+---
+title: "Feedly Sync"
+slug: feedly-sync
+excerpt: "An Obsidian plugin that pulls public Feedly boards into a vault as cleaned-up Markdown articles."
+publishDate: 2026-06-13
+projectType: "Obsidian plugin"
+status: "Usable"
+builtWith:
+  - Obsidian API
+  - TypeScript
+  - Feedly public streams
+  - Turndown
+  - Defuddle
+highlights:
+  - "Syncs selected public Feedly boards into configured Obsidian folders."
+  - "Deduplicates articles with Feedly IDs and supports incremental sync by board."
+  - "Fetches article bodies, extracts readable content, and writes Markdown with frontmatter."
+sortOrder: 8
+tags:
+  - Obsidian
+  - Feedly
+  - Reading
+  - Automation
+---
+
+## Why I Built It
+
+Feedly Sync came from wanting saved articles to land somewhere durable instead of staying trapped in a feed reader.
+
+Feedly is useful for capture and triage. Obsidian is better for longer-term reading, linking, and writing. The plugin bridges those roles by turning Feedly board items into Markdown files inside a vault.
+
+## How It Works
+
+The plugin accepts public Feedly board URLs, parses the stream identifiers, and fetches articles through Feedly's public stream endpoints. Each configured board has its own destination folder, last sync timestamp, and optional force-full-sync setting.
+
+For each article, the plugin resolves the original URL where it can, extracts readable content, converts HTML to Markdown, generates frontmatter, and writes the note into the vault. It also checks existing notes by Feedly ID and URL so repeated syncs do not create duplicate articles.
+
+## What I Like About It
+
+This is a practical piece of reading infrastructure. It takes a behavior that already exists, saving articles, and makes the output more useful by moving it into the same place as notes and writing.

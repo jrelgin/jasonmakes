@@ -1,0 +1,39 @@
+---
+title: "Kol"
+slug: kol
+excerpt: "A SwiftUI iOS practice app for learning blessings with word-by-word highlighting, phonetics, and follow-along audio."
+publishDate: 2026-06-13
+projectType: "iOS app"
+status: "Prototype"
+builtWith:
+  - SwiftUI
+  - AVFoundation
+  - Xcode
+  - Custom word timing data
+highlights:
+  - "Turns blessings into a guided practice flow instead of a static text reference."
+  - "Supports follow-along audio, word practice, phonetics, and completion states."
+  - "Uses timestamp data to highlight each word as the audio plays."
+sortOrder: 4
+tags:
+  - iOS
+  - SwiftUI
+  - Learning
+  - Family
+---
+
+## Why I Built It
+
+Kol is a small iOS app for practicing Jewish blessings in a way that feels calmer and more useful than reading from a static page.
+
+The first content set is Hanukkah blessings, but the structure points toward a broader practice app: choose a package, pick a blessing, follow the words, and use phonetics when the transliteration alone is not enough.
+
+## How It Works
+
+The app is built in SwiftUI with a compact model layer for prayers, words, audio metadata, and practice modes. Each blessing is represented as an ordered set of words with transliteration, optional phonetics, phrase breaks, translations, and notes.
+
+The teleprompter view has two practice modes. Follow Along mode plays bundled audio and highlights words based on timestamp JSON. Word Practice mode lets the user tap individual words to hear their segments. AVFoundation handles playback, while a view model maps audio time to the active word and drives the SwiftUI state.
+
+## What I Like About It
+
+Kol is interesting because it combines personal software, language learning, and a very specific use case. It is not trying to be a broad education platform. It is a small tool for making a ritual easier to practice.
