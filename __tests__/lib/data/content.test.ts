@@ -48,8 +48,11 @@ describe("Keystatic content loader", () => {
       "boulevard-run",
       "paper-route",
       "jason-makes",
+      "kol",
+      "freewriter",
       "pixoo-timer",
       "little-broomstick-tales",
+      "feedly-sync",
       "inkscribe",
     ]);
   });

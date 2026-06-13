@@ -6,6 +6,8 @@ const nextConfig: NextConfig = {
     "/articles/[slug]": ["./content/articles/**/*"],
     "/case-studies": ["./content/case-studies/**/*"],
     "/case-studies/[slug]": ["./content/case-studies/**/*"],
+    "/hobbies": ["./content/hobby-projects/**/*"],
+    "/hobbies/[slug]": ["./content/hobby-projects/**/*"],
   },
   images: {
     remotePatterns: [
