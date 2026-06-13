@@ -52,6 +52,9 @@ export interface DotCircleFormation {
   innerRadius: number;
   ringSpacing: number;
   dotSize: number;
+  /** Multiplier applied to per-dot size (default 1). Used to render bolder dots
+   *  on small viewports so the sun reads solid instead of washed-out. */
+  dotScale?: number;
   colors: string[];
 }
 

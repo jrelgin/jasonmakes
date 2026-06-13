@@ -34,6 +34,13 @@
   }
 }
 
+/* Reserve the vertical scrollbar gutter on every page so the content-box width
+   (and the fixed nav) stays put when navigating between scrollable and
+   non-scrollable routes. */
+html {
+  scrollbar-gutter: stable;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
@@ -44,10 +51,24 @@ body {
   position: fixed;
   inset: 0;
   z-index: 0;
+  /* Span the FULL viewport width, including the reserved scrollbar gutter, so
+     no empty gutter strip shows on the right of the (non-scrolling) homepage.
+     The overflow lock below clips the gutter-width overhang so 100vw can't
+     create a horizontal scrollbar. */
   width: 100vw;
-  height: 100vh;
   overflow: hidden;
   background: #12203a;
+}
+
+/* The homepage is a single fixed canvas that never scrolls. Lock overflow at
+   all widths so the 100vw scene can't create a scrollbar (and so mobile 100dvh
+   transitions don't leak a few px of scroll). overflow:hidden keeps <html> a
+   scroll container, so scrollbar-gutter:stable still reserves the gutter and
+   the nav stays aligned with inner pages. Inner pages (no .home-seascape) are
+   unaffected. */
+html:has(.home-seascape),
+html:has(.home-seascape) body {
+  overflow: hidden;
 }
 
 /* Apply Apoc font to all heading elements */
