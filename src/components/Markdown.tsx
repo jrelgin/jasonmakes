@@ -4,6 +4,12 @@ type MarkdownProps = {
   source: string;
 };
 
+type ImageBlock = {
+  alt: string;
+  src: string;
+  title?: string;
+};
+
 let keyCounter = 0;
 
 function getKey(prefix: string) {
@@ -88,6 +94,36 @@ function flushCode(code: string[] | null, elements: ReactNode[]) {
   );
 }
 
+function flushFigure(
+  image: ImageBlock | null,
+  elements: ReactNode[],
+  caption?: string,
+) {
+  if (!image) return;
+  elements.push(
+    <figure key={getKey("figure")}>
+      <img src={image.src} alt={image.alt} title={image.title} />
+      {caption && <figcaption>{parseInline(caption)}</figcaption>}
+    </figure>,
+  );
+}
+
+function parseImageBlock(line: string): ImageBlock | null {
+  const imageMatch = line.match(/^!\[([^\]]*)\]\((\S+?)(?:\s+"([^"]+)")?\)$/);
+  if (!imageMatch) return null;
+
+  return {
+    alt: imageMatch[1],
+    src: imageMatch[2],
+    title: imageMatch[3],
+  };
+}
+
+function parseCaption(line: string): string | null {
+  const captionMatch = line.match(/^_(.+)_$/) ?? line.match(/^\*(.+)\*$/);
+  return captionMatch ? captionMatch[1] : null;
+}
+
 export default function Markdown({ source }: MarkdownProps) {
   const lines = source.split(/\r?\n/);
   const elements: ReactNode[] = [];
@@ -96,9 +132,20 @@ export default function Markdown({ source }: MarkdownProps) {
   const blockquote: string[] = [];
   let orderedList = false;
   let codeBlock: string[] | null = null;
+  let pendingFigure: ImageBlock | null = null;
 
   for (const line of lines) {
     const trimmed = line.trimEnd();
+
+    if (pendingFigure) {
+      const caption = parseCaption(trimmed.trim());
+      flushFigure(pendingFigure, elements, caption ?? undefined);
+      pendingFigure = null;
+
+      if (caption) {
+        continue;
+      }
+    }
 
     if (codeBlock) {
       if (trimmed.trim() === "```") {
@@ -122,6 +169,15 @@ export default function Markdown({ source }: MarkdownProps) {
       flushParagraph(paragraph, elements);
       flushList(listItems, elements, orderedList);
       flushBlockquote(blockquote, elements);
+      continue;
+    }
+
+    const imageBlock = parseImageBlock(trimmed.trim());
+    if (imageBlock) {
+      flushParagraph(paragraph, elements);
+      flushList(listItems, elements, orderedList);
+      flushBlockquote(blockquote, elements);
+      pendingFigure = imageBlock;
       continue;
     }
 
@@ -177,6 +233,7 @@ export default function Markdown({ source }: MarkdownProps) {
     paragraph.push(trimmed);
   }
 
+  flushFigure(pendingFigure, elements);
   flushCode(codeBlock, elements);
   flushParagraph(paragraph, elements);
   flushList(listItems, elements, orderedList);
