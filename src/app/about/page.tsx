@@ -9,9 +9,7 @@ export const metadata = {
 
 const elsewhere = [
   { label: "GitHub", href: "https://github.com/jrelgin" },
-  { label: "Email", href: "mailto:jason@signallantern.com" },
-  { label: "Signal Lantern", href: "https://signallantern.com" },
-  { label: "FullStory", href: "https://fullstory.com" },
+  { label: "LinkedIn", href: "https://www.linkedin.com/in/jrelgin" },
 ];
 
 export default function AboutPage() {
