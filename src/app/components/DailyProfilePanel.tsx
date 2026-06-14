@@ -19,6 +19,9 @@ const FOCUSABLE_SELECTOR = [
   '[tabindex]:not([tabindex="-1"])',
 ].join(",");
 
+const INTRO_DELAY_MS = 1800;
+const INTRO_ANIMATION_MS = 1200;
+
 export default function DailyProfilePanel({
   blurb,
   children,
@@ -28,11 +31,12 @@ export default function DailyProfilePanel({
 }) {
   const [open, setOpen] = useState(false);
   const [ready, setReady] = useState(false);
+  const [entered, setEntered] = useState(false);
   const dialogId = useId();
   const titleId = useId();
   const triggerRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
-  const dialogRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useRef<HTMLDialogElement>(null);
   const previouslyFocusedRef = useRef<HTMLElement | null>(null);
 
   const closePanel = useCallback(() => {
@@ -121,20 +125,31 @@ export default function DailyProfilePanel({
 
     if (reducedMotion) {
       setReady(true);
+      setEntered(true);
       return;
     }
 
-    const timer = window.setTimeout(() => {
+    const readyTimer = window.setTimeout(() => {
       setReady(true);
-    }, 2200);
+    }, INTRO_DELAY_MS);
+
+    const enteredTimer = window.setTimeout(() => {
+      setEntered(true);
+    }, INTRO_DELAY_MS + INTRO_ANIMATION_MS);
 
     return () => {
-      window.clearTimeout(timer);
+      window.clearTimeout(readyTimer);
+      window.clearTimeout(enteredTimer);
     };
   }, []);
 
   return (
-    <div className="daily-profile-shell" data-open={open} data-ready={ready}>
+    <div
+      className="daily-profile-shell"
+      data-entered={entered}
+      data-open={open}
+      data-ready={ready}
+    >
       {open && (
         <button
           type="button"
@@ -165,16 +180,15 @@ export default function DailyProfilePanel({
             onClick={togglePanel}
             className="daily-profile-trigger"
           >
-            Look below the surface
-            <span aria-hidden="true">{open ? "Close" : "Open"}</span>
+            What is this daily current?
           </button>
         </div>
 
         {open && (
-          <div
+          <dialog
             ref={dialogRef}
             id={dialogId}
-            role="dialog"
+            open
             aria-modal="true"
             aria-labelledby={titleId}
             tabIndex={-1}
@@ -192,7 +206,7 @@ export default function DailyProfilePanel({
               </button>
             </div>
             <div className="daily-profile-dialog__body">{children}</div>
-          </div>
+          </dialog>
         )}
       </aside>
     </div>

@@ -163,17 +163,52 @@ function LatestReads({
         )}
       </div>
       <ul>
-        {articles.map((article) => (
+        {articles.map((article, index) => (
           <li key={article.url || `article-${article.date}-${article.title}`}>
-            <a href={article.url} target="_blank" rel="noopener noreferrer">
-              <span>{article.title}</span>
-              {article.source && <small>{article.source}</small>}
+            <a
+              href={article.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="daily-profile-read-card"
+            >
+              <span className="daily-profile-read-thumb" aria-hidden="true">
+                {article.imageUrl ? (
+                  <img src={article.imageUrl} alt="" loading="lazy" />
+                ) : (
+                  <span
+                    className="daily-profile-read-thumb__fallback"
+                    data-pattern={getArticlePattern(article, index)}
+                  />
+                )}
+              </span>
+              <span className="daily-profile-read-copy">
+                <span className="daily-profile-read-title">
+                  {article.title}
+                </span>
+                {article.excerpt && (
+                  <span className="daily-profile-read-excerpt">
+                    {article.excerpt}
+                  </span>
+                )}
+                {article.source && <small>{article.source}</small>}
+              </span>
             </a>
           </li>
         ))}
       </ul>
     </section>
   );
+}
+
+function getArticlePattern(article: ReadingArticle, index: number): string {
+  const basis = article.url || article.title;
+  let hash = index + 7;
+
+  for (const character of basis) {
+    hash = (hash * 31 + character.charCodeAt(0)) % 997;
+  }
+
+  return String(hash % 5);
 }
 
 export default async function DailyProfileOverlay() {
