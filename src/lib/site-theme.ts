@@ -29,6 +29,18 @@ export function readStoredSiteTheme(): SiteTheme | null {
   return isSiteTheme(legacyTheme) ? legacyTheme : null;
 }
 
+/**
+ * Resolve the active theme: an explicit, persisted choice always wins; with no
+ * stored preference the site follows the visitor's OS `prefers-color-scheme`.
+ *
+ * Product decision (issue #105): a two-state, persistent toggle. There is no
+ * stored preference until the visitor toggles manually, so first visits follow
+ * the device color scheme (and live OS changes are honored while no preference
+ * is stored — see the `matchMedia` listeners in Navigation/SeascapeCanvas). Once
+ * the visitor toggles, that choice persists across visits. The legacy
+ * `jasonmakes:home-theme` key is intentionally still honored so prior choices
+ * carry over (see `readStoredSiteTheme`).
+ */
 export function resolveSiteTheme(): SiteTheme {
   return readStoredSiteTheme() ?? getSystemSiteTheme();
 }
