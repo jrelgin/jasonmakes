@@ -20,7 +20,7 @@ const FOCUSABLE_SELECTOR = [
 ].join(",");
 
 const INTRO_DELAY_MS = 1800;
-const INTRO_ANIMATION_MS = 1200;
+const INTRO_ANIMATION_MS = 1500;
 
 export default function DailyProfilePanel({
   blurb,

@@ -59,7 +59,7 @@ describe("DailyProfilePanel", () => {
     expect(trigger.hasAttribute("disabled")).toBe(false);
 
     act(() => {
-      vi.advanceTimersByTime(1200);
+      vi.advanceTimersByTime(1500);
     });
 
     expect(shell?.getAttribute("data-entered")).toBe("true");
