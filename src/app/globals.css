@@ -738,6 +738,35 @@ body {
   }
 }
 
+/* Mobile full-screen nav overlay. Stays mounted so the close animation can run
+   and aria-controls always resolves; visibility is delayed until the fade-out
+   finishes so links aren't focusable while hidden. Uses the same ease-out-expo
+   curve as the daily-profile overlay so it feels native to the site. */
+.mobile-nav-overlay {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-8px);
+  transition: opacity 260ms cubic-bezier(0.19, 1, 0.22, 1),
+    transform 260ms cubic-bezier(0.19, 1, 0.22, 1),
+    visibility 0s linear 260ms;
+}
+
+.mobile-nav-overlay[data-open="true"] {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+  transition: opacity 260ms cubic-bezier(0.19, 1, 0.22, 1),
+    transform 260ms cubic-bezier(0.19, 1, 0.22, 1), visibility 0s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobile-nav-overlay {
+    transition: visibility 0s linear 0ms;
+  }
+}
+
 /* The homepage is a single fixed canvas that never scrolls. Lock overflow at
    all widths so the 100vw scene can't create a scrollbar (and so mobile 100dvh
    transitions don't leak a few px of scroll). overflow:hidden keeps <html> a
