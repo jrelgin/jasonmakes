@@ -129,13 +129,13 @@ body {
 }
 
 :root[data-theme="hokusai"] .daily-profile-panel {
-  border-color: color-mix(in srgb, var(--u-panel-border) 68%, transparent);
+  border-color: color-mix(in srgb, var(--u-panel-border) 92%, transparent);
   background: linear-gradient(
       145deg,
-      color-mix(in srgb, var(--u-panel) 78%, transparent) 0%,
-      color-mix(in srgb, var(--u-panel) 70%, transparent) 52%,
-      color-mix(in srgb, var(--u-bg-1) 54%, transparent) 100%
-    ), color-mix(in srgb, white 34%, transparent);
+      color-mix(in srgb, var(--u-panel) 100%, transparent) 0%,
+      color-mix(in srgb, var(--u-panel) 100%, transparent) 52%,
+      color-mix(in srgb, var(--u-bg-1) 94%, transparent) 100%
+    ), color-mix(in srgb, white 62%, transparent);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.48), inset 0 -30px 54px -36px
     color-mix(in srgb, var(--u-accent) 35%, black), 0 30px 96px -42px
     rgba(0, 0, 0, 0.66);
@@ -283,29 +283,47 @@ body {
   position: relative;
   z-index: 1;
   box-sizing: border-box;
+  display: grid;
+  grid-template-rows: 0fr;
   width: 100%;
   max-width: none;
   max-height: calc(100dvh - 20rem);
   margin: 0;
-  overflow-y: auto;
+  overflow: hidden;
   border-right: 0;
   border-bottom: 0;
   border-left: 0;
   background: transparent;
   color: inherit;
-  border-top: 1px solid color-mix(in srgb, var(--u-panel-border) 78%, white 22%);
+  border-top: 1px solid transparent;
   opacity: 0;
-  padding: 1rem clamp(1rem, 0.8rem + 1vw, 1.55rem) 1.2rem;
+  padding: 0 clamp(1rem, 0.8rem + 1vw, 1.55rem);
   pointer-events: none;
   transform: translate3d(0, 0.45rem, 0);
-  transition: opacity 260ms ease, transform 640ms cubic-bezier(0.19, 1, 0.22, 1);
+  transition: grid-template-rows 640ms cubic-bezier(0.19, 1, 0.22, 1),
+    opacity 260ms ease, padding 640ms cubic-bezier(0.19, 1, 0.22, 1),
+    transform 640ms cubic-bezier(0.19, 1, 0.22, 1),
+    border-color 320ms ease;
 }
 
 .daily-profile-dialog[data-visible="true"] {
+  grid-template-rows: 1fr;
+  overflow-y: auto;
+  border-top-color: color-mix(in srgb, var(--u-panel-border) 78%, white 22%);
   opacity: 1;
+  padding-block: 1rem 1.2rem;
   pointer-events: auto;
   transform: none;
-  transition-delay: 80ms, 0ms;
+  transition-delay: 0ms, 80ms, 0ms, 0ms, 0ms;
+}
+
+.daily-profile-dialog__inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.daily-profile-dialog[data-visible="true"] .daily-profile-dialog__inner {
+  overflow: visible;
 }
 
 .daily-profile-dialog__header {
@@ -357,8 +375,8 @@ body {
 
 :root[data-theme="hokusai"] .daily-profile-signal,
 :root[data-theme="hokusai"] .daily-profile-reads {
-  border-color: color-mix(in srgb, var(--u-panel-border) 64%, transparent);
-  background: color-mix(in srgb, var(--u-bg-1) 58%, transparent);
+  border-color: color-mix(in srgb, var(--u-panel-border) 94%, transparent);
+  background: color-mix(in srgb, var(--u-bg-1) 95%, transparent);
 }
 
 .daily-profile-signal__label {
@@ -668,6 +686,9 @@ body {
 
   .daily-profile-dialog {
     max-height: none;
+  }
+
+  .daily-profile-dialog[data-visible="true"] {
     overflow: visible;
     padding-bottom: calc(1.6rem + env(safe-area-inset-bottom));
   }

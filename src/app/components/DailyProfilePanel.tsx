@@ -252,18 +252,20 @@ export default function DailyProfilePanel({
             tabIndex={-1}
             className="daily-profile-dialog"
           >
-            <div className="daily-profile-dialog__header">
-              <h2 id={titleId}>Below the surface</h2>
-              <button
-                ref={closeRef}
-                type="button"
-                onClick={closePanel}
-                className="daily-profile-close"
-              >
-                Close
-              </button>
+            <div className="daily-profile-dialog__inner">
+              <div className="daily-profile-dialog__header">
+                <h2 id={titleId}>Below the surface</h2>
+                <button
+                  ref={closeRef}
+                  type="button"
+                  onClick={closePanel}
+                  className="daily-profile-close"
+                >
+                  Close
+                </button>
+              </div>
+              <div className="daily-profile-dialog__body">{children}</div>
             </div>
-            <div className="daily-profile-dialog__body">{children}</div>
           </dialog>
         )}
       </aside>
