@@ -219,9 +219,10 @@ export default async function DailyProfileOverlay() {
     <DailyProfilePanel blurb={blurb}>
       <div className="daily-profile-explainer">
         <p>
-          This panel runs on its own. Atlanta weather, the last track Jason
-          played, and the latest things he saved to read update through the day.
-          The short dispatch on the glass is generated from those same signals.
+          This panel runs on its own (which is why it's in third person). What
+          you see is made up of the last track I played on Spotify, the weather
+          in my city, and what I'm currently reading in my news feed, updated
+          hourly. The short dispatch above is generated from these same signals.
         </p>
       </div>
 

@@ -37,11 +37,11 @@ export default function AboutPage() {
               people fast, and being honest about whether it actually helped.
             </p>
             <p>
-              The craft underneath still matters to me: heuristic evaluation,
-              information architecture, design systems, the quiet scaffolding
-              that makes the next decision easier. Good work doesn't erase
-              complexity so much as organize it, so the people I build for can
-              make confident choices.
+              The craft underneath still matters to me a lot. Heuristic
+              evaluation, information architecture, design systems, the quiet
+              scaffolding that makes the next decision easier. Good work doesn't
+              erase complexity so much as organize it, so the people I build for
+              can make confident choices.
             </p>
             <p>
               That's the work at Standard Education, where we turn K-12
@@ -56,8 +56,7 @@ export default function AboutPage() {
               >
                 FullStory
               </a>
-              , rebuilt the survey-export experience at Glass for research teams
-              at brands like Unilever and Clorox, and shaped product strategy at{" "}
+              , ran{" "}
               <a
                 href="https://signallantern.com"
                 target="_blank"
@@ -65,8 +64,10 @@ export default function AboutPage() {
                 className="text-[var(--u-accent)] underline decoration-1 underline-offset-4 transition-colors hover:text-[var(--u-accent-strong)]"
               >
                 Signal Lantern
-              </a>
-              .
+              </a>{" "}
+              where I rebuilt the survey-export experience at Glass for research
+              teams at brands like Unilever and Clorox, and led a development
+              team and facilitated Design Sprints at Three Five Two.
             </p>
             <p className="font-[family-name:var(--font-instrument-serif)] text-xl italic text-[var(--u-ink-strong)]">
               This site is a small experiment in that idea: a calm surface over
