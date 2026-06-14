@@ -19,8 +19,8 @@ const FOCUSABLE_SELECTOR = [
   '[tabindex]:not([tabindex="-1"])',
 ].join(",");
 
-const INTRO_DELAY_MS = 1800;
-const INTRO_ANIMATION_MS = 1500;
+const INTRO_DELAY_MS = 0;
+const INTRO_ANIMATION_MS = 1900;
 const DETAILS_OPEN_DELAY_MS = 30;
 const DETAILS_EXIT_MS = 640;
 
