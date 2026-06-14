@@ -137,7 +137,7 @@ export default async function Page({ params }: Params) {
             </div>
           )}
 
-          <div className="ink-prose ink-prose--dropcap u-rise u-rise-2 mt-12">
+          <div className="ink-prose u-rise u-rise-2 mt-12">
             <Markdown source={hobbyProject.content} />
           </div>
         </div>

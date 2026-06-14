@@ -369,14 +369,47 @@ li:last-child > .index-row {
   padding: 0;
 }
 
+/* Drop cap: a large initial letter on the first paragraph of long-form copy.
+ * Modern browsers use `initial-letter`, which sinks the glyph an exact number
+ * of lines and aligns its cap-height to the first line and its baseline to the
+ * Nth line automatically. Firefox (no `initial-letter` support) falls back to a
+ * tuned `float` recipe below. */
 .ink-prose--dropcap > p:first-of-type::first-letter {
   font-family: var(--font-gloock), serif;
-  float: left;
-  font-size: 3.6em;
-  line-height: 0.76;
-  padding-right: 0.09em;
-  margin-top: 0.04em;
   color: var(--u-accent);
+  -webkit-initial-letter: 3;
+  initial-letter: 3;
+  margin-right: 0.09em;
+}
+
+/* Float fallback for browsers without `initial-letter` (notably Firefox).
+ * With base prose at 1.12rem / line-height 1.8, three line boxes ≈ 6.05rem.
+ * font-size 3.35em with line-height 0.74 seats the cap-height against the first
+ * line and drops the baseline onto the third line. */
+@supports not (initial-letter: 3) {
+  .ink-prose--dropcap > p:first-of-type::first-letter {
+    float: left;
+    font-size: 3.35em;
+    line-height: 0.74;
+    margin-top: 0.02em;
+    margin-right: 0.09em;
+  }
+}
+
+/* Reduce the cap to two lines on small screens so it does not crowd the
+ * tighter line wrapping. */
+@media (max-width: 767px) {
+  .ink-prose--dropcap > p:first-of-type::first-letter {
+    -webkit-initial-letter: 2;
+    initial-letter: 2;
+  }
+
+  @supports not (initial-letter: 2) {
+    .ink-prose--dropcap > p:first-of-type::first-letter {
+      font-size: 2.55em;
+      line-height: 0.78;
+    }
+  }
 }
 
 /* =========================================================================
