@@ -60,6 +60,495 @@ body {
   background: #12203a;
 }
 
+.daily-profile-shell {
+  position: fixed;
+  right: clamp(1rem, 3vw, 2.5rem);
+  bottom: max(clamp(1rem, 4vh, 2.25rem), env(safe-area-inset-bottom));
+  z-index: 40;
+  width: min(28rem, calc(100vw - 2rem));
+  color: var(--u-ink);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(0, 18px, 0) scale(0.98);
+}
+
+.daily-profile-shell[data-ready="true"] {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+.daily-profile-shell[data-open="true"] {
+  z-index: 70;
+}
+
+.daily-profile-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  border: 0;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--u-bg-1) 12%, transparent),
+      color-mix(in srgb, var(--u-bg-1) 30%, transparent)
+    ),
+    rgba(2, 8, 18, 0.22);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+  cursor: default;
+  padding: 0;
+  pointer-events: auto;
+}
+
+.daily-profile-panel {
+  position: relative;
+  width: 100%;
+  max-height: min(16rem, calc(100dvh - 7.5rem));
+  overflow: hidden;
+  pointer-events: auto;
+  border: 1px solid color-mix(in srgb, var(--u-panel-border) 74%, white 26%);
+  border-radius: 8px;
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--u-panel) 86%, white 14%) 0%,
+    color-mix(in srgb, var(--u-panel) 76%, var(--u-bg-0) 24%) 52%,
+    color-mix(in srgb, var(--u-panel) 62%, var(--u-bg-1) 38%) 100%
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.42),
+    inset 0 -28px 42px -36px color-mix(in srgb, var(--u-accent) 42%, black),
+    0 26px 80px -42px rgba(0, 0, 0, 0.72);
+  -webkit-backdrop-filter: blur(18px) saturate(1.18);
+  backdrop-filter: blur(18px) saturate(1.18);
+  transition:
+    width 420ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    max-height 420ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 420ms ease;
+}
+
+.daily-profile-panel[data-open="true"] {
+  width: min(44rem, calc(100vw - 2rem));
+  max-height: min(82dvh, 46rem);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.48),
+    inset 0 -30px 54px -36px color-mix(in srgb, var(--u-accent) 46%, black),
+    0 34px 120px -44px rgba(0, 0, 0, 0.78);
+}
+
+.daily-profile-panel::before {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background:
+    repeating-linear-gradient(
+      112deg,
+      transparent 0 18px,
+      color-mix(in srgb, var(--u-wave-line) 20%, transparent) 18px 19px,
+      transparent 19px 32px
+    ),
+    linear-gradient(
+      105deg,
+      rgba(255, 255, 255, 0.18),
+      transparent 28%,
+      rgba(255, 255, 255, 0.07) 62%,
+      transparent
+    );
+  mix-blend-mode: soft-light;
+  opacity: 0.58;
+  pointer-events: none;
+}
+
+.daily-profile-panel::after {
+  position: absolute;
+  inset: 1px;
+  content: "";
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 7px;
+  pointer-events: none;
+}
+
+.daily-profile-glass-line {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    color-mix(in srgb, var(--u-accent) 56%, white),
+    transparent
+  );
+  opacity: 0.74;
+  pointer-events: none;
+}
+
+.daily-profile-blurb {
+  position: relative;
+  z-index: 1;
+  padding: clamp(1rem, 0.8rem + 1vw, 1.45rem)
+    clamp(1.1rem, 0.9rem + 1vw, 1.65rem) 0.8rem;
+}
+
+.daily-profile-blurb blockquote {
+  font-family: var(--font-instrument-serif), serif;
+  font-size: clamp(1.32rem, 1.06rem + 0.9vw, 1.9rem);
+  font-style: italic;
+  line-height: 1.18;
+  color: var(--u-ink-strong);
+  text-wrap: balance;
+}
+
+.daily-profile-actions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 1rem 1rem;
+}
+
+.daily-profile-trigger,
+.daily-profile-close {
+  display: inline-flex;
+  min-height: 2.25rem;
+  align-items: center;
+  border: 1px solid color-mix(in srgb, var(--u-panel-border) 82%, white 18%);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--u-bg-1) 58%, transparent);
+  color: var(--u-ink-strong);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1;
+  text-transform: uppercase;
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+.daily-profile-trigger {
+  gap: 0.75rem;
+  padding: 0 0.35rem 0 0.8rem;
+}
+
+.daily-profile-trigger span {
+  display: inline-flex;
+  min-height: 1.6rem;
+  align-items: center;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--u-accent) 24%, transparent);
+  padding: 0 0.48rem;
+  color: var(--u-accent-strong);
+}
+
+.daily-profile-trigger:hover,
+.daily-profile-close:hover {
+  border-color: color-mix(in srgb, var(--u-accent) 54%, var(--u-panel-border));
+  background: color-mix(in srgb, var(--u-bg-1) 76%, transparent);
+  color: var(--u-accent-strong);
+}
+
+.daily-profile-trigger:disabled {
+  cursor: default;
+  opacity: 0.64;
+}
+
+.daily-profile-trigger:focus-visible,
+.daily-profile-close:focus-visible,
+.daily-profile-link:focus-visible,
+.daily-profile-reads a:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--u-accent) 82%, white);
+  outline-offset: 3px;
+}
+
+.daily-profile-dialog {
+  position: relative;
+  z-index: 1;
+  max-height: calc(min(82dvh, 46rem) - 8rem);
+  overflow-y: auto;
+  border-top: 1px solid color-mix(in srgb, var(--u-panel-border) 78%, white 22%);
+  padding: 1rem clamp(1rem, 0.8rem + 1vw, 1.55rem) 1.2rem;
+}
+
+.daily-profile-dialog__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.daily-profile-dialog__header h2 {
+  font-family: var(--font-gloock), serif;
+  font-size: clamp(1.7rem, 1.25rem + 1.3vw, 2.35rem);
+  font-weight: 400;
+  line-height: 1;
+  color: var(--u-ink-strong);
+}
+
+.daily-profile-close {
+  flex: none;
+  padding: 0 0.8rem;
+}
+
+.daily-profile-dialog__body {
+  margin-top: 1rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.daily-profile-explainer {
+  max-width: 38rem;
+  color: var(--u-ink);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.daily-profile-signal-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.daily-profile-signal,
+.daily-profile-reads {
+  border: 1px solid color-mix(in srgb, var(--u-panel-border) 80%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--u-bg-1) 42%, transparent);
+  padding: 0.95rem;
+}
+
+.daily-profile-signal__label {
+  margin-bottom: 0.35rem;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  color: var(--u-accent);
+}
+
+.daily-profile-signal h3,
+.daily-profile-reads h3 {
+  font-family: var(--font-instrument-serif), serif;
+  font-size: 1.35rem;
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.05;
+  color: var(--u-ink-strong);
+}
+
+.daily-profile-weather,
+.daily-profile-track {
+  margin-top: 0.8rem;
+}
+
+.daily-profile-weather {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.daily-profile-weather__mark {
+  display: inline-flex;
+  min-width: 2.25rem;
+  min-height: 2.25rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid color-mix(in srgb, var(--u-accent) 26%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--u-accent) 12%, transparent);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--u-accent-strong);
+}
+
+.daily-profile-signal__value {
+  color: var(--u-ink-strong);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.daily-profile-signal__meta {
+  margin-top: 0.2rem;
+  color: var(--u-ink-muted);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.daily-profile-facts {
+  margin-top: 0.9rem;
+  display: grid;
+  gap: 0.35rem;
+  color: var(--u-ink);
+  font-size: 0.86rem;
+}
+
+.daily-profile-facts div {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.daily-profile-facts dt {
+  color: var(--u-ink-muted);
+}
+
+.daily-profile-facts dd {
+  color: var(--u-ink-strong);
+  font-weight: 700;
+  text-align: right;
+}
+
+.daily-profile-updated {
+  margin-top: 0.85rem;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  color: var(--u-ink-muted);
+}
+
+.daily-profile-link {
+  margin-top: 0.55rem;
+  display: inline-flex;
+  color: var(--u-accent);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  transition: color 180ms ease;
+}
+
+.daily-profile-link:hover {
+  color: var(--u-accent-strong);
+}
+
+.daily-profile-section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.daily-profile-section-heading .daily-profile-updated {
+  margin-top: 0;
+  text-align: right;
+}
+
+.daily-profile-reads ul {
+  margin-top: 0.75rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.daily-profile-reads a {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  border-top: 1px solid
+    color-mix(in srgb, var(--u-panel-border) 62%, transparent);
+  padding-top: 0.5rem;
+  color: var(--u-ink-strong);
+  line-height: 1.35;
+  transition: color 180ms ease;
+}
+
+.daily-profile-reads li:first-child a {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.daily-profile-reads a:hover {
+  color: var(--u-accent-strong);
+}
+
+.daily-profile-reads small {
+  flex: none;
+  color: var(--u-ink-muted);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+@media (max-width: 767px) {
+  .daily-profile-shell {
+    right: 1rem;
+    bottom: max(1rem, env(safe-area-inset-bottom));
+    left: 1rem;
+    width: auto;
+  }
+
+  .daily-profile-panel,
+  .daily-profile-panel[data-open="true"] {
+    width: 100%;
+  }
+
+  .daily-profile-panel {
+    max-height: min(15rem, calc(100dvh - 7.25rem));
+  }
+
+  .daily-profile-panel[data-open="true"] {
+    max-height: calc(100dvh - 7.25rem);
+  }
+
+  .daily-profile-blurb blockquote {
+    font-size: clamp(1.18rem, 1rem + 2vw, 1.5rem);
+  }
+
+  .daily-profile-actions {
+    justify-content: stretch;
+  }
+
+  .daily-profile-trigger {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .daily-profile-dialog {
+    max-height: calc(100dvh - 15.5rem);
+  }
+
+  .daily-profile-dialog__header {
+    align-items: flex-start;
+  }
+
+  .daily-profile-signal-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .daily-profile-section-heading,
+  .daily-profile-reads a {
+    display: grid;
+    gap: 0.4rem;
+  }
+
+  .daily-profile-section-heading .daily-profile-updated {
+    text-align: left;
+  }
+
+  .daily-profile-reads small {
+    white-space: normal;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .daily-profile-panel,
+  .daily-profile-trigger,
+  .daily-profile-close,
+  .daily-profile-link,
+  .daily-profile-reads a {
+    transition: none;
+  }
+}
+
 /* The homepage is a single fixed canvas that never scrolls. Lock overflow at
    all widths so the 100vw scene can't create a scrollbar (and so mobile 100dvh
    transitions don't leak a few px of scroll). overflow:hidden keeps <html> a

@@ -1,3 +1,4 @@
+import { revalidatePath } from "next/cache";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Profile } from "../../../lib/profile";
@@ -129,6 +130,8 @@ describe("cron update-profile route", () => {
       expect.objectContaining({ reading }),
       12000,
     );
+    expect(revalidatePath).toHaveBeenCalledWith("/");
+    expect(revalidatePath).not.toHaveBeenCalledWith("/about");
   });
 
   it("preserves previous reading data when Readwise returns no articles", async () => {

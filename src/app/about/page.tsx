@@ -1,8 +1,3 @@
-import AboutBlurb from "@/app/components/AboutBlurb";
-import LatestReadsWidget from "@/app/components/LatestReadsWidget";
-import SpotifyWidget from "@/app/components/SpotifyWidget";
-import WeatherWidget from "@/app/components/WeatherWidget";
-import Disclosure from "@/components/Disclosure";
 import DriftingWave from "@/components/DriftingWave";
 import PageShell from "@/components/PageShell";
 
@@ -11,11 +6,6 @@ export const metadata = {
   description:
     "About Jason Elgin, product leader and designer building tools for education, analytics, and creative work.",
 };
-
-// The KV-backed Daily Profile widgets below are the only live data on this
-// page. Revalidate hourly so they stay fresh even between cron runs; the cron
-// job also calls revalidatePath('/about') right after each profile update.
-export const revalidate = 3600;
 
 const elsewhere = [
   { label: "GitHub", href: "https://github.com/jrelgin" },
@@ -100,35 +90,6 @@ export default function AboutPage() {
               </li>
             ))}
           </ul>
-
-          <h2 className="u-title mt-16 text-4xl md:text-5xl">Right now</h2>
-
-          <div className="u-rise u-rise-1 mt-8">
-            <AboutBlurb />
-          </div>
-
-          <Disclosure
-            className="u-rise u-rise-1 mt-3"
-            label="Wait, what is this?"
-            align="right"
-          >
-            <p>
-              This part runs on its own. The weather over Atlanta, the last
-              track I played, and what I'm reading all update through the day.
-              The short dispatch up top is written each morning by AI from those
-              same signals, which is why it talks about me in the third person.
-              It's the moving water from the line above, made literal.
-            </p>
-          </Disclosure>
-
-          <div className="u-rise u-rise-2 mt-8 grid gap-6 md:grid-cols-2">
-            <WeatherWidget />
-            <SpotifyWidget />
-          </div>
-
-          <div className="u-rise u-rise-2 mt-6">
-            <LatestReadsWidget />
-          </div>
         </div>
       </section>
 
