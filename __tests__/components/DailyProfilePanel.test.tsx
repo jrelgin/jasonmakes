@@ -85,21 +85,30 @@ describe("DailyProfilePanel", () => {
     fireEvent.click(trigger);
 
     expect(shell?.getAttribute("data-open")).toBe("true");
-    expect(
-      screen.getByRole("dialog", { name: "Below the surface" }),
-    ).toBeTruthy();
+    const dialog = screen.getByRole("dialog", { name: "Below the surface" });
+    expect(dialog).toBeTruthy();
+    expect(dialog.getAttribute("data-visible")).toBe("false");
     expect(screen.getByRole("button", { name: "Close" })).toBe(
       document.activeElement,
     );
 
+    act(() => {
+      vi.advanceTimersByTime(30);
+    });
+
+    expect(dialog.getAttribute("data-visible")).toBe("true");
+
     fireEvent.keyDown(document, { key: "Escape" });
+
+    expect(shell?.getAttribute("data-open")).toBe("false");
+    expect(dialog.getAttribute("aria-hidden")).toBe("true");
+    expect(dialog.getAttribute("data-visible")).toBe("false");
+    expect(trigger).toBe(document.activeElement);
 
     act(() => {
       vi.runOnlyPendingTimers();
     });
 
-    expect(shell?.getAttribute("data-open")).toBe("false");
     expect(screen.queryByRole("dialog")).toBeNull();
-    expect(trigger).toBe(document.activeElement);
   });
 });

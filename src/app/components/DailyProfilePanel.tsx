@@ -21,6 +21,8 @@ const FOCUSABLE_SELECTOR = [
 
 const INTRO_DELAY_MS = 1800;
 const INTRO_ANIMATION_MS = 1500;
+const DETAILS_OPEN_DELAY_MS = 30;
+const DETAILS_EXIT_MS = 640;
 
 export default function DailyProfilePanel({
   blurb,
@@ -32,28 +34,78 @@ export default function DailyProfilePanel({
   const [open, setOpen] = useState(false);
   const [ready, setReady] = useState(false);
   const [entered, setEntered] = useState(false);
+  const [detailsMounted, setDetailsMounted] = useState(false);
+  const [detailsVisible, setDetailsVisible] = useState(false);
   const dialogId = useId();
   const titleId = useId();
   const triggerRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const previouslyFocusedRef = useRef<HTMLElement | null>(null);
+  const closeTimerRef = useRef<number | null>(null);
+  const revealTimerRef = useRef<number | null>(null);
+  const reducedMotionRef = useRef(false);
+
+  const clearPanelTimers = useCallback(() => {
+    if (closeTimerRef.current !== null) {
+      window.clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+
+    if (revealTimerRef.current !== null) {
+      window.clearTimeout(revealTimerRef.current);
+      revealTimerRef.current = null;
+    }
+  }, []);
 
   const closePanel = useCallback(() => {
     setOpen(false);
-    window.setTimeout(() => {
-      const focusTarget = previouslyFocusedRef.current ?? triggerRef.current;
-      focusTarget?.focus();
-    }, 0);
+    setDetailsVisible(false);
+
+    if (revealTimerRef.current !== null) {
+      window.clearTimeout(revealTimerRef.current);
+      revealTimerRef.current = null;
+    }
+
+    const focusTarget = previouslyFocusedRef.current ?? triggerRef.current;
+    focusTarget?.focus();
+
+    const finishClose = () => {
+      closeTimerRef.current = null;
+      setDetailsMounted(false);
+    };
+
+    if (reducedMotionRef.current) {
+      finishClose();
+      return;
+    }
+
+    if (closeTimerRef.current !== null) {
+      window.clearTimeout(closeTimerRef.current);
+    }
+
+    closeTimerRef.current = window.setTimeout(finishClose, DETAILS_EXIT_MS);
   }, []);
 
   const openPanel = useCallback(() => {
+    clearPanelTimers();
     previouslyFocusedRef.current =
       document.activeElement instanceof HTMLElement
         ? document.activeElement
         : triggerRef.current;
+    setDetailsMounted(true);
     setOpen(true);
-  }, []);
+
+    if (reducedMotionRef.current) {
+      setDetailsVisible(true);
+      return;
+    }
+
+    revealTimerRef.current = window.setTimeout(() => {
+      revealTimerRef.current = null;
+      setDetailsVisible(true);
+    }, DETAILS_OPEN_DELAY_MS);
+  }, [clearPanelTimers]);
 
   const togglePanel = useCallback(() => {
     if (!ready) return;
@@ -114,14 +166,15 @@ export default function DailyProfilePanel({
   }, [closePanel, open, trapFocus]);
 
   useLayoutEffect(() => {
-    if (!open) return;
+    if (!open || !detailsMounted) return;
     closeRef.current?.focus();
-  }, [open]);
+  }, [detailsMounted, open]);
 
   useEffect(() => {
     const reducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
+    reducedMotionRef.current = reducedMotion;
 
     if (reducedMotion) {
       setReady(true);
@@ -142,6 +195,8 @@ export default function DailyProfilePanel({
       window.clearTimeout(enteredTimer);
     };
   }, []);
+
+  useEffect(() => clearPanelTimers, [clearPanelTimers]);
 
   return (
     <div
@@ -184,13 +239,16 @@ export default function DailyProfilePanel({
           </button>
         </div>
 
-        {open && (
+        {detailsMounted && (
           <dialog
             ref={dialogRef}
             id={dialogId}
             open
             aria-modal="true"
+            aria-hidden={!open}
             aria-labelledby={titleId}
+            data-visible={detailsVisible}
+            inert={!open}
             tabIndex={-1}
             className="daily-profile-dialog"
           >
