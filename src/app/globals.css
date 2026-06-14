@@ -638,6 +638,11 @@ body {
 
   .daily-profile-panel[data-open="true"] {
     max-height: calc(100dvh - 7.25rem);
+    max-height: calc(100svh - 7.25rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scroll-padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));
+    -webkit-overflow-scrolling: touch;
   }
 
   .daily-profile-blurb blockquote {
@@ -653,7 +658,9 @@ body {
   }
 
   .daily-profile-dialog {
-    max-height: calc(100dvh - 15.5rem);
+    max-height: none;
+    overflow: visible;
+    padding-bottom: calc(1.6rem + env(safe-area-inset-bottom));
   }
 
   .daily-profile-dialog__header {
