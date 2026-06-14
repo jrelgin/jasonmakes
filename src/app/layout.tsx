@@ -74,6 +74,8 @@ const themeInitScript = `
     const legacyThemeKey = ${JSON.stringify(LEGACY_THEME_STORAGE_KEY)};
     const stored = localStorage.getItem(themeKey) || localStorage.getItem(legacyThemeKey);
     const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "twilight" : "hokusai";
+    // A stored "system" preference (or anything absent/invalid) intentionally
+    // falls through to systemTheme via this else branch — no special-casing needed.
     const theme = stored === "hokusai" || stored === "twilight" ? stored : systemTheme;
     document.documentElement.classList.toggle("dark", theme === "twilight");
     document.documentElement.dataset.theme = theme;

@@ -7,8 +7,11 @@ import {
   applySiteTheme,
   getSystemSiteTheme,
   isSiteTheme,
+  isSiteThemePreference,
+  readStoredPreference,
   readStoredSiteTheme,
   resolveSiteTheme,
+  setStoredPreference,
   setStoredSiteTheme,
 } from "../../src/lib/site-theme";
 
@@ -57,6 +60,20 @@ describe("site-theme", () => {
       expect(isSiteTheme(null)).toBe(false);
       expect(isSiteTheme("dark")).toBe(false);
       expect(isSiteTheme("")).toBe(false);
+    });
+  });
+
+  describe("isSiteThemePreference", () => {
+    it("accepts the two themes plus system", () => {
+      expect(isSiteThemePreference("hokusai")).toBe(true);
+      expect(isSiteThemePreference("twilight")).toBe(true);
+      expect(isSiteThemePreference("system")).toBe(true);
+    });
+
+    it("rejects null and unknown values", () => {
+      expect(isSiteThemePreference(null)).toBe(false);
+      expect(isSiteThemePreference("auto")).toBe(false);
+      expect(isSiteThemePreference("")).toBe(false);
     });
   });
 
@@ -115,6 +132,78 @@ describe("site-theme", () => {
       mockMatchMedia(true); // OS prefers dark...
       window.localStorage.setItem(SITE_THEME_STORAGE_KEY, "hokusai"); // ...but user chose light
       expect(resolveSiteTheme()).toBe("hokusai");
+    });
+
+    it("follows the OS when the stored preference is the literal system", () => {
+      mockMatchMedia(true);
+      window.localStorage.setItem(SITE_THEME_STORAGE_KEY, "system");
+      expect(resolveSiteTheme()).toBe("twilight");
+    });
+  });
+
+  describe("readStoredPreference", () => {
+    it("defaults to system when nothing is stored", () => {
+      expect(readStoredPreference()).toBe("system");
+    });
+
+    it("returns the literal system preference", () => {
+      window.localStorage.setItem(SITE_THEME_STORAGE_KEY, "system");
+      expect(readStoredPreference()).toBe("system");
+    });
+
+    it("returns an explicit stored theme", () => {
+      window.localStorage.setItem(SITE_THEME_STORAGE_KEY, "twilight");
+      expect(readStoredPreference()).toBe("twilight");
+    });
+
+    it("migrates a legacy explicit choice", () => {
+      window.localStorage.setItem(LEGACY_THEME_STORAGE_KEY, "hokusai");
+      expect(readStoredPreference()).toBe("hokusai");
+    });
+
+    it("defaults to system for garbage values", () => {
+      window.localStorage.setItem(SITE_THEME_STORAGE_KEY, "not-a-theme");
+      expect(readStoredPreference()).toBe("system");
+    });
+  });
+
+  describe("setStoredPreference", () => {
+    it("persists an explicit theme to both keys and applies it", () => {
+      setStoredPreference("twilight");
+      expect(window.localStorage.getItem(SITE_THEME_STORAGE_KEY)).toBe(
+        "twilight",
+      );
+      expect(window.localStorage.getItem(LEGACY_THEME_STORAGE_KEY)).toBe(
+        "twilight",
+      );
+      expect(document.documentElement.dataset.theme).toBe("twilight");
+    });
+
+    it("stores the literal system value but applies the resolved OS theme", () => {
+      mockMatchMedia(true); // OS prefers dark
+      setStoredPreference("system");
+      expect(window.localStorage.getItem(SITE_THEME_STORAGE_KEY)).toBe(
+        "system",
+      );
+      // isSiteTheme still treats "system" as no explicit theme...
+      expect(readStoredSiteTheme()).toBeNull();
+      // ...but the DOM gets the resolved OS theme.
+      expect(document.documentElement.dataset.theme).toBe("twilight");
+    });
+
+    it("dispatches the resolved theme for a system preference", () => {
+      mockMatchMedia(false); // OS prefers light
+      const listener = vi.fn();
+      window.addEventListener(SITE_THEME_CHANGE_EVENT, listener);
+
+      setStoredPreference("system");
+
+      const event = listener.mock.calls[0][0] as CustomEvent<{
+        theme: string;
+      }>;
+      expect(event.detail.theme).toBe("hokusai");
+
+      window.removeEventListener(SITE_THEME_CHANGE_EVENT, listener);
     });
   });
 
