@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
+
 import type { SiteThemePreference } from "@/lib/site-theme";
 import { cn } from "#lib/utils/cn";
 
@@ -23,11 +25,30 @@ type ThemeControlProps = {
 
 /**
  * Segmented, icons-only theme control exposing all three states at once:
- * Day (light/hokusai), Auto (follow OS), Night (dark/twilight). The selected
- * segment is highlighted; the rounded-full pill sets it apart from the squared
- * nav links.
+ * Day (light/hokusai), Auto (follow OS), Night (dark/twilight). A single soft
+ * "thumb" slides behind the icons to mark the selection — low visual weight so
+ * it never pulls focus from the page. The rounded-full pill sets the grouping
+ * apart from the squared nav links.
  */
 export default function ThemeControl({ value, onChange }: ThemeControlProps) {
+  // Only morph after an actual switch, never on first paint — otherwise the
+  // control would squash itself into existence on load. We flip this the first
+  // time `value` changes from its initial selection and leave it on; the keyed
+  // fill below replays the keyframe on every subsequent change.
+  const [hasSwitched, setHasSwitched] = useState(false);
+  const previousValue = useRef(value);
+  useEffect(() => {
+    if (previousValue.current !== value) {
+      previousValue.current = value;
+      setHasSwitched(true);
+    }
+  }, [value]);
+
+  const selectedIndex = Math.max(
+    0,
+    THEME_OPTIONS.findIndex((option) => option.value === value),
+  );
+
   const moveFocus = (currentIndex: number, direction: 1 | -1) => {
     const nextIndex =
       (currentIndex + direction + THEME_OPTIONS.length) % THEME_OPTIONS.length;
@@ -38,8 +59,28 @@ export default function ThemeControl({ value, onChange }: ThemeControlProps) {
     <div
       role="radiogroup"
       aria-label="Theme"
-      className="flex items-center gap-0.5 rounded-full bg-white/5 p-0.5"
+      className="relative flex items-center rounded-full bg-white/10 p-0.5 ring-1 ring-inset ring-white/15"
     >
+      {/* Sliding selection marker. The outer element handles the glide between
+          segments; the inner fill remounts on each change (via `key`) to replay
+          the squash keyframe, so the circle stretches as it travels. */}
+      <span
+        aria-hidden="true"
+        className="theme-thumb pointer-events-none"
+        style={{
+          width: "calc((100% - 0.25rem) / 3)",
+          transform: `translateX(${selectedIndex * 100}%)`,
+        }}
+      >
+        <span
+          key={value}
+          className={cn(
+            "theme-thumb-fill",
+            hasSwitched && "theme-thumb-fill--morph",
+          )}
+        />
+      </span>
+
       {THEME_OPTIONS.map((option, index) => {
         const isSelected = option.value === value;
         return (
@@ -62,10 +103,10 @@ export default function ThemeControl({ value, onChange }: ThemeControlProps) {
               }
             }}
             className={cn(
-              "flex min-h-11 min-w-10 cursor-pointer items-center justify-center rounded-full transition sm:min-h-9",
+              "relative z-10 flex min-h-11 min-w-10 flex-1 cursor-pointer items-center justify-center rounded-full outline-none transition-colors focus-visible:ring-2 focus-visible:ring-white/40 sm:min-h-9",
               isSelected
-                ? "bg-white text-slate-950"
-                : "text-white/60 hover:text-white",
+                ? "text-white/85"
+                : "text-white/40 hover:text-white/70",
             )}
           >
             <option.Icon />
