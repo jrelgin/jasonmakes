@@ -118,17 +118,24 @@ function MusicSignal({
         <h3>Recently played</h3>
       </div>
       <div className="daily-profile-track">
-        <p className="daily-profile-signal__value">{track.title}</p>
-        <p className="daily-profile-signal__meta">by {track.artist}</p>
-        {track.trackUrl && (
-          <a
-            href={track.trackUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="daily-profile-link"
-          >
-            Listen on Spotify
-          </a>
+        <div className="daily-profile-track__copy">
+          <p className="daily-profile-signal__value">{track.title}</p>
+          <p className="daily-profile-signal__meta">by {track.artist}</p>
+          {track.trackUrl && (
+            <a
+              href={track.trackUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="daily-profile-link"
+            >
+              Listen on Spotify
+            </a>
+          )}
+        </div>
+        {track.coverUrl && (
+          <span className="daily-profile-track__art" aria-hidden="true">
+            <img src={track.coverUrl} alt="" loading="lazy" />
+          </span>
         )}
       </div>
       {spotify?.lastUpdated && (
