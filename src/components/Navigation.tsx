@@ -5,16 +5,19 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 
+import ThemeControl from "@/components/theme-control";
 import {
   LEGACY_THEME_STORAGE_KEY,
   SITE_THEME_CHANGE_EVENT,
   SITE_THEME_STORAGE_KEY,
   type SiteTheme,
+  type SiteThemePreference,
   applySiteTheme,
   isSiteTheme,
+  readStoredPreference,
   readStoredSiteTheme,
   resolveSiteTheme,
-  setStoredSiteTheme,
+  setStoredPreference,
 } from "@/lib/site-theme";
 import { NAVIGATION_ITEMS } from "#lib/config/navigation";
 import { cn } from "#lib/utils/cn";
@@ -23,6 +26,7 @@ import { isNavItemActive } from "#lib/utils/navigation";
 export default function Navigation() {
   const pathname = usePathname();
   const [theme, setTheme] = useState<SiteTheme>("hokusai");
+  const [preference, setPreference] = useState<SiteThemePreference>("system");
   const [menuOpen, setMenuOpen] = useState(false);
   const menuId = useId();
   const menuPanelRef = useRef<HTMLDivElement>(null);
@@ -31,6 +35,7 @@ export default function Navigation() {
   useEffect(() => {
     const initialTheme = resolveSiteTheme();
     setTheme(initialTheme);
+    setPreference(readStoredPreference());
     applySiteTheme(initialTheme);
 
     const handleThemeChange = (event: Event) => {
@@ -39,6 +44,7 @@ export default function Navigation() {
       if (isSiteTheme(nextTheme)) {
         setTheme(nextTheme);
       }
+      setPreference(readStoredPreference());
     };
 
     const handleStorage = (event: StorageEvent) => {
@@ -51,6 +57,7 @@ export default function Navigation() {
 
       const nextTheme = resolveSiteTheme();
       setTheme(nextTheme);
+      setPreference(readStoredPreference());
       applySiteTheme(nextTheme);
     };
 
@@ -59,6 +66,7 @@ export default function Navigation() {
       if (readStoredSiteTheme()) return;
       const nextTheme = resolveSiteTheme();
       setTheme(nextTheme);
+      setPreference(readStoredPreference());
       applySiteTheme(nextTheme);
     };
 
@@ -73,11 +81,11 @@ export default function Navigation() {
     };
   }, []);
 
-  const toggleTheme = useCallback(() => {
-    const nextTheme = theme === "twilight" ? "hokusai" : "twilight";
-    setTheme(nextTheme);
-    setStoredSiteTheme(nextTheme);
-  }, [theme]);
+  const handlePreferenceChange = useCallback((pref: SiteThemePreference) => {
+    setPreference(pref);
+    setStoredPreference(pref);
+    setTheme(resolveSiteTheme());
+  }, []);
 
   // Close the mobile menu whenever the route changes so navigating always
   // dismisses it (even when the destination is the current page).
@@ -110,7 +118,6 @@ export default function Navigation() {
     };
   }, [menuOpen]);
 
-  const nextThemeLabel = theme === "twilight" ? "day" : "night";
   const isTwilight = theme === "twilight";
   const shouldInvertLogo = isTwilight && pathname !== "/";
 
@@ -133,11 +140,11 @@ export default function Navigation() {
             width={132}
             height={72}
             priority
-            className={cn("h-8 w-auto sm:h-10", shouldInvertLogo && "invert")}
+            className={cn("h-10 w-auto", shouldInvertLogo && "invert")}
           />
         </Link>
 
-        <div className="pointer-events-auto flex items-center rounded border border-white/15 bg-slate-950/95 p-1 text-[10px] font-semibold uppercase text-white shadow-xl backdrop-blur-sm sm:text-xs">
+        <div className="pointer-events-auto flex items-center gap-1 rounded border border-white/15 bg-slate-950/95 p-1 text-xs font-semibold uppercase text-white shadow-xl backdrop-blur-sm sm:text-sm">
           <ul className="hidden items-center md:flex">
             {NAVIGATION_ITEMS.map((item) => {
               const isActive = isNavItemActive(pathname, item);
@@ -146,7 +153,7 @@ export default function Navigation() {
                   <Link
                     href={item.href}
                     className={cn(
-                      "flex min-h-8 items-center rounded px-2 transition sm:min-h-9 sm:px-3",
+                      "flex min-h-10 items-center rounded px-3 transition",
                       isActive
                         ? "bg-white text-slate-950"
                         : "text-white/70 hover:bg-white/10 hover:text-white",
@@ -158,16 +165,7 @@ export default function Navigation() {
               );
             })}
           </ul>
-          <div className="mx-1 hidden h-5 w-px bg-white/15 md:block" />
-          <button
-            type="button"
-            aria-label={`Switch to ${nextThemeLabel} theme`}
-            title={`Switch to ${nextThemeLabel} theme`}
-            onClick={toggleTheme}
-            className="flex min-h-8 min-w-8 cursor-pointer items-center justify-center rounded text-white/80 transition hover:bg-white/10 hover:text-white sm:min-h-9 sm:min-w-9"
-          >
-            {theme === "twilight" ? <SunIcon /> : <SeaCreatureIcon />}
-          </button>
+          <ThemeControl value={preference} onChange={handlePreferenceChange} />
           <button
             ref={menuButtonRef}
             type="button"
@@ -175,9 +173,9 @@ export default function Navigation() {
             aria-expanded={menuOpen}
             aria-controls={menuId}
             onClick={() => setMenuOpen((open) => !open)}
-            className="flex min-h-8 min-w-8 cursor-pointer items-center justify-center rounded text-white/80 transition hover:bg-white/10 hover:text-white sm:min-h-9 sm:min-w-9 md:hidden"
+            className="flex min-h-12 cursor-pointer items-center justify-center rounded px-3 text-sm text-white/80 transition hover:bg-white/10 hover:text-white sm:min-h-10 md:hidden"
           >
-            {menuOpen ? <CloseIcon /> : <MenuIcon />}
+            {menuOpen ? "Close" : "Menu"}
           </button>
         </div>
       </div>
@@ -214,82 +212,5 @@ export default function Navigation() {
         </ul>
       </div>
     </nav>
-  );
-}
-
-function SunIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="2"
-    >
-      <circle cx="12" cy="12" r="4" />
-      <path d="M12 2v2" />
-      <path d="M12 20v2" />
-      <path d="m4.93 4.93 1.41 1.41" />
-      <path d="m17.66 17.66 1.41 1.41" />
-      <path d="M2 12h2" />
-      <path d="M20 12h2" />
-      <path d="m6.34 17.66-1.41 1.41" />
-      <path d="m19.07 4.93-1.41 1.41" />
-    </svg>
-  );
-}
-
-function MenuIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="2"
-    >
-      <path d="M3 6h18" />
-      <path d="M3 12h18" />
-      <path d="M3 18h18" />
-    </svg>
-  );
-}
-
-function CloseIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="2"
-    >
-      <path d="M18 6 6 18" />
-      <path d="m6 6 12 12" />
-    </svg>
-  );
-}
-
-function SeaCreatureIcon() {
-  return (
-    <span
-      aria-hidden="true"
-      className="block h-5 w-7 bg-contain bg-center bg-no-repeat"
-      style={{
-        backgroundImage: "url('/images/tentacles-icon-swapped.png')",
-      }}
-    />
   );
 }

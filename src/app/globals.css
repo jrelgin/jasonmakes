@@ -767,6 +767,56 @@ body {
   }
 }
 
+/* Theme control: a single soft marker that glides between the three segments.
+   The outer .theme-thumb handles the slide; the inner .theme-thumb-fill carries
+   the low-weight pill and replays a brief squash as it travels, so the circle
+   appears to morph rather than teleport. Easing matches the nav overlay so the
+   motion feels native to the site. */
+.theme-thumb {
+  position: absolute;
+  top: 0.125rem;
+  bottom: 0.125rem;
+  left: 0.125rem;
+  transition: transform 440ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+.theme-thumb-fill {
+  position: absolute;
+  inset: 0;
+  /* Nest the marker's corners just inside the track's squared radius so it reads
+     as part of the same family as the nav, not a pill grafted on. */
+  border-radius: 0.125rem;
+  /* Soft marker — readable against the lighter track but far less prominent
+     than a solid pill, so it never pulls focus from the page. */
+  background-color: rgb(255 255 255 / 0.18);
+}
+
+.theme-thumb-fill--morph {
+  animation: theme-thumb-morph 440ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes theme-thumb-morph {
+  0% {
+    transform: scaleX(1) scaleY(1);
+  }
+  40% {
+    transform: scaleX(1.28) scaleY(0.9);
+  }
+  100% {
+    transform: scaleX(1) scaleY(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-thumb {
+    transition: none;
+  }
+  .theme-thumb-fill--morph {
+    animation: none;
+  }
+}
+
 /* The homepage is a single fixed canvas that never scrolls. Lock overflow at
    all widths so the 100vw scene can't create a scrollbar (and so mobile 100dvh
    transitions don't leak a few px of scroll). overflow:hidden keeps <html> a

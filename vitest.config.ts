@@ -19,6 +19,9 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": resolve(__dirname, "./"),
+      // Mirror the tsconfig "#lib/*" -> "./lib/*" subpath so component tests can
+      // resolve imports like "#lib/utils/cn".
+      "#lib": resolve(__dirname, "./lib"),
     },
   },
 });
