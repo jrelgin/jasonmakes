@@ -71,9 +71,11 @@ body {
   /* Intro runs as a CSS animation so it plays on first paint—while the page is
      still loading—instead of waiting for React to hydrate before fading in. The
      panel surfaces from below the waterline: it rises blurred and desaturated
-     (as if underwater), crests just past its resting line like a swell, then
-     bobs into place with a damped settle. The 300ms delay holds it under. */
-  animation: daily-profile-surface 2000ms cubic-bezier(0.16, 0.84, 0.34, 1) 300ms
+     (as if underwater), crests its resting line like a swell, then rides a long,
+     low, slowly-damping roll—crossing the line several times so it's hard to
+     tell when it finally stills, like settling at sea. 300ms delay holds it
+     under first. */
+  animation: daily-profile-surface 3600ms cubic-bezier(0.16, 0.84, 0.34, 1) 300ms
     both;
   transition: width 640ms cubic-bezier(0.19, 1, 0.22, 1);
 }
@@ -86,22 +88,30 @@ body {
     /* buoyant rise toward the surface, decelerating as it crests */
     animation-timing-function: cubic-bezier(0.16, 0.84, 0.34, 1);
   }
-  45% {
+  33% {
     opacity: 1;
     filter: blur(0) saturate(1);
-    /* crest just above the resting line, like the top of a swell */
-    transform: translate3d(0, -9px, 0) scale(1.006);
-    /* sine ease for each leg of the bob so it reads like water, not a glide */
+    /* crest its resting line, like the top of a swell (scale has settled,
+       so the roll is pure vertical drift—no pulse, no bounce) */
+    transform: translate3d(0, -5px, 0);
+    /* sine ease on every leg so each crossing rolls like water, not a glide */
     animation-timing-function: cubic-bezier(0.37, 0, 0.63, 1);
   }
-  68% {
-    /* dip just past rest, the way a buoy dunks before settling */
-    transform: translate3d(0, 5px, 0);
+  49% {
+    transform: translate3d(0, 3px, 0);
     animation-timing-function: cubic-bezier(0.37, 0, 0.63, 1);
   }
-  86% {
-    /* smaller rebound above the line as the bob decays */
-    transform: translate3d(0, -2px, 0);
+  64% {
+    transform: translate3d(0, -1.8px, 0);
+    animation-timing-function: cubic-bezier(0.37, 0, 0.63, 1);
+  }
+  77% {
+    transform: translate3d(0, 1px, 0);
+    animation-timing-function: cubic-bezier(0.37, 0, 0.63, 1);
+  }
+  89% {
+    /* the last crossing is barely perceptible—the sea going still */
+    transform: translate3d(0, -0.5px, 0);
     animation-timing-function: cubic-bezier(0.37, 0, 0.63, 1);
   }
   to {
