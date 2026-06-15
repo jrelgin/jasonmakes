@@ -103,7 +103,7 @@ export default function ThemeControl({ value, onChange }: ThemeControlProps) {
               }
             }}
             className={cn(
-              "relative z-10 flex min-h-12 min-w-9 flex-1 cursor-pointer items-center justify-center rounded-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-white/40 sm:min-h-10 sm:min-w-10",
+              "relative z-10 flex min-h-12 min-w-12 flex-1 cursor-pointer items-center justify-center rounded-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-white/40 sm:min-h-10 sm:min-w-10",
               isSelected
                 ? "text-white/85"
                 : "text-white/40 hover:text-white/70",

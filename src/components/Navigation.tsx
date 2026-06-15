@@ -165,9 +165,7 @@ export default function Navigation() {
               );
             })}
           </ul>
-          <div className="hidden h-6 w-px bg-white/15 md:block" />
           <ThemeControl value={preference} onChange={handlePreferenceChange} />
-          <div className="h-6 w-px bg-white/15 md:hidden" />
           <button
             ref={menuButtonRef}
             type="button"
