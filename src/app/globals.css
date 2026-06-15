@@ -67,24 +67,24 @@ body {
   z-index: 40;
   width: min(30rem, calc(100vw - 2rem));
   color: var(--u-ink);
-  filter: blur(5px) saturate(0.92);
-  opacity: 0;
   pointer-events: none;
-  transform: translate3d(0, 26px, 0) scale(0.985);
-  transition: opacity 1900ms cubic-bezier(0.19, 1, 0.22, 1), filter 1900ms
-    cubic-bezier(0.19, 1, 0.22, 1), transform 1900ms
-    cubic-bezier(0.19, 1, 0.22, 1), width 640ms
-    cubic-bezier(0.19, 1, 0.22, 1);
+  /* Intro runs as a CSS animation so it plays on first paint—while the page is
+     still loading—instead of waiting for React to hydrate before fading in. */
+  animation: daily-profile-intro 1900ms cubic-bezier(0.19, 1, 0.22, 1) both;
+  transition: width 640ms cubic-bezier(0.19, 1, 0.22, 1);
 }
 
-.daily-profile-shell[data-ready="true"] {
-  filter: blur(0) saturate(1);
-  opacity: 1;
-  transform: none;
-}
-
-.daily-profile-shell[data-entered="true"] {
-  transition: filter 220ms ease, width 640ms cubic-bezier(0.19, 1, 0.22, 1);
+@keyframes daily-profile-intro {
+  from {
+    filter: blur(5px) saturate(0.92);
+    opacity: 0;
+    transform: translate3d(0, 26px, 0) scale(0.985);
+  }
+  to {
+    filter: blur(0) saturate(1);
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .daily-profile-shell[data-open="true"] {
@@ -735,6 +735,10 @@ body {
   .daily-profile-link,
   .daily-profile-read-card {
     transition: none;
+  }
+
+  .daily-profile-shell {
+    animation: none;
   }
 }
 
