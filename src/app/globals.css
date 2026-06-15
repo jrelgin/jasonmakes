@@ -784,7 +784,9 @@ body {
 .theme-thumb-fill {
   position: absolute;
   inset: 0;
-  border-radius: 9999px;
+  /* Nest the marker's corners just inside the track's squared radius so it reads
+     as part of the same family as the nav, not a pill grafted on. */
+  border-radius: 0.125rem;
   /* Soft marker — readable against the lighter track but far less prominent
      than a solid pill, so it never pulls focus from the page. */
   background-color: rgb(255 255 255 / 0.18);

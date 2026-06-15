@@ -140,11 +140,11 @@ export default function Navigation() {
             width={132}
             height={72}
             priority
-            className={cn("h-8 w-auto sm:h-10", shouldInvertLogo && "invert")}
+            className={cn("h-10 w-auto", shouldInvertLogo && "invert")}
           />
         </Link>
 
-        <div className="pointer-events-auto flex items-center rounded border border-white/15 bg-slate-950/95 p-1 text-[10px] font-semibold uppercase text-white shadow-xl backdrop-blur-sm sm:text-xs">
+        <div className="pointer-events-auto flex items-center gap-1 rounded border border-white/15 bg-slate-950/95 p-1 text-xs font-semibold uppercase text-white shadow-xl backdrop-blur-sm sm:text-sm">
           <ul className="hidden items-center md:flex">
             {NAVIGATION_ITEMS.map((item) => {
               const isActive = isNavItemActive(pathname, item);
@@ -153,7 +153,7 @@ export default function Navigation() {
                   <Link
                     href={item.href}
                     className={cn(
-                      "flex min-h-8 items-center rounded px-2 transition sm:min-h-9 sm:px-3",
+                      "flex min-h-10 items-center rounded px-3 transition",
                       isActive
                         ? "bg-white text-slate-950"
                         : "text-white/70 hover:bg-white/10 hover:text-white",
@@ -165,9 +165,9 @@ export default function Navigation() {
               );
             })}
           </ul>
-          <div className="mx-1 hidden h-5 w-px bg-white/15 md:block" />
+          <div className="hidden h-6 w-px bg-white/15 md:block" />
           <ThemeControl value={preference} onChange={handlePreferenceChange} />
-          <div className="mx-1 h-5 w-px bg-white/15 md:hidden" />
+          <div className="h-6 w-px bg-white/15 md:hidden" />
           <button
             ref={menuButtonRef}
             type="button"
@@ -175,7 +175,7 @@ export default function Navigation() {
             aria-expanded={menuOpen}
             aria-controls={menuId}
             onClick={() => setMenuOpen((open) => !open)}
-            className="flex min-h-11 cursor-pointer items-center justify-center rounded px-3 text-white/80 transition hover:bg-white/10 hover:text-white sm:min-h-9 md:hidden"
+            className="flex min-h-12 cursor-pointer items-center justify-center rounded px-3 text-sm text-white/80 transition hover:bg-white/10 hover:text-white sm:min-h-10 md:hidden"
           >
             {menuOpen ? "Close" : "Menu"}
           </button>
