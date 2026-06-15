@@ -70,20 +70,31 @@ body {
   pointer-events: none;
   /* Intro runs as a CSS animation so it plays on first paint—while the page is
      still loading—instead of waiting for React to hydrate before fading in. The
-     short delay holds the hidden state briefly before the reveal begins. */
-  animation: daily-profile-intro 1900ms cubic-bezier(0.19, 1, 0.22, 1) 300ms both;
+     panel surfaces from below the waterline: it rises blurred and desaturated
+     (as if underwater), crests just past its resting line like a swell, then
+     ebbs back down and settles. The 300ms delay holds it under before the rise. */
+  animation: daily-profile-surface 1500ms cubic-bezier(0.16, 0.84, 0.34, 1) 300ms
+    both;
   transition: width 640ms cubic-bezier(0.19, 1, 0.22, 1);
 }
 
-@keyframes daily-profile-intro {
+@keyframes daily-profile-surface {
   from {
-    filter: blur(5px) saturate(0.92);
     opacity: 0;
-    transform: translate3d(0, 26px, 0) scale(0.985);
+    filter: blur(6px) saturate(0.86);
+    transform: translate3d(0, 32px, 0) scale(0.98);
+    /* buoyant rise toward the surface, decelerating as it crests */
+    animation-timing-function: cubic-bezier(0.16, 0.84, 0.34, 1);
+  }
+  62% {
+    opacity: 1;
+    filter: blur(0) saturate(1);
+    /* crest just above the resting line */
+    transform: translate3d(0, -6px, 0) scale(1.005);
+    /* calm ebb back down to rest */
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   }
   to {
-    filter: blur(0) saturate(1);
-    opacity: 1;
     transform: none;
   }
 }
