@@ -215,6 +215,27 @@ function maxMaskOnRow(
   return max;
 }
 
+/**
+ * Exclusive upper loop bound guaranteed to include every physical pixel the
+ * mask can cover, clamped to the read buffer. Mask-contained passes write
+ * nothing outside [off, off + extent*dpr), so looping only up to here is
+ * lossless — the per-pixel maskAt/maskByteAt bounds check still rejects pixels.
+ *
+ * The `+ 1` is a floating-point guard: at fractional DPR, Math.ceil(extent*dpr)
+ * can land one short of the true edge column (e.g. dpr=1.07, where round-off
+ * makes a valid right-edge mask column map just under the ceil). The extra
+ * column/row is a harmless no-op (maskAt returns 0 there), so a superset is
+ * always safe and never drops a silhouette edge.
+ */
+function maskLoopEnd(
+  off: number,
+  extent: number,
+  dpr: number,
+  limit: number,
+): number {
+  return Math.min(limit, off + Math.ceil(extent * dpr) + 1);
+}
+
 // ---------------------------------------------------------------------------
 // Utility
 // ---------------------------------------------------------------------------
@@ -388,7 +409,14 @@ function applyHorizontalDisplacement(
   const MAX_SHIFT = Math.round(maxShift * dpr * burst);
   if (MAX_SHIFT === 0) return;
 
-  for (let y = 0; y < h; y++) {
+  // Mask bounding box. The full-row snapshot is kept (a shifted read can land
+  // anywhere on the row), but the write loop only needs the mask band.
+  const x0 = Math.max(0, offX);
+  const x1 = maskLoopEnd(offX, mw, dpr, w);
+  const y0 = Math.max(0, offY);
+  const y1 = maskLoopEnd(offY, mh, dpr, h);
+
+  for (let y = y0; y < y1; y++) {
     const rowMax = maxMaskOnRow(mask, mw, mh, y, dpr, offY);
     if (rowMax < 10) continue;
 
@@ -403,7 +431,7 @@ function applyHorizontalDisplacement(
     const rowStart = y * w * 4;
     rowBuf.set(data.subarray(rowStart, rowStart + w * 4));
 
-    for (let x = 0; x < w; x++) {
+    for (let x = x0; x < x1; x++) {
       const mv = maskAt(mask, mw, mh, x, y, dpr, offX, offY);
       if (mv < 0.04) continue;
 
@@ -436,7 +464,7 @@ function applyChannelSeparation(
   time: number,
   burst: number,
   maxOffset: number,
-  scratch: Uint8ClampedArray,
+  rowBuf: Uint8ClampedArray,
 ) {
   const MAX_OFFSET = Math.round(maxOffset * dpr * burst);
   if (MAX_OFFSET === 0) return;
@@ -444,22 +472,30 @@ function applyChannelSeparation(
   const rOff = Math.round(-MAX_OFFSET * pulse);
   const bOff = Math.round(MAX_OFFSET * pulse);
 
-  // Snapshot the current pixels into a reused scratch buffer so reads see the
-  // pre-separation state while we write `data` in place (no per-frame alloc).
-  const copy = scratch;
-  copy.set(data);
+  // The mask is nonzero only inside this bounding box; outside it mv === 0 and
+  // every write below is skipped, so restricting the loops here is lossless and
+  // avoids scanning the (often full-width) empty margins.
+  const x0 = Math.max(0, offX);
+  const x1 = maskLoopEnd(offX, mw, dpr, w);
+  const y0 = Math.max(0, offY);
+  const y1 = maskLoopEnd(offY, mh, dpr, h);
 
-  for (let y = 0; y < h; y++) {
-    for (let x = 0; x < w; x++) {
+  for (let y = y0; y < y1; y++) {
+    const rowStart = y * w * 4;
+    // Channel separation only reads pixels on the SAME row (rx, bx share y), so
+    // a per-row snapshot is exactly equivalent to a full-frame copy — taken
+    // before this row is written — but moves far fewer bytes.
+    rowBuf.set(data.subarray(rowStart, rowStart + w * 4));
+    for (let x = x0; x < x1; x++) {
       const mv = maskAt(mask, mw, mh, x, y, dpr, offX, offY);
       if (mv < 0.08) continue;
 
-      const di = (y * w + x) * 4;
+      const di = rowStart + x * 4;
       const rx = Math.max(0, Math.min(w - 1, x + Math.round(rOff * mv)));
-      data[di] = copy[(y * w + rx) * 4];
+      data[di] = rowBuf[rx * 4];
 
       const bx = Math.max(0, Math.min(w - 1, x + Math.round(bOff * mv)));
-      data[di + 2] = copy[(y * w + bx) * 4 + 2];
+      data[di + 2] = rowBuf[bx * 4 + 2];
     }
   }
 }
@@ -489,8 +525,14 @@ function applyAlienColors(
   const minMask = burst > 0.6 ? 0.15 : 0.3;
   const quantizedTime = Math.floor(time * 4);
 
-  for (let y = 0; y < h; y++) {
-    for (let x = 0; x < w; x++) {
+  // Mask bounding box — outside it mv === 0, so all writes are skipped anyway.
+  const x0 = Math.max(0, offX);
+  const x1 = maskLoopEnd(offX, mw, dpr, w);
+  const y0 = Math.max(0, offY);
+  const y1 = maskLoopEnd(offY, mh, dpr, h);
+
+  for (let y = y0; y < y1; y++) {
+    for (let x = x0; x < x1; x++) {
       const mv = maskAt(mask, mw, mh, x, y, dpr, offX, offY);
       if (mv < minMask) continue;
 
@@ -533,13 +575,19 @@ function applyScanLines(
   const darkFactor = intensity * burst;
   const brightFactor = intensity * 0.54 * burst;
 
-  for (let y = 0; y < h; y++) {
+  // Mask bounding box — outside it mv === 0, so all writes are skipped anyway.
+  const x0 = Math.max(0, offX);
+  const x1 = maskLoopEnd(offX, mw, dpr, w);
+  const y0 = Math.max(0, offY);
+  const y1 = maskLoopEnd(offY, mh, dpr, h);
+
+  for (let y = y0; y < y1; y++) {
     const scanPhase = (y + drift) % SCAN_PERIOD;
     const isDark = scanPhase === 0;
     const isBright = scanPhase === 1;
     if (!isDark && !isBright) continue;
 
-    for (let x = 0; x < w; x++) {
+    for (let x = x0; x < x1; x++) {
       const mv = maskAt(mask, mw, mh, x, y, dpr, offX, offY);
       if (mv < 0.05) continue;
 
@@ -670,8 +718,16 @@ function applyEdgeFringe(
   const EDGE_HI = 95;
   const darken = Math.round(100 * burst * intensity * 2);
 
-  for (let y = 1; y < h - 1; y++) {
-    for (let x = 1; x < w - 1; x++) {
+  // Mask bounding box intersected with the [1, w-1)/[1, h-1) interior this pass
+  // needs for its neighbour reads. Outside the mask, v === 0 < EDGE_LO, so the
+  // skipped pixels never wrote anything.
+  const x0 = Math.max(1, offX);
+  const x1 = Math.min(w - 1, maskLoopEnd(offX, mw, dpr, w));
+  const y0 = Math.max(1, offY);
+  const y1 = Math.min(h - 1, maskLoopEnd(offY, mh, dpr, h));
+
+  for (let y = y0; y < y1; y++) {
+    for (let x = x0; x < x1; x++) {
       const v = maskByteAt(mask, mw, mh, x, y, dpr, offX, offY);
       if (v < EDGE_LO || v > EDGE_HI) continue;
 
@@ -813,7 +869,7 @@ export function renderGlitchTentacles(
     time,
     burst,
     p.chromaticOffset,
-    scratch,
+    rowBuf,
   );
   applyAlienColors(
     data,
