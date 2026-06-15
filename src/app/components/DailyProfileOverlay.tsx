@@ -113,29 +113,38 @@ function MusicSignal({
 
   return (
     <section className="daily-profile-signal">
-      <div>
-        <p className="daily-profile-signal__label">Music</p>
-        <h3>Recently played</h3>
-      </div>
-      <div className="daily-profile-track">
-        <p className="daily-profile-signal__value">{track.title}</p>
-        <p className="daily-profile-signal__meta">by {track.artist}</p>
-        {track.trackUrl && (
-          <a
-            href={track.trackUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="daily-profile-link"
-          >
-            Listen on Spotify
-          </a>
+      <div className="daily-profile-music">
+        <div className="daily-profile-music__copy">
+          <div>
+            <p className="daily-profile-signal__label">Music</p>
+            <h3>Recently played</h3>
+          </div>
+          <div className="daily-profile-track">
+            <p className="daily-profile-signal__value">{track.title}</p>
+            <p className="daily-profile-signal__meta">by {track.artist}</p>
+            {track.trackUrl && (
+              <a
+                href={track.trackUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="daily-profile-link"
+              >
+                Listen on Spotify
+              </a>
+            )}
+          </div>
+          {spotify?.lastUpdated && (
+            <p className="daily-profile-updated">
+              Updated {formatUpdatedAt(spotify.lastUpdated)}
+            </p>
+          )}
+        </div>
+        {track.coverUrl && (
+          <span className="daily-profile-music__art" aria-hidden="true">
+            <img src={track.coverUrl} alt="" loading="lazy" />
+          </span>
         )}
       </div>
-      {spotify?.lastUpdated && (
-        <p className="daily-profile-updated">
-          Updated {formatUpdatedAt(spotify.lastUpdated)}
-        </p>
-      )}
     </section>
   );
 }
