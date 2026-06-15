@@ -311,7 +311,10 @@ body {
   overflow-y: auto;
   border-top-color: color-mix(in srgb, var(--u-panel-border) 78%, white 22%);
   opacity: 1;
-  padding-block: 1rem 1.2rem;
+  /* Bottom gap lives on the scrolled child (__inner) instead of here: a grid
+     scroll container's own padding-bottom is dropped at scroll-end in Chromium,
+     which made the last card touch the panel edge on desktop. */
+  padding-block: 1rem 0;
   pointer-events: auto;
   transform: none;
   transition-delay: 0ms, 80ms, 0ms, 0ms, 0ms;
@@ -324,6 +327,7 @@ body {
 
 .daily-profile-dialog[data-visible="true"] .daily-profile-dialog__inner {
   overflow: visible;
+  padding-bottom: 1.2rem;
 }
 
 .daily-profile-dialog__header {
