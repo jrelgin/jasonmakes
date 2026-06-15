@@ -327,7 +327,6 @@ body {
 
 .daily-profile-dialog[data-visible="true"] .daily-profile-dialog__inner {
   overflow: visible;
-  padding-bottom: 1.2rem;
 }
 
 .daily-profile-dialog__header {
@@ -354,6 +353,11 @@ body {
   margin-top: 1rem;
   display: grid;
   gap: 1rem;
+  /* The dialog is a grid scroll container; its own padding-bottom (and that of
+     the stretched __inner) is dropped at scroll-end. Put the bottom gap on the
+     actual overflowing content so it's included in the scrollable area and the
+     last card doesn't touch the panel edge on desktop. */
+  padding-bottom: 1.2rem;
 }
 
 .daily-profile-explainer {
