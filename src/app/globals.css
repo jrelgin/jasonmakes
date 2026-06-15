@@ -75,7 +75,7 @@ body {
      low, slowly-damping roll—crossing the line several times so it's hard to
      tell when it finally stills, like settling at sea. 300ms delay holds it
      under first. */
-  animation: daily-profile-surface 3600ms cubic-bezier(0.16, 0.84, 0.34, 1) 300ms
+  animation: daily-profile-surface 4000ms cubic-bezier(0.16, 0.84, 0.34, 1) 300ms
     both;
   transition: width 640ms cubic-bezier(0.19, 1, 0.22, 1);
 }
@@ -84,38 +84,42 @@ body {
   from {
     opacity: 0;
     filter: blur(6px) saturate(0.86);
-    transform: translate3d(0, 32px, 0) scale(0.98);
+    transform: translate3d(0, 32px, 0) scale(0.98) rotate(0deg);
     /* buoyant rise toward the surface, decelerating as it crests */
     animation-timing-function: cubic-bezier(0.16, 0.84, 0.34, 1);
   }
   33% {
     opacity: 1;
     filter: blur(0) saturate(1);
-    /* crest its resting line, like the top of a swell (scale has settled,
-       so the roll is pure vertical drift—no pulse, no bounce) */
-    transform: translate3d(0, -5px, 0);
+    /* crest its resting line, level and centered—the lateral roll only
+       begins once it's surfaced, so the entrance stays a clean vertical */
+    transform: translate3d(0, -5px, 0) scale(1) rotate(0deg);
     /* sine ease on every leg so each crossing rolls like water, not a glide */
     animation-timing-function: cubic-bezier(0.37, 0, 0.63, 1);
   }
+  /* Vertical bobs ~2.5 times; the horizontal drift swings just once (right,
+     then left) over the same span, so the two run out of phase and trace a
+     slow ellipse instead of a diagonal. The micro-roll leans into the drift,
+     like a hull listing, and everything decays to dead level by 100%. */
   49% {
-    transform: translate3d(0, 3px, 0);
+    transform: translate3d(2.2px, 3px, 0) scale(1) rotate(0.3deg);
     animation-timing-function: cubic-bezier(0.37, 0, 0.63, 1);
   }
   64% {
-    transform: translate3d(0, -1.8px, 0);
+    transform: translate3d(0.4px, -1.8px, 0) scale(1) rotate(0.05deg);
     animation-timing-function: cubic-bezier(0.37, 0, 0.63, 1);
   }
   77% {
-    transform: translate3d(0, 1px, 0);
+    transform: translate3d(-1.4px, 1px, 0) scale(1) rotate(-0.2deg);
     animation-timing-function: cubic-bezier(0.37, 0, 0.63, 1);
   }
   89% {
     /* the last crossing is barely perceptible—the sea going still */
-    transform: translate3d(0, -0.5px, 0);
+    transform: translate3d(-0.4px, -0.5px, 0) scale(1) rotate(-0.05deg);
     animation-timing-function: cubic-bezier(0.37, 0, 0.63, 1);
   }
   to {
-    transform: none;
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
   }
 }
 
