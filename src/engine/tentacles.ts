@@ -132,6 +132,8 @@ export function createGlitchState(
     blockSeed: 0,
     lastBlockUpdate: 0,
     params: createDefaultGlitchParams(),
+    scratch: null,
+    rowBuf: null,
   };
 }
 
@@ -328,12 +330,12 @@ function applyBleedTears(
   noise2D: Noise2D,
   burst: number,
   intensity: number,
+  rowBuf: Uint8ClampedArray,
 ) {
   if (intensity <= 0 || burst < 0.5) return;
 
   const tearIntensity = ((burst - 0.5) / 0.5) * intensity * 2;
   const MAX_TEAR_SHIFT = Math.round(100 * dpr);
-  const rowBuf = new Uint8ClampedArray(w * 4);
 
   for (let y = 0; y < h; y++) {
     const rowMax = maxMaskOnRow(mask, mw, mh, y, dpr, offY);
@@ -381,10 +383,10 @@ function applyHorizontalDisplacement(
   noise2D: Noise2D,
   burst: number,
   maxShift: number,
+  rowBuf: Uint8ClampedArray,
 ) {
   const MAX_SHIFT = Math.round(maxShift * dpr * burst);
   if (MAX_SHIFT === 0) return;
-  const rowBuf = new Uint8ClampedArray(w * 4);
 
   for (let y = 0; y < h; y++) {
     const rowMax = maxMaskOnRow(mask, mw, mh, y, dpr, offY);
@@ -434,6 +436,7 @@ function applyChannelSeparation(
   time: number,
   burst: number,
   maxOffset: number,
+  scratch: Uint8ClampedArray,
 ) {
   const MAX_OFFSET = Math.round(maxOffset * dpr * burst);
   if (MAX_OFFSET === 0) return;
@@ -441,7 +444,10 @@ function applyChannelSeparation(
   const rOff = Math.round(-MAX_OFFSET * pulse);
   const bOff = Math.round(MAX_OFFSET * pulse);
 
-  const copy = new Uint8ClampedArray(data);
+  // Snapshot the current pixels into a reused scratch buffer so reads see the
+  // pre-separation state while we write `data` in place (no per-frame alloc).
+  const copy = scratch;
+  copy.set(data);
 
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
@@ -563,10 +569,14 @@ function applyBlockCorruption(
   blockSeed: number,
   burst: number,
   maxBlocks: number,
+  scratch: Uint8ClampedArray,
 ) {
   const BLOCK_COUNT = Math.round(maxBlocks * burst);
   if (BLOCK_COUNT === 0) return;
-  const copy = new Uint8ClampedArray(data);
+  // Snapshot into the reused scratch buffer (no per-frame alloc). This runs
+  // after earlier effects, so it intentionally captures their output.
+  const copy = scratch;
+  copy.set(data);
 
   for (let i = 0; i < BLOCK_COUNT; i++) {
     const seed = blockSeed * 31 + i * 7919;
@@ -744,6 +754,20 @@ export function renderGlitchTentacles(
   const imageData = ctx.getImageData(readX, readY, readW, readH);
   const data = imageData.data;
 
+  // Reuse frame-to-frame scratch buffers instead of allocating per frame.
+  // `scratch` holds a full-buffer snapshot for channel-separation and block
+  // corruption; `rowBuf` holds a single row for the tear/displacement passes.
+  // Both grow only when the read region grows, so steady-state allocation is
+  // zero. A larger-than-needed buffer is fine: callers copy/read from index 0.
+  if (!state.scratch || state.scratch.length < data.length) {
+    state.scratch = new Uint8ClampedArray(data.length);
+  }
+  if (!state.rowBuf || state.rowBuf.length < readW * 4) {
+    state.rowBuf = new Uint8ClampedArray(readW * 4);
+  }
+  const scratch = state.scratch;
+  const rowBuf = state.rowBuf;
+
   applySkyStatic(data, readW, actualSkyExt, dpr, time, burst, p.skyStatic);
   applyBleedTears(
     data,
@@ -758,6 +782,7 @@ export function renderGlitchTentacles(
     noise2D,
     burst,
     p.bleedTears,
+    rowBuf,
   );
   applyHorizontalDisplacement(
     data,
@@ -773,6 +798,7 @@ export function renderGlitchTentacles(
     noise2D,
     burst,
     p.displacement,
+    rowBuf,
   );
   applyChannelSeparation(
     data,
@@ -787,6 +813,7 @@ export function renderGlitchTentacles(
     time,
     burst,
     p.chromaticOffset,
+    scratch,
   );
   applyAlienColors(
     data,
@@ -829,6 +856,7 @@ export function renderGlitchTentacles(
     state.blockSeed,
     burst,
     p.blockCount,
+    scratch,
   );
   applyEdgeFringe(
     data,

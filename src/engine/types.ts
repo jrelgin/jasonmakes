@@ -150,6 +150,15 @@ export interface TentacleGlitchState {
   blockSeed: number;
   lastBlockUpdate: number;
   params: GlitchParams;
+  /**
+   * Reusable per-frame scratch buffers. The glitch pass runs every frame and
+   * would otherwise allocate several megabyte-sized typed arrays per frame
+   * (two full-buffer snapshots + per-row buffers), churning the GC hard. These
+   * are allocated once and grown only when the read region grows. See
+   * `renderGlitchTentacles`.
+   */
+  scratch: Uint8ClampedArray | null;
+  rowBuf: Uint8ClampedArray | null;
 }
 
 export interface SeaPatternCacheRow {

@@ -243,7 +243,24 @@ export function SeascapeCanvas() {
 
     const nextWidth = Math.round(width * dpr);
     const nextHeight = Math.round(height * dpr);
-    if (canvas.width !== nextWidth || canvas.height !== nextHeight) {
+    const dimensionsChanged =
+      canvas.width !== nextWidth || canvas.height !== nextHeight;
+
+    // A resize event can fire without the rounded backing size or DPR actually
+    // changing (sub-pixel jitter, mobile address-bar show/hide, etc.). The
+    // scene is deterministic for a fixed seed, so a rebuild here would produce
+    // a byte-identical result — skip the wasted work. This is purely a no-op
+    // elimination: when anything real changes we fall through and rebuild at
+    // full resolution exactly as before.
+    if (
+      sceneRef.current &&
+      !dimensionsChanged &&
+      sceneRef.current.config.renderScale === dpr
+    ) {
+      return;
+    }
+
+    if (dimensionsChanged) {
       canvas.width = nextWidth;
       canvas.height = nextHeight;
     }
@@ -313,10 +330,15 @@ export function SeascapeCanvas() {
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
     loadTentaclesImage().then((img) => {
+      if (cancelled) return;
       tentaclesImgRef.current = img;
       attachTentacleGlitch();
     });
+    return () => {
+      cancelled = true;
+    };
   }, [attachTentacleGlitch]);
 
   useEffect(() => {
@@ -369,6 +391,10 @@ export function SeascapeCanvas() {
   useEffect(() => {
     initScene();
 
+    // Rebuild immediately on every real resize so the scene is always rendered
+    // at the canvas's native resolution (no transient scaling). initScene
+    // no-ops when the backing size and DPR are unchanged, so redundant resize
+    // events are cheap.
     const handleResize = () => {
       initScene();
     };
