@@ -47,13 +47,16 @@ const DPRS = [1, 1.07, 1.25, 1.5, 1.75, 2];
 
 // Pinned from the pristine committed code, per DPR. Set a value to -1 to print
 // and capture it. Any rendered-output change breaks the matching assertion.
+// Pinned from the current intended output (which now spreads bleed-tears /
+// block-corruption across alternating frames). Re-pin only when a visual change
+// is intended; an unexpected mismatch means an accidental change to the glitch.
 const GOLDEN: Record<string, number> = {
-  "1": 924407180,
-  "1.07": 2305640950,
-  "1.25": 3471708631,
-  "1.5": 3032205036,
-  "1.75": 3904315882,
-  "2": 2736679400,
+  "1": 944267281,
+  "1.07": 1042846591,
+  "1.25": 2042511563,
+  "1.5": 1005742698,
+  "1.75": 1688380554,
+  "2": 2003867736,
 };
 
 function buildMask(): Uint8Array {
@@ -80,6 +83,7 @@ function freshState(): TentacleGlitchState {
     blockSeed: 0,
     lastBlockUpdate: 0,
     params: TWILIGHT_GLITCH,
+    frameCount: 0,
     scratch: null,
     rowBuf: null,
   };

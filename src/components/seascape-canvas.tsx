@@ -30,7 +30,10 @@ import {
 const MAX_DAY_CANVAS_DPR = 2;
 const MAX_NIGHT_CANVAS_DPR = 2;
 const DAY_FRAME_INTERVAL = 1000 / 30;
-const NIGHT_FRAME_INTERVAL = 1000 / 20;
+// Night targets the same 30fps as day. It used to run at 20fps because the
+// per-frame glitch cost was too high; the heavy glitch passes are now spread
+// across frames (see renderGlitchTentacles) so night can hold day's cadence.
+const NIGHT_FRAME_INTERVAL = 1000 / 30;
 const IS_DEV = process.env.NODE_ENV === "development";
 
 const THEME_PALETTES: Record<ThemeKey, Palette> = {
@@ -427,10 +430,18 @@ export function SeascapeCanvas() {
       const ctx = ctxRef.current;
       if (!ctx) return;
 
-      const deltaTime = lastTimeRef.current
-        ? Math.min((timestamp - lastTimeRef.current) / 1000, 0.05)
-        : 0.016;
-      lastTimeRef.current = timestamp;
+      // Fixed timestep: advance the scene by exactly one frame interval so wave
+      // motion is even regardless of when each frame actually presents. If the
+      // device can't keep up, motion stays smooth but runs slightly slow rather
+      // than juddering.
+      const deltaTime = lastTimeRef.current ? frameInterval / 1000 : 0.016;
+      // Phase-correct toward the vsync grid instead of snapping to the (often
+      // late) actual time, so scheduling error self-cancels rather than drifting.
+      // The catch-up clamp keeps us from falling more than one interval behind
+      // after a hitch (no render spiral).
+      lastTimeRef.current = lastTimeRef.current
+        ? Math.max(timestamp - frameInterval, lastTimeRef.current + frameInterval)
+        : timestamp;
 
       updateScene(scene, deltaTime);
 

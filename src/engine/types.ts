@@ -151,6 +151,14 @@ export interface TentacleGlitchState {
   lastBlockUpdate: number;
   params: GlitchParams;
   /**
+   * Per-frame counter, incremented once per glitch render. Used to spread the
+   * two heaviest/jumpiest passes (bleed tears, block corruption) across
+   * alternating frames so each frame carries at most one of them — flattening
+   * per-frame cost so the waves stay smooth. Those two passes therefore update
+   * at half the frame rate; the rest run every frame.
+   */
+  frameCount: number;
+  /**
    * Reusable per-frame scratch buffers. The glitch pass runs every frame and
    * would otherwise allocate several megabyte-sized typed arrays per frame
    * (two full-buffer snapshots + per-row buffers), churning the GC hard. These

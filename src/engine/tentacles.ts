@@ -132,6 +132,7 @@ export function createGlitchState(
     blockSeed: 0,
     lastBlockUpdate: 0,
     params: createDefaultGlitchParams(),
+    frameCount: 0,
     scratch: null,
     rowBuf: null,
   };
@@ -824,22 +825,34 @@ export function renderGlitchTentacles(
   const scratch = state.scratch;
   const rowBuf = state.rowBuf;
 
+  // Spread the two heaviest, most variable passes (bleed tears + block
+  // corruption) across alternating frames so each frame carries at most one.
+  // This flattens per-frame cost — the actual cure for the wave stutter. Both
+  // effects are already chaotic, so updating each at half the frame rate reads
+  // as part of the glitch. Sky static and the cheap mask-local passes run every
+  // frame, so the silhouette never fully "calms".
+  state.frameCount += 1;
+  const runBleedTears = state.frameCount % 2 === 0;
+  const runBlockCorruption = !runBleedTears;
+
   applySkyStatic(data, readW, actualSkyExt, dpr, time, burst, p.skyStatic);
-  applyBleedTears(
-    data,
-    readW,
-    readH,
-    mask,
-    maskWidth,
-    maskHeight,
-    dpr,
-    offY,
-    time,
-    noise2D,
-    burst,
-    p.bleedTears,
-    rowBuf,
-  );
+  if (runBleedTears) {
+    applyBleedTears(
+      data,
+      readW,
+      readH,
+      mask,
+      maskWidth,
+      maskHeight,
+      dpr,
+      offY,
+      time,
+      noise2D,
+      burst,
+      p.bleedTears,
+      rowBuf,
+    );
+  }
   applyHorizontalDisplacement(
     data,
     readW,
@@ -899,21 +912,23 @@ export function renderGlitchTentacles(
     burst,
     p.scanLines,
   );
-  applyBlockCorruption(
-    data,
-    readW,
-    readH,
-    mask,
-    maskWidth,
-    maskHeight,
-    dpr,
-    offX,
-    offY,
-    state.blockSeed,
-    burst,
-    p.blockCount,
-    scratch,
-  );
+  if (runBlockCorruption) {
+    applyBlockCorruption(
+      data,
+      readW,
+      readH,
+      mask,
+      maskWidth,
+      maskHeight,
+      dpr,
+      offX,
+      offY,
+      state.blockSeed,
+      burst,
+      p.blockCount,
+      scratch,
+    );
+  }
   applyEdgeFringe(
     data,
     readW,
