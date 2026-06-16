@@ -34,6 +34,13 @@
   }
 }
 
+/* Reserve the vertical scrollbar gutter on every page so the content-box width
+   (and the fixed nav) stays put when navigating between scrollable and
+   non-scrollable routes. */
+html {
+  scrollbar-gutter: stable;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
@@ -44,14 +51,832 @@ body {
   position: fixed;
   inset: 0;
   z-index: 0;
+  /* Span the FULL viewport width, including the reserved scrollbar gutter, so
+     no empty gutter strip shows on the right of the (non-scrolling) homepage.
+     The overflow lock below clips the gutter-width overhang so 100vw can't
+     create a horizontal scrollbar. */
   width: 100vw;
-  height: 100vh;
   overflow: hidden;
   background: #12203a;
 }
 
+.daily-profile-shell {
+  position: fixed;
+  right: clamp(1rem, 3vw, 2.5rem);
+  bottom: max(clamp(1rem, 4vh, 2.25rem), env(safe-area-inset-bottom));
+  z-index: 40;
+  width: min(30rem, calc(100vw - 2rem));
+  color: var(--u-ink);
+  filter: blur(5px) saturate(0.92);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(0, 26px, 0) scale(0.985);
+  transition: opacity 1900ms cubic-bezier(0.19, 1, 0.22, 1), filter 1900ms
+    cubic-bezier(0.19, 1, 0.22, 1), transform 1900ms
+    cubic-bezier(0.19, 1, 0.22, 1), width 640ms
+    cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.daily-profile-shell[data-ready="true"] {
+  filter: blur(0) saturate(1);
+  opacity: 1;
+  transform: none;
+}
+
+.daily-profile-shell[data-entered="true"] {
+  transition: filter 220ms ease, width 640ms cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.daily-profile-shell[data-open="true"] {
+  z-index: 70;
+  width: min(52rem, calc(100vw - 3rem));
+}
+
+.daily-profile-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  border: 0;
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  cursor: default;
+  padding: 0;
+  pointer-events: auto;
+}
+
+.daily-profile-panel {
+  position: relative;
+  width: 100%;
+  max-height: min(22rem, calc(100dvh - 7.5rem));
+  overflow: hidden;
+  isolation: isolate;
+  pointer-events: auto;
+  border: 1px solid color-mix(in srgb, var(--u-panel-border) 48%, transparent);
+  border-radius: 8px;
+  background: linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--u-panel) 58%, transparent) 0%,
+      color-mix(in srgb, var(--u-panel) 44%, transparent) 52%,
+      color-mix(in srgb, var(--u-bg-1) 30%, transparent) 100%
+    ), color-mix(in srgb, white 18%, transparent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.46), inset 0 -28px 42px -36px
+    color-mix(in srgb, var(--u-accent) 34%, black), 0 26px 80px -42px
+    rgba(0, 0, 0, 0.62);
+  -webkit-backdrop-filter: blur(9px) saturate(1.08);
+  backdrop-filter: blur(9px) saturate(1.08);
+  transition: max-height 640ms cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+:root[data-theme="hokusai"] .daily-profile-panel {
+  border-color: color-mix(in srgb, var(--u-panel-border) 92%, transparent);
+  background: linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--u-panel) 100%, transparent) 0%,
+      color-mix(in srgb, var(--u-panel) 100%, transparent) 52%,
+      color-mix(in srgb, var(--u-bg-1) 94%, transparent) 100%
+    ), color-mix(in srgb, white 62%, transparent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.48), inset 0 -30px 54px -36px
+    color-mix(in srgb, var(--u-accent) 35%, black), 0 30px 96px -42px
+    rgba(0, 0, 0, 0.66);
+}
+
+.daily-profile-panel[data-open="true"] {
+  max-height: calc(100dvh - 8rem);
+}
+
+.daily-profile-panel::before {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background: repeating-linear-gradient(
+      112deg,
+      transparent 0 18px,
+      color-mix(in srgb, var(--u-wave-line) 20%, transparent) 18px 19px,
+      transparent 19px 32px
+    ),
+    linear-gradient(
+      105deg,
+      rgba(255, 255, 255, 0.18),
+      transparent 28%,
+      rgba(255, 255, 255, 0.07) 62%,
+      transparent
+    );
+  mix-blend-mode: soft-light;
+  opacity: 0.58;
+  pointer-events: none;
+}
+
+.daily-profile-panel::after {
+  position: absolute;
+  inset: 1px;
+  content: "";
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 7px;
+  pointer-events: none;
+}
+
+.daily-profile-glass-line {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    color-mix(in srgb, var(--u-accent) 56%, white),
+    transparent
+  );
+  opacity: 0.74;
+  pointer-events: none;
+}
+
+.daily-profile-blurb {
+  position: relative;
+  z-index: 1;
+  padding: clamp(1rem, 0.8rem + 1vw, 1.45rem)
+    clamp(1.1rem, 0.9rem + 1vw, 1.65rem) 0.8rem;
+}
+
+.daily-profile-blurb blockquote {
+  font-family: var(--font-instrument-serif), serif;
+  font-size: clamp(1.32rem, 1.06rem + 0.9vw, 1.9rem);
+  font-style: italic;
+  line-height: 1.18;
+  color: var(--u-ink-strong);
+  text-wrap: balance;
+}
+
+.daily-profile-actions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 clamp(1.1rem, 0.9rem + 1vw, 1.65rem)
+    clamp(0.9rem, 0.8rem + 0.5vw, 1.15rem);
+}
+
+.daily-profile-close {
+  display: inline-flex;
+  min-height: 2.25rem;
+  align-items: center;
+  border: 1px solid color-mix(in srgb, var(--u-panel-border) 82%, white 18%);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--u-bg-1) 58%, transparent);
+  color: var(--u-ink-strong);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1;
+  text-transform: uppercase;
+  transition: border-color 180ms ease, background-color 180ms ease, color 180ms
+    ease, transform 180ms ease;
+}
+
+.daily-profile-trigger {
+  display: inline-flex;
+  align-items: center;
+  border: 0;
+  background: transparent;
+  color: var(--u-ink-strong);
+  cursor: pointer;
+  font-family: var(--font-instrument-serif), serif;
+  font-size: 1rem;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.2;
+  padding: 0.2rem 0 0.18rem;
+  text-align: right;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--u-accent) 48%, transparent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.23em;
+  transition: color 180ms ease, text-decoration-color 180ms ease;
+}
+
+.daily-profile-close:hover {
+  border-color: color-mix(in srgb, var(--u-accent) 54%, var(--u-panel-border));
+  background: color-mix(in srgb, var(--u-bg-1) 76%, transparent);
+  color: var(--u-accent-strong);
+}
+
+.daily-profile-trigger:hover {
+  color: var(--u-accent-strong);
+  text-decoration-color: color-mix(in srgb, var(--u-accent) 82%, white);
+}
+
+.daily-profile-trigger:disabled {
+  cursor: default;
+  opacity: 0;
+}
+
+.daily-profile-trigger:focus-visible,
+.daily-profile-close:focus-visible,
+.daily-profile-link:focus-visible,
+.daily-profile-reads a:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--u-accent) 82%, white);
+  outline-offset: 3px;
+}
+
+.daily-profile-dialog {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-rows: 0fr;
+  width: 100%;
+  max-width: none;
+  max-height: calc(100dvh - 20rem);
+  margin: 0;
+  overflow: hidden;
+  border-right: 0;
+  border-bottom: 0;
+  border-left: 0;
+  background: transparent;
+  color: inherit;
+  border-top: 1px solid transparent;
+  opacity: 0;
+  padding: 0 clamp(1rem, 0.8rem + 1vw, 1.55rem);
+  pointer-events: none;
+  transform: translate3d(0, 0.45rem, 0);
+  transition: grid-template-rows 640ms cubic-bezier(0.19, 1, 0.22, 1),
+    opacity 260ms ease, padding 640ms cubic-bezier(0.19, 1, 0.22, 1),
+    transform 640ms cubic-bezier(0.19, 1, 0.22, 1),
+    border-color 320ms ease;
+}
+
+.daily-profile-dialog[data-visible="true"] {
+  grid-template-rows: 1fr;
+  overflow-y: auto;
+  border-top-color: color-mix(in srgb, var(--u-panel-border) 78%, white 22%);
+  opacity: 1;
+  /* Bottom gap lives on the scrolled child (__inner) instead of here: a grid
+     scroll container's own padding-bottom is dropped at scroll-end in Chromium,
+     which made the last card touch the panel edge on desktop. */
+  padding-block: 1rem 0;
+  pointer-events: auto;
+  transform: none;
+  transition-delay: 0ms, 80ms, 0ms, 0ms, 0ms;
+}
+
+.daily-profile-dialog__inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.daily-profile-dialog[data-visible="true"] .daily-profile-dialog__inner {
+  overflow: visible;
+}
+
+.daily-profile-dialog__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.daily-profile-dialog__header h2 {
+  font-family: var(--font-gloock), serif;
+  font-size: clamp(1.7rem, 1.25rem + 1.3vw, 2.35rem);
+  font-weight: 400;
+  line-height: 1;
+  color: var(--u-ink-strong);
+}
+
+.daily-profile-close {
+  flex: none;
+  padding: 0 0.8rem;
+}
+
+.daily-profile-dialog__body {
+  margin-top: 1rem;
+  display: grid;
+  gap: 1rem;
+  /* The dialog is a grid scroll container; its own padding-bottom (and that of
+     the stretched __inner) is dropped at scroll-end. Put the bottom gap on the
+     actual overflowing content so it's included in the scrollable area and the
+     last card doesn't touch the panel edge on desktop. */
+  padding-bottom: 1.2rem;
+}
+
+.daily-profile-explainer {
+  max-width: 38rem;
+  color: var(--u-ink);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.daily-profile-signal-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.daily-profile-signal,
+.daily-profile-reads {
+  border: 1px solid color-mix(in srgb, var(--u-panel-border) 58%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--u-bg-1) 24%, transparent);
+  padding: 0.95rem;
+}
+
+:root[data-theme="hokusai"] .daily-profile-signal,
+:root[data-theme="hokusai"] .daily-profile-reads {
+  border-color: color-mix(in srgb, var(--u-panel-border) 94%, transparent);
+  background: color-mix(in srgb, var(--u-bg-1) 95%, transparent);
+}
+
+.daily-profile-signal__label {
+  margin-bottom: 0.35rem;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  color: var(--u-accent);
+}
+
+.daily-profile-signal h3,
+.daily-profile-reads h3 {
+  font-family: var(--font-instrument-serif), serif;
+  font-size: 1.35rem;
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.05;
+  color: var(--u-ink-strong);
+}
+
+.daily-profile-weather,
+.daily-profile-track {
+  margin-top: 0.8rem;
+}
+
+.daily-profile-weather {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.daily-profile-music {
+  display: flex;
+  gap: clamp(0.85rem, 3%, 1.4rem);
+  align-items: flex-start;
+}
+
+/* Left column sizes to fill remaining space but never shrinks below the
+   widest fixed line ("UPDATED MON 00, 00:00 PM EDT") so that copy never wraps;
+   the album art takes the rest and gives way first when space is tight. */
+.daily-profile-music__copy {
+  flex: 1 1 0;
+  min-width: min(100%, 11.75rem);
+}
+
+.daily-profile-music__art {
+  flex: 0 1 auto;
+  align-self: flex-start;
+  width: 46%;
+  max-width: 12rem;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--u-panel-border) 42%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--u-bg-0) 58%, var(--u-bg-1));
+}
+
+.daily-profile-music__art img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(0.88) contrast(0.96);
+}
+
+.daily-profile-weather__mark {
+  display: inline-flex;
+  min-width: 2.25rem;
+  min-height: 2.25rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid color-mix(in srgb, var(--u-accent) 26%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--u-accent) 12%, transparent);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--u-accent-strong);
+}
+
+.daily-profile-signal__value {
+  color: var(--u-ink-strong);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.daily-profile-signal__meta {
+  margin-top: 0.2rem;
+  color: var(--u-ink-muted);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.daily-profile-facts {
+  margin-top: 0.9rem;
+  display: grid;
+  gap: 0.35rem;
+  color: var(--u-ink);
+  font-size: 0.86rem;
+}
+
+.daily-profile-facts div {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.daily-profile-facts dt {
+  color: var(--u-ink-muted);
+}
+
+.daily-profile-facts dd {
+  color: var(--u-ink-strong);
+  font-weight: 700;
+  text-align: right;
+}
+
+.daily-profile-updated {
+  margin-top: 0.85rem;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  color: var(--u-ink-muted);
+}
+
+.daily-profile-link {
+  margin-top: 0.55rem;
+  display: inline-flex;
+  color: var(--u-accent);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  transition: color 180ms ease;
+}
+
+.daily-profile-link:hover {
+  color: var(--u-accent-strong);
+}
+
+.daily-profile-section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.daily-profile-section-heading .daily-profile-updated {
+  margin-top: 0;
+  text-align: right;
+}
+
+.daily-profile-reads ul {
+  margin-top: 0.85rem;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.daily-profile-read-card {
+  display: grid;
+  grid-template-columns: minmax(0, 5.5rem) minmax(0, 1fr);
+  align-items: stretch;
+  column-gap: 1rem;
+  row-gap: 0.4rem;
+  border-top: 1px solid
+    color-mix(in srgb, var(--u-panel-border) 48%, transparent);
+  padding-top: 0.7rem;
+  color: var(--u-ink-strong);
+  line-height: 1.35;
+  text-decoration: none;
+  transition: color 180ms ease;
+}
+
+.daily-profile-reads li:first-child .daily-profile-read-card {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.daily-profile-read-card:hover {
+  color: var(--u-accent-strong);
+}
+
+.daily-profile-read-thumb {
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 3;
+  width: 100%;
+  max-width: 5.5rem;
+  min-width: 0;
+  min-height: 4.25rem;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--u-panel-border) 42%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--u-bg-0) 58%, var(--u-bg-1));
+}
+
+.daily-profile-read-thumb img,
+.daily-profile-read-thumb__fallback {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.daily-profile-read-thumb img {
+  object-fit: cover;
+  filter: saturate(0.88) contrast(0.96);
+}
+
+.daily-profile-read-thumb__fallback {
+  position: relative;
+  background: radial-gradient(
+      circle,
+      color-mix(in srgb, var(--u-accent) 44%, transparent) 0 2px,
+      transparent 2.4px
+    ),
+    repeating-linear-gradient(
+      135deg,
+      transparent 0 9px,
+      color-mix(in srgb, var(--u-wave-line) 28%, transparent) 9px 10px
+    ),
+    linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--u-bg-0) 62%, transparent),
+      color-mix(in srgb, var(--u-accent) 16%, var(--u-bg-1))
+    );
+  background-position: 0 0, 0 0, 0 0;
+  background-size: 13px 13px, auto, auto;
+}
+
+.daily-profile-read-thumb__fallback::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0 14px,
+    rgba(255, 255, 255, 0.14) 14px 15px,
+    transparent 15px 28px
+  );
+  mix-blend-mode: soft-light;
+}
+
+.daily-profile-read-thumb__fallback[data-pattern="1"] {
+  background-position: 4px 2px, 0 0, 0 0;
+  background-size: 11px 11px, auto, auto;
+}
+
+.daily-profile-read-thumb__fallback[data-pattern="2"] {
+  background-position: 3px 5px, 0 0, 0 0;
+  background-size: 15px 15px, auto, auto;
+}
+
+.daily-profile-read-thumb__fallback[data-pattern="3"] {
+  background-position: 7px 1px, 0 0, 0 0;
+  background-size: 12px 12px, auto, auto;
+}
+
+.daily-profile-read-thumb__fallback[data-pattern="4"] {
+  background-position: 2px 6px, 0 0, 0 0;
+  background-size: 16px 16px, auto, auto;
+}
+
+.daily-profile-read-copy {
+  display: grid;
+  align-content: center;
+  gap: 0.22rem;
+  min-width: 0;
+}
+
+.daily-profile-read-title {
+  color: inherit;
+  font-weight: 700;
+}
+
+.daily-profile-read-excerpt {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--u-ink);
+  font-size: 0.88rem;
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.daily-profile-reads small {
+  color: var(--u-ink-muted);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+@media (max-width: 767px) {
+  .daily-profile-shell {
+    right: 1rem;
+    bottom: max(1rem, env(safe-area-inset-bottom));
+    left: 1rem;
+    width: auto;
+  }
+
+  .daily-profile-shell[data-open="true"] {
+    width: auto;
+  }
+
+  .daily-profile-panel,
+  .daily-profile-panel[data-open="true"] {
+    width: 100%;
+  }
+
+  .daily-profile-panel {
+    max-height: min(15rem, calc(100dvh - 7.25rem));
+  }
+
+  .daily-profile-panel[data-open="true"] {
+    max-height: calc(100dvh - 7.25rem);
+    max-height: calc(100svh - 7.25rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scroll-padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .daily-profile-blurb blockquote {
+    font-size: clamp(1.18rem, 1rem + 2vw, 1.5rem);
+  }
+
+  .daily-profile-actions {
+    justify-content: flex-end;
+  }
+
+  .daily-profile-trigger {
+    justify-content: flex-end;
+  }
+
+  .daily-profile-dialog {
+    max-height: none;
+  }
+
+  .daily-profile-dialog[data-visible="true"] {
+    overflow: visible;
+    padding-bottom: calc(1.6rem + env(safe-area-inset-bottom));
+  }
+
+  .daily-profile-dialog__header {
+    align-items: flex-start;
+  }
+
+  .daily-profile-signal-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .daily-profile-section-heading,
+  .daily-profile-read-card {
+    display: grid;
+    gap: 0.4rem;
+  }
+
+  .daily-profile-read-card {
+    grid-template-columns: minmax(0, 4.75rem) minmax(0, 1fr);
+    column-gap: 0.85rem;
+  }
+
+  .daily-profile-read-thumb {
+    max-width: 4.75rem;
+    min-height: 4rem;
+  }
+
+  .daily-profile-section-heading .daily-profile-updated {
+    text-align: left;
+  }
+
+  .daily-profile-reads small {
+    white-space: normal;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .daily-profile-shell,
+  .daily-profile-dialog,
+  .daily-profile-panel,
+  .daily-profile-trigger,
+  .daily-profile-close,
+  .daily-profile-link,
+  .daily-profile-read-card {
+    transition: none;
+  }
+}
+
+/* Mobile full-screen nav overlay. Stays mounted so the close animation can run
+   and aria-controls always resolves; visibility is delayed until the fade-out
+   finishes so links aren't focusable while hidden. Uses the same ease-out-expo
+   curve as the daily-profile overlay so it feels native to the site. */
+.mobile-nav-overlay {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-8px);
+  transition: opacity 260ms cubic-bezier(0.19, 1, 0.22, 1),
+    transform 260ms cubic-bezier(0.19, 1, 0.22, 1),
+    visibility 0s linear 260ms;
+}
+
+.mobile-nav-overlay[data-open="true"] {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+  transition: opacity 260ms cubic-bezier(0.19, 1, 0.22, 1),
+    transform 260ms cubic-bezier(0.19, 1, 0.22, 1), visibility 0s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobile-nav-overlay {
+    transition: visibility 0s linear 0ms;
+  }
+}
+
+/* Theme control: a single soft marker that glides between the three segments.
+   The outer .theme-thumb handles the slide; the inner .theme-thumb-fill carries
+   the low-weight pill and replays a brief squash as it travels, so the circle
+   appears to morph rather than teleport. Easing matches the nav overlay so the
+   motion feels native to the site. */
+.theme-thumb {
+  position: absolute;
+  top: 0.125rem;
+  bottom: 0.125rem;
+  left: 0.125rem;
+  transition: transform 440ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+.theme-thumb-fill {
+  position: absolute;
+  inset: 0;
+  /* Nest the marker's corners just inside the track's squared radius so it reads
+     as part of the same family as the nav, not a pill grafted on. */
+  border-radius: 0.125rem;
+  /* Soft marker — readable against the lighter track but far less prominent
+     than a solid pill, so it never pulls focus from the page. */
+  background-color: rgb(255 255 255 / 0.18);
+}
+
+.theme-thumb-fill--morph {
+  animation: theme-thumb-morph 440ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes theme-thumb-morph {
+  0% {
+    transform: scaleX(1) scaleY(1);
+  }
+  40% {
+    transform: scaleX(1.28) scaleY(0.9);
+  }
+  100% {
+    transform: scaleX(1) scaleY(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-thumb {
+    transition: none;
+  }
+  .theme-thumb-fill--morph {
+    animation: none;
+  }
+}
+
+/* The homepage is a single fixed canvas that never scrolls. Lock overflow at
+   all widths so the 100vw scene can't create a scrollbar (and so mobile 100dvh
+   transitions don't leak a few px of scroll). overflow:hidden keeps <html> a
+   scroll container, so scrollbar-gutter:stable still reserves the gutter and
+   the nav stays aligned with inner pages. Inner pages (no .home-seascape) are
+   unaffected. */
+html:has(.home-seascape),
+html:has(.home-seascape) body {
+  overflow: hidden;
+}
+
 /* Apply Apoc font to all heading elements */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-apoc), serif;
 }
 

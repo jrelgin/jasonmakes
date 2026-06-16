@@ -1,8 +1,3 @@
-import AboutBlurb from "@/app/components/AboutBlurb";
-import FeedlyArticlesWidget from "@/app/components/FeedlyArticlesWidget";
-import SpotifyWidget from "@/app/components/SpotifyWidget";
-import WeatherWidget from "@/app/components/WeatherWidget";
-import Disclosure from "@/components/Disclosure";
 import DriftingWave from "@/components/DriftingWave";
 import PageShell from "@/components/PageShell";
 
@@ -12,16 +7,9 @@ export const metadata = {
     "About Jason Elgin, product leader and designer building tools for education, analytics, and creative work.",
 };
 
-// The KV-backed Daily Profile widgets below are the only live data on this
-// page. Revalidate hourly so they stay fresh even between cron runs; the cron
-// job also calls revalidatePath('/about') right after each profile update.
-export const revalidate = 3600;
-
 const elsewhere = [
   { label: "GitHub", href: "https://github.com/jrelgin" },
-  { label: "Email", href: "mailto:jason@signallantern.com" },
-  { label: "Signal Lantern", href: "https://signallantern.com" },
-  { label: "FullStory", href: "https://fullstory.com" },
+  { label: "LinkedIn", href: "https://www.linkedin.com/in/jrelgin" },
 ];
 
 export default function AboutPage() {
@@ -49,11 +37,11 @@ export default function AboutPage() {
               people fast, and being honest about whether it actually helped.
             </p>
             <p>
-              The craft underneath still matters to me: heuristic evaluation,
-              information architecture, design systems, the quiet scaffolding
-              that makes the next decision easier. Good work doesn't erase
-              complexity so much as organize it, so the people I build for can
-              make confident choices.
+              The craft underneath still matters to me a lot. Heuristic
+              evaluation, information architecture, design systems, the quiet
+              scaffolding that makes the next decision easier. Good work doesn't
+              erase complexity so much as organize it, so the people I build for
+              can make confident choices.
             </p>
             <p>
               That's the work at Standard Education, where we turn K-12
@@ -68,8 +56,7 @@ export default function AboutPage() {
               >
                 FullStory
               </a>
-              , rebuilt the survey-export experience at Glass for research teams
-              at brands like Unilever and Clorox, and shaped product strategy at{" "}
+              , ran{" "}
               <a
                 href="https://signallantern.com"
                 target="_blank"
@@ -77,8 +64,10 @@ export default function AboutPage() {
                 className="text-[var(--u-accent)] underline decoration-1 underline-offset-4 transition-colors hover:text-[var(--u-accent-strong)]"
               >
                 Signal Lantern
-              </a>
-              .
+              </a>{" "}
+              where I rebuilt the survey-export experience at Glass for research
+              teams at brands like Unilever and Clorox, and led a development
+              team and facilitated Design Sprints at Three Five Two.
             </p>
             <p className="font-[family-name:var(--font-instrument-serif)] text-xl italic text-[var(--u-ink-strong)]">
               This site is a small experiment in that idea: a calm surface over
@@ -100,35 +89,6 @@ export default function AboutPage() {
               </li>
             ))}
           </ul>
-
-          <h2 className="u-title mt-16 text-4xl md:text-5xl">Right now</h2>
-
-          <div className="u-rise u-rise-1 mt-8">
-            <AboutBlurb />
-          </div>
-
-          <Disclosure
-            className="u-rise u-rise-1 mt-3"
-            label="Wait, what is this?"
-            align="right"
-          >
-            <p>
-              This part runs on its own. The weather over Atlanta, the last
-              track I played, and what I'm reading all update through the day.
-              The short dispatch up top is written each morning by AI from those
-              same signals, which is why it talks about me in the third person.
-              It's the moving water from the line above, made literal.
-            </p>
-          </Disclosure>
-
-          <div className="u-rise u-rise-2 mt-8 grid gap-6 md:grid-cols-2">
-            <WeatherWidget />
-            <SpotifyWidget />
-          </div>
-
-          <div className="u-rise u-rise-2 mt-6">
-            <FeedlyArticlesWidget />
-          </div>
         </div>
       </section>
 

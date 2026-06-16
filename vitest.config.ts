@@ -6,7 +6,7 @@ import { defineConfig } from "vitest/config";
 // Configuration for Vitest with Vite 4.x
 export default defineConfig({
   // For Vite 4.x, the plugins are defined as an array
-  plugins: [react()],
+  plugins: [react({ fastRefresh: false })],
   css: {
     postcss: {
       plugins: [],
@@ -19,6 +19,9 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": resolve(__dirname, "./"),
+      // Mirror the tsconfig "#lib/*" -> "./lib/*" subpath so component tests can
+      // resolve imports like "#lib/utils/cn".
+      "#lib": resolve(__dirname, "./lib"),
     },
   },
 });

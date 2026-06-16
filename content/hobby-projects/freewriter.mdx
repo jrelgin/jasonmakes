@@ -1,0 +1,39 @@
+---
+title: "Freewriter"
+slug: freewriter
+excerpt: "An Obsidian plugin that turns the editor into a focused writing surface with hidden chrome, centered text, and typewriter scrolling."
+publishDate: 2026-06-13
+projectType: "Obsidian plugin"
+status: "Usable"
+builtWith:
+  - Obsidian API
+  - CodeMirror 6
+  - TypeScript
+  - esbuild
+highlights:
+  - "Creates a distraction-free writing mode inside an existing Obsidian vault."
+  - "Uses CodeMirror compartments so focus features can be toggled cleanly."
+  - "Supports typewriter scrolling, focus highlighting, custom width, and typography controls."
+sortOrder: 5
+tags:
+  - Obsidian
+  - Writing
+  - TypeScript
+  - Notes
+---
+
+## Why I Built It
+
+Freewriter exists because sometimes Obsidian is the right place to write, but the full Obsidian interface is not the right surface for writing.
+
+The goal is to keep the benefits of a real vault while making the act of drafting feel closer to a dedicated writing app: less chrome, less visual noise, a centered column, and the current line staying in a comfortable position.
+
+## How It Works
+
+The plugin is built with TypeScript against the Obsidian API and CodeMirror 6. It registers Freewrite mode as a command and uses CodeMirror compartments to turn editor behavior on and off without rebuilding the editor.
+
+The implementation separates the core mode controller from smaller pieces for typewriter scrolling, focus highlighting, cursor behavior, platform checks, settings, and the status indicator. CSS variables carry the user-facing typography and layout settings into the editor surface.
+
+## What I Like About It
+
+This is the kind of small personal tool that earns its keep by removing friction. It does not need to be a platform. It just makes one repeated activity feel better.

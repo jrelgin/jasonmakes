@@ -1,0 +1,40 @@
+---
+title: "PixooTimer"
+slug: pixoo-timer
+excerpt: "A macOS menu bar timer that renders a visual countdown on a Divoom Pixoo 64 LED display."
+publishDate: 2026-06-13
+projectType: "Mac utility"
+status: "Usable"
+builtWith:
+  - Swift
+  - SwiftUI
+  - macOS menu bar APIs
+  - Pixoo 64 local HTTP API
+highlights:
+  - "Turns a small LED panel into a glanceable Time Timer-style countdown."
+  - "Falls back to a floating Mac window when the Pixoo display is unavailable."
+  - "Saves and restores the Pixoo channel after sending rendered timer frames."
+repoUrl: "https://github.com/jrelgin/PixooTimer"
+sortOrder: 6
+tags:
+  - macOS
+  - SwiftUI
+  - Hardware
+  - Utility
+---
+
+## Why I Built It
+
+PixooTimer exists because a timer is more useful when it is visible without becoming another window to manage. I already had a Divoom Pixoo 64 LED display, and it seemed like a good home for a simple, physical countdown.
+
+The goal was not to build a complicated productivity system. It was to make a focused timer that could sit outside the computer screen and show time passing at a glance.
+
+## How It Works
+
+The app lives in the macOS menu bar and offers a small set of preset durations. When a timer starts, it renders 64 by 64 pixel frames that show a shrinking pie chart and the remaining minutes, then sends those frames to the Pixoo over its local HTTP API.
+
+If the Pixoo is not available, the app can show a floating Mac fallback display. When the timer finishes, it can trigger a Pixoo buzzer or a local system sound.
+
+## What I Like About It
+
+This is a small project, but it has a nice physicality. It connects software to an object in the room, and that makes the timer feel less like another app and more like part of the desk.

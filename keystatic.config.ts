@@ -119,6 +119,74 @@ const caseStudyFields = {
   }),
 };
 
+const hobbyProjectFields = {
+  title: articleFields.title,
+  slug: articleFields.slug,
+  excerpt: articleFields.excerpt,
+  publishDate: articleFields.publishDate,
+  heroImage: fields.image({
+    label: "Hero image",
+    directory: "public/images/hobby-projects",
+    publicPath: "/images/hobby-projects/",
+    description:
+      "Displayed on listing cards and the hobby project header. Optional.",
+  }),
+  projectType: fields.text({
+    label: "Project type",
+    description: "Short category such as Personal tool, Game, or Plugin.",
+  }),
+  status: fields.text({
+    label: "Status",
+    description: "Current state such as Active, Prototype, or Paused.",
+  }),
+  builtWith: fields.array(
+    fields.text({
+      label: "Technology",
+      validation: { isRequired: true },
+    }),
+    {
+      label: "Built with",
+      description: "Primary tools, frameworks, APIs, or platforms.",
+      itemLabel: ({ value }) => value ?? "Technology",
+    },
+  ),
+  highlights: fields.array(
+    fields.text({
+      label: "Highlight",
+      validation: { isRequired: true },
+    }),
+    {
+      label: "Highlights",
+      description: "Short points shown on listing cards and project headers.",
+      itemLabel: ({ value }) => value ?? "Highlight",
+    },
+  ),
+  liveUrl: fields.text({
+    label: "Live URL",
+    description: "Optional public URL for the running project.",
+  }),
+  repoUrl: fields.text({
+    label: "Repository URL",
+    description: "Optional public GitHub URL.",
+  }),
+  sortOrder: fields.integer({
+    label: "Sort order",
+    description:
+      "Lower numbers appear first on the hobbies listing. Leave empty to fall back to publish date.",
+  }),
+  tags: articleFields.tags,
+  content: fields.mdx({
+    label: "Body",
+    description: "Write the main hobby project writeup in Markdown or MDX.",
+    options: {
+      image: {
+        directory: "public/images/hobby-projects",
+        publicPath: "/images/hobby-projects/",
+      },
+    },
+  }),
+};
+
 export default config({
   storage: {
     kind: "github",
@@ -129,7 +197,7 @@ export default config({
       name: "Jason Makes",
     },
     navigation: {
-      Content: ["articles", "caseStudies"],
+      Content: ["articles", "caseStudies", "hobbyProjects"],
     },
   },
   collections: {
@@ -154,6 +222,17 @@ export default config({
         contentField: "content",
       },
       schema: caseStudyFields,
+    }),
+    hobbyProjects: collection({
+      label: "Hobby Projects",
+      path: "content/hobby-projects/*",
+      slugField: "slug",
+      entryLayout: "content",
+      format: {
+        data: "yaml",
+        contentField: "content",
+      },
+      schema: hobbyProjectFields,
     }),
   },
 });

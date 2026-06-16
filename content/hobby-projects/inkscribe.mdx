@@ -1,0 +1,39 @@
+---
+title: "InkScribe"
+slug: inkscribe
+excerpt: "An Obsidian plugin that captures handwritten notes by camera or file picker and turns them into Markdown with Claude vision."
+publishDate: 2026-06-13
+projectType: "Obsidian plugin"
+status: "Usable"
+builtWith:
+  - Obsidian API
+  - TypeScript
+  - esbuild
+  - Claude vision API
+highlights:
+  - "Captures handwritten notes on mobile or desktop and saves the source image."
+  - "Creates Markdown notes with configurable folders, filenames, and frontmatter."
+  - "Makes analog capture fit into an existing Obsidian workflow."
+sortOrder: 9
+tags:
+  - Obsidian
+  - Claude
+  - TypeScript
+  - Notes
+---
+
+## Why I Built It
+
+InkScribe came from a gap between how I sometimes think and where I keep durable notes. Handwriting is still useful, especially for messy first passes, but handwritten pages do not naturally end up in an Obsidian vault.
+
+The plugin makes that bridge simple: capture the page, send it through Claude vision, and save the transcription as Markdown alongside the original image.
+
+## How It Works
+
+On mobile, the plugin can open the camera. On desktop, it falls back to a file picker. After previewing the image, it sends the file to Claude for transcription and creates a new note with configurable frontmatter, folders, image handling, and filename patterns.
+
+It is built as a TypeScript Obsidian plugin with esbuild, using the normal plugin settings surface for API keys and output preferences.
+
+## What I Like About It
+
+This is not technically the flashiest project, but it is useful because it respects the way the notes start. Instead of forcing every thought through a keyboard, it lets paper be the input and Markdown be the archive.

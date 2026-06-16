@@ -1,0 +1,46 @@
+---
+title: "Boulevard Run"
+slug: boulevard-run
+excerpt: "A retro-modern 3D discovery map for exploring the Atlanta BeltLine from the Boulevard crossing near Grant Park."
+publishDate: 2026-06-13
+heroImage: /images/hobby-projects/boulevard-run/hero.jpg
+projectType: "Neighborhood map"
+status: "Active prototype"
+builtWith:
+  - Next.js
+  - React Three Fiber
+  - Three.js
+  - Turf.js
+  - Public BeltLine GIS data
+  - OpenStreetMap
+highlights:
+  - "Turns public trail geometry into a game-board style map centered on a real neighborhood start point."
+  - "Computes connected trail segments from the Boulevard crossing instead of showing every segment as equally reachable."
+  - "Uses curated quests and places to make the map feel like an invitation to go outside."
+sortOrder: 1
+tags:
+  - Maps
+  - Atlanta
+  - Three.js
+  - Agentic Coding
+---
+
+## Why I Built It
+
+Boulevard Run started from a very practical desire: I wanted a better way to understand what parts of the Atlanta BeltLine are actually connected from the public crossing near Boulevard and Grant Park.
+
+Normal maps are good at showing where paths exist. They are less good at answering the question I actually had, which was closer to: if I start here with my family, what can we comfortably reach, and what would make the ride feel fun?
+
+That made the project a nice fit for agentic coding. The shape of the idea was clear, but there were many details to push through: public GIS data, connectivity rules, map projection, visual style, place curation, and a front end that feels more like a small game than a civic data viewer.
+
+## How It Works
+
+The app refreshes a committed data snapshot from public BeltLine trail and access-point services. A data script normalizes trail statuses, applies reviewed manual overrides, snaps endpoints, and walks the graph from the Boulevard home base to determine what is connected, disconnected, under construction, or future.
+
+The front end renders that data as a stylized 3D scene. React Three Fiber and Three.js handle the trail ribbons, park islands, labels, and pixel-like markers. Turf.js helps with geometry work, and a development-only debug view can compare the computed state against a raw basemap.
+
+The important product choice is that this is not an official GIS tool. It is a personal discovery map. The data gives it structure, but the map is trying to make nearby routes feel legible, playful, and worth trying.
+
+## What I Like About It
+
+This is one of the clearest examples of what I like using coding agents for: a specific personal itch that crosses design, data, and implementation. The result is not just a demo of a library. It is a small piece of personal infrastructure for exploring a real place.
