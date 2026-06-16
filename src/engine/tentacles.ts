@@ -274,6 +274,13 @@ const ALIEN_COLORS: [number, number, number][] = [
 // Effect: Sky static (operates in extension zone above the mask)
 // ---------------------------------------------------------------------------
 
+// Minimum burst for the sky/background horizontal static to render. Twilight's
+// calm-frame burst floor is 0.42, so the old 0.4 gate meant this static was on
+// EVERY frame (constant). Raising it well above the floor makes the static
+// PERIODIC — it only appears during the stronger bursts — which is both less
+// busy and cheaper (the pass is skipped on calm frames). Tunable: higher = rarer.
+const SKY_STATIC_BURST_MIN = 0.6;
+
 function applySkyStatic(
   data: Uint8ClampedArray,
   w: number,
@@ -283,9 +290,12 @@ function applySkyStatic(
   burst: number,
   intensity: number,
 ) {
-  if (intensity <= 0 || burst < 0.4 || skyRows <= 0) return;
+  if (intensity <= 0 || burst < SKY_STATIC_BURST_MIN || skyRows <= 0) return;
 
-  const staticIntensity = ((burst - 0.4) / 0.6) * intensity * 2;
+  const staticIntensity =
+    ((burst - SKY_STATIC_BURST_MIN) / (1 - SKY_STATIC_BURST_MIN)) *
+    intensity *
+    2;
   const bandFrame = Math.floor(time * 4);
   const shiftFrame = Math.floor(time * 1.6);
   const staticFrame = Math.floor(time * 60);

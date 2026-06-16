@@ -51,12 +51,12 @@ const DPRS = [1, 1.07, 1.25, 1.5, 1.75, 2];
 // block-corruption across alternating frames). Re-pin only when a visual change
 // is intended; an unexpected mismatch means an accidental change to the glitch.
 const GOLDEN: Record<string, number> = {
-  "1": 944267281,
-  "1.07": 1042846591,
-  "1.25": 2042511563,
-  "1.5": 1005742698,
-  "1.75": 1688380554,
-  "2": 2003867736,
+  "1": 1295165189,
+  "1.07": 787624086,
+  "1.25": 4271214865,
+  "1.5": 3276444076,
+  "1.75": 2505349811,
+  "2": 2933019212,
 };
 
 function buildMask(): Uint8Array {
