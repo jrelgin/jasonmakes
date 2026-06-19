@@ -5,7 +5,7 @@ import localFont from "next/font/local";
 
 import { siteMetadata } from "#lib/config/site";
 
-import Navigation from "@/components/Navigation";
+import SiteShell from "@/components/SiteShell";
 import PostHogAnalytics from "@/components/posthog-analytics";
 import {
   LEGACY_THEME_STORAGE_KEY,
@@ -96,8 +96,7 @@ export default function RootLayout({
         className={`${apocFont.variable} ${gloockFont.variable} ${instrumentSerifFont.variable} ${instrumentSans.variable} ${geistMono.variable} antialiased`}
       >
         <script>{themeInitScript}</script>
-        <Navigation />
-        <div className="min-h-[100dvh] pt-28">{children}</div>
+        <SiteShell>{children}</SiteShell>
         <PostHogAnalytics />
         <Analytics />
       </body>
