@@ -124,8 +124,6 @@ export interface GlitchParams {
   scanLines: number;
   blockCount: number;
   alienColors: number;
-  bleedTears: number;
-  skyStatic: number;
   edgeFringe: number;
 }
 
@@ -138,8 +136,6 @@ export function createDefaultGlitchParams(): GlitchParams {
     scanLines: 0.65,
     blockCount: 14,
     alienColors: 0.5,
-    bleedTears: 0.5,
-    skyStatic: 0.5,
     edgeFringe: 0.5,
   };
 }

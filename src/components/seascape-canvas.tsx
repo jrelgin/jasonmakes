@@ -28,9 +28,14 @@ import {
 } from "@/lib/site-theme";
 
 const MAX_DAY_CANVAS_DPR = 2;
-const MAX_NIGHT_CANVAS_DPR = 2;
+// Night runs the per-pixel creature glitch (a CPU readback). Readback cost scales
+// with pixel count (~DPR²); the glitch is intentionally lossy, so a lower internal
+// resolution is imperceptible while cutting the read area substantially on 2× displays.
+const MAX_NIGHT_CANVAS_DPR = 1.5;
 const DAY_FRAME_INTERVAL = 1000 / 30;
-const NIGHT_FRAME_INTERVAL = 1000 / 20;
+// Night now runs at the same cadence as day so the waves are equally smooth; the
+// glitch is cheap enough after confining it to the creature's footprint.
+const NIGHT_FRAME_INTERVAL = 1000 / 30;
 const IS_DEV = process.env.NODE_ENV === "development";
 
 const THEME_PALETTES: Record<ThemeKey, Palette> = {
@@ -76,8 +81,6 @@ const PRODUCTION_SETTINGS: Record<
       scanLines: 0.65,
       blockCount: 14,
       alienColors: 0.5,
-      bleedTears: 0.5,
-      skyStatic: 0.5,
       edgeFringe: 0.5,
     },
   },
@@ -111,8 +114,6 @@ const PRODUCTION_SETTINGS: Record<
       scanLines: 1,
       blockCount: 24,
       alienColors: 0.65,
-      bleedTears: 0.68,
-      skyStatic: 0.3,
       edgeFringe: 0.66,
     },
   },

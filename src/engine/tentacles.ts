@@ -246,132 +246,17 @@ const ALIEN_COLORS: [number, number, number][] = [
   [255, 0, 255], // magenta
 ];
 
-// ---------------------------------------------------------------------------
-// Effect: Sky static (operates in extension zone above the mask)
-// ---------------------------------------------------------------------------
+// Reusable scratch buffer for passes that need a snapshot of the read region
+// before mutating it (channel separation, block corruption). Grown on demand
+// and reused across frames to avoid per-frame allocation / GC churn.
+let scratchBuf: Uint8ClampedArray = new Uint8ClampedArray(0);
 
-function applySkyStatic(
-  data: Uint8ClampedArray,
-  w: number,
-  skyRows: number,
-  dpr: number,
-  time: number,
-  burst: number,
-  intensity: number,
-) {
-  if (intensity <= 0 || burst < 0.4 || skyRows <= 0) return;
-
-  const staticIntensity = ((burst - 0.4) / 0.6) * intensity * 2;
-  const bandFrame = Math.floor(time * 4);
-  const shiftFrame = Math.floor(time * 1.6);
-  const staticFrame = Math.floor(time * 60);
-
-  for (let y = 0; y < skyRows; y++) {
-    const fade = 1 - y / skyRows;
-
-    const bandSeed = hashInt(y * 131 + bandFrame * 7919);
-    const isBand = bandSeed % 18 === 0;
-    const bandShift = isBand
-      ? Math.round(
-          ((hashInt(y * 7 + shiftFrame * 149) % 80) - 40) *
-            dpr *
-            staticIntensity,
-        )
-      : 0;
-    const segmentWidth = Math.max(
-      24,
-      Math.round((70 + (bandSeed % 130)) * dpr),
-    );
-    const segmentOffset = bandSeed % segmentWidth;
-
-    for (let x = 0; x < w; x++) {
-      const di = (y * w + x) * 4;
-      const prob = fade * staticIntensity * 0.12;
-      const hash = hashInt(x * 31 + y * 997 + staticFrame);
-
-      if (bandShift !== 0) {
-        const segment = Math.floor((x + segmentOffset) / segmentWidth);
-        const segmentHash = hashInt(segment * 4099 + y * 113 + bandFrame * 271);
-        if (segmentHash % 100 < 58) {
-          const segmentJitter = ((segmentHash >>> 8) % 5) - 2;
-          const sx = Math.max(
-            0,
-            Math.min(w - 1, x + bandShift + Math.round(segmentJitter * dpr)),
-          );
-          const si = (y * w + sx) * 4;
-          data[di] = data[si];
-          data[di + 1] = data[si + 1];
-          data[di + 2] = data[si + 2];
-        }
-      }
-
-      if ((hash % 1000) / 1000 < prob) {
-        const bright = hash % 2 === 0;
-        if (bright) {
-          const v = 160 + (hash % 95);
-          data[di] = v;
-          data[di + 1] = v - 20;
-          data[di + 2] = v + 10;
-        } else {
-          data[di] = Math.max(0, data[di] - 80);
-          data[di + 1] = Math.max(0, data[di + 1] - 80);
-          data[di + 2] = Math.max(0, data[di + 2] - 80);
-        }
-      }
-    }
+function snapshot(data: Uint8ClampedArray): Uint8ClampedArray {
+  if (scratchBuf.length < data.length) {
+    scratchBuf = new Uint8ClampedArray(data.length);
   }
-}
-
-// ---------------------------------------------------------------------------
-// Effect: Full-width bleed tears
-// ---------------------------------------------------------------------------
-
-function applyBleedTears(
-  data: Uint8ClampedArray,
-  w: number,
-  h: number,
-  mask: Uint8Array,
-  mw: number,
-  mh: number,
-  dpr: number,
-  offY: number,
-  time: number,
-  noise2D: Noise2D,
-  burst: number,
-  intensity: number,
-) {
-  if (intensity <= 0 || burst < 0.5) return;
-
-  const tearIntensity = ((burst - 0.5) / 0.5) * intensity * 2;
-  const MAX_TEAR_SHIFT = Math.round(100 * dpr);
-  const rowBuf = new Uint8ClampedArray(w * 4);
-
-  for (let y = 0; y < h; y++) {
-    const rowMax = maxMaskOnRow(mask, mw, mh, y, dpr, offY);
-    if (rowMax < 60) continue;
-
-    const logicalY = y / dpr;
-    const selectNoise = noise2D(logicalY * 0.12, time * 2.5);
-    if (Math.abs(selectNoise) < 0.65) continue;
-
-    const shiftNoise = noise2D(logicalY * 0.08, time * 3.0 + 100);
-    const shift = Math.round(
-      shiftNoise * MAX_TEAR_SHIFT * tearIntensity * (rowMax / 255),
-    );
-    if (shift === 0) continue;
-
-    const rowStart = y * w * 4;
-    rowBuf.set(data.subarray(rowStart, rowStart + w * 4));
-
-    for (let x = 0; x < w; x++) {
-      const sx = Math.max(0, Math.min(w - 1, x - shift));
-      const di = rowStart + x * 4;
-      const si = sx * 4;
-      data[di] = rowBuf[si];
-      data[di + 1] = rowBuf[si + 1];
-      data[di + 2] = rowBuf[si + 2];
-    }
-  }
+  scratchBuf.set(data);
+  return scratchBuf;
 }
 
 // ---------------------------------------------------------------------------
@@ -452,7 +337,7 @@ function applyChannelSeparation(
   const rOff = Math.round(-MAX_OFFSET * pulse);
   const bOff = Math.round(MAX_OFFSET * pulse);
 
-  const copy = new Uint8ClampedArray(data);
+  const copy = snapshot(data);
 
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
@@ -577,7 +462,7 @@ function applyBlockCorruption(
 ) {
   const BLOCK_COUNT = Math.round(maxBlocks * burst);
   if (BLOCK_COUNT === 0) return;
-  const copy = new Uint8ClampedArray(data);
+  const copy = snapshot(data);
 
   for (let i = 0; i < BLOCK_COUNT; i++) {
     const seed = blockSeed * 31 + i * 7919;
@@ -703,8 +588,6 @@ function applyEdgeFringe(
 // Main glitch render pass
 // ---------------------------------------------------------------------------
 
-const SKY_EXTENSION_RATIO = 0.15;
-
 export function renderGlitchTentacles(
   ctx: CanvasRenderingContext2D,
   state: TentacleGlitchState,
@@ -723,29 +606,24 @@ export function renderGlitchTentacles(
   if (maskPw <= 0 || maskPh <= 0) return;
 
   const burst = computeBurstIntensity(time, noise2D, p);
-  const needsSkyStatic = p.skyStatic > 0 && burst >= 0.4;
-  const needsFullWidth = needsSkyStatic || (p.bleedTears > 0 && burst >= 0.5);
-  const skyExtPhys = needsSkyStatic
-    ? Math.round(maskPh * SKY_EXTENSION_RATIO)
-    : 0;
-  const readY = Math.max(0, maskPy - skyExtPhys);
-  const actualSkyExt = maskPy - readY;
 
+  // The read region is the creature's bounding box plus a margin for the
+  // displacement passes. No full-width or sky-extension reads — the glitch
+  // stays confined to the creature's own footprint.
   const margin = Math.ceil(
     Math.max(p.displacement, p.chromaticOffset, 24) *
       dpr *
       Math.max(0.25, burst),
   );
-  const readX = needsFullWidth ? 0 : Math.max(0, maskPx - margin);
-  const readRight = needsFullWidth
-    ? physCanvasW
-    : Math.min(physCanvasW, maskPx + maskPw + margin);
+  const readX = Math.max(0, maskPx - margin);
+  const readRight = Math.min(physCanvasW, maskPx + maskPw + margin);
+  const readY = maskPy;
   const readW = readRight - readX;
-  const readH = Math.min(actualSkyExt + maskPh, physCanvasH - readY);
+  const readH = Math.min(maskPh, physCanvasH - readY);
   if (readW <= 0 || readH <= 0) return;
 
   const offX = maskPx - readX;
-  const offY = actualSkyExt;
+  const offY = 0;
 
   if (time - state.lastBlockUpdate > BLOCK_UPDATE_INTERVAL) {
     state.blockSeed = Math.floor(time * 4);
@@ -755,21 +633,6 @@ export function renderGlitchTentacles(
   const imageData = ctx.getImageData(readX, readY, readW, readH);
   const data = imageData.data;
 
-  applySkyStatic(data, readW, actualSkyExt, dpr, time, burst, p.skyStatic);
-  applyBleedTears(
-    data,
-    readW,
-    readH,
-    mask,
-    maskWidth,
-    maskHeight,
-    dpr,
-    offY,
-    time,
-    noise2D,
-    burst,
-    p.bleedTears,
-  );
   applyHorizontalDisplacement(
     data,
     readW,
