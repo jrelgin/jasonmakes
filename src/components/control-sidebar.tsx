@@ -387,14 +387,6 @@ export function ControlSidebar({
                   step={0.01}
                   onChange={(v) => updateGlitch("alienColors", v)}
                 />
-                <EffectSlider
-                  label="Tears"
-                  value={glitchParams.bleedTears}
-                  min={0}
-                  max={1}
-                  step={0.01}
-                  onChange={(v) => updateGlitch("bleedTears", v)}
-                />
               </div>
 
               <div style={{ marginBottom: 10 }}>
@@ -407,14 +399,6 @@ export function ControlSidebar({
                 >
                   Atmosphere
                 </span>
-                <EffectSlider
-                  label="Sky"
-                  value={glitchParams.skyStatic}
-                  min={0}
-                  max={1}
-                  step={0.01}
-                  onChange={(v) => updateGlitch("skyStatic", v)}
-                />
                 <EffectSlider
                   label="Fringe"
                   value={glitchParams.edgeFringe}
