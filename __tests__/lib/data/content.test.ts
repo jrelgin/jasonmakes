@@ -26,10 +26,14 @@ describe("Keystatic content loader", () => {
   });
 
   it("reads a specific article by slug", async () => {
-    const article = await getArticle("new-article");
+    const article = await getArticle(
+      "i-built-the-perfect-automated-planner-i-hate-it",
+    );
     expect(article).not.toBeNull();
-    expect(article?.title).toBe("New Article");
-    expect(article?.content).toContain("Ok let's try this again");
+    expect(article?.title).toBe(
+      "I built the perfect automated planner. I hate it.",
+    );
+    expect(article?.content).toContain("paper planner person");
   });
 
   it("lists real case studies by sort order", async () => {
