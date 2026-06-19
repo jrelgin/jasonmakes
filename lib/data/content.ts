@@ -54,7 +54,11 @@ async function toContent<
         : "";
 
   return {
-    slug: entry.slug ?? slug,
+    // Keystatic's `fields.slug` stores the human-readable *name* in the entry
+    // data and uses the slugified value as the filename/entry key. The entry
+    // key (passed in as `slug`) is the canonical URL slug — `entry.slug` would
+    // be the name (with spaces/capitals), which breaks routing.
+    slug,
     title: entry.title,
     excerpt: entry.excerpt ?? "",
     publishDate: entry.publishDate,

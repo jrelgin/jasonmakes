@@ -18,6 +18,13 @@ describe("Keystatic content loader", () => {
     expect(dates).toEqual(sorted);
   });
 
+  it("derives URL-safe slugs from the entry key, not the slug source name", async () => {
+    const articles = await listArticles();
+    for (const article of articles) {
+      expect(article.slug).toMatch(/^[a-z0-9-]+$/);
+    }
+  });
+
   it("reads a specific article by slug", async () => {
     const article = await getArticle("new-article");
     expect(article).not.toBeNull();
