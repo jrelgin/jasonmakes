@@ -68,6 +68,22 @@ async function toContent<
   };
 }
 
+/**
+ * Resolve the feature image for an article: a manually-set Keystatic hero
+ * always wins; otherwise the deterministically generated image at a known path
+ * (written at build time by scripts/generate-feature-images.ts).
+ */
+export function resolveArticleFeatureImage(article: Article): string {
+  return article.heroImage ?? `/images/articles/${article.slug}/generated.webp`;
+}
+
+/** Same as {@link resolveArticleFeatureImage} for hobby projects. */
+export function resolveHobbyFeatureImage(project: HobbyProject): string {
+  return (
+    project.heroImage ?? `/images/hobby-projects/${project.slug}/generated.webp`
+  );
+}
+
 export async function listArticles(): Promise<Article[]> {
   const items = await reader.collections.articles.all();
   const mapped = await Promise.all(

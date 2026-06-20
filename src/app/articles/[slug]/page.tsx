@@ -5,7 +5,11 @@ import { notFound } from "next/navigation";
 
 import DriftingWave from "@/components/DriftingWave";
 import PageShell from "@/components/PageShell";
-import { getArticle, listArticles } from "../../../../lib/data/content";
+import {
+  getArticle,
+  listArticles,
+  resolveArticleFeatureImage,
+} from "../../../../lib/data/content";
 import Markdown from "../../../components/Markdown";
 
 interface Params {
@@ -74,18 +78,16 @@ export default async function Page({ params }: Params) {
             <DriftingWave className="mt-8 max-w-[14rem]" />
           </header>
 
-          {article.heroImage && (
-            <div className="u-rise u-rise-1 relative mt-10 aspect-video overflow-hidden rounded-xl border border-[var(--u-panel-border)]">
-              <Image
-                src={article.heroImage}
-                alt={article.title}
-                fill
-                priority
-                sizes="(max-width: 768px) 100vw, 768px"
-                className="object-cover"
-              />
-            </div>
-          )}
+          <div className="u-rise u-rise-1 relative mt-10 aspect-video overflow-hidden rounded-xl border border-[var(--u-panel-border)]">
+            <Image
+              src={resolveArticleFeatureImage(article)}
+              alt={article.title}
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, 768px"
+              className="object-cover"
+            />
+          </div>
 
           <div className="ink-prose ink-prose--dropcap u-rise u-rise-2 mt-12">
             <Markdown source={article.content} />

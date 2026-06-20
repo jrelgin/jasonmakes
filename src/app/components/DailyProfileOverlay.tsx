@@ -1,3 +1,4 @@
+import { readsFallbackImage } from "@/engine/feature-art";
 import { formatUpdatedAt } from "@/lib/date";
 import { kv } from "#lib/kv";
 import type { Profile } from "#lib/profile";
@@ -172,7 +173,7 @@ function LatestReads({
         )}
       </div>
       <ul>
-        {articles.map((article, index) => (
+        {articles.map((article) => (
           <li key={article.url || `article-${article.date}-${article.title}`}>
             <a
               href={article.url}
@@ -181,14 +182,14 @@ function LatestReads({
               className="daily-profile-read-card"
             >
               <span className="daily-profile-read-thumb" aria-hidden="true">
-                {article.imageUrl ? (
-                  <img src={article.imageUrl} alt="" loading="lazy" />
-                ) : (
-                  <span
-                    className="daily-profile-read-thumb__fallback"
-                    data-pattern={getArticlePattern(article, index)}
-                  />
-                )}
+                <img
+                  src={
+                    article.imageUrl ||
+                    readsFallbackImage(article.url || article.title)
+                  }
+                  alt=""
+                  loading="lazy"
+                />
               </span>
               <span className="daily-profile-read-copy">
                 <span className="daily-profile-read-title">
@@ -207,17 +208,6 @@ function LatestReads({
       </ul>
     </section>
   );
-}
-
-function getArticlePattern(article: ReadingArticle, index: number): string {
-  const basis = article.url || article.title;
-  let hash = index + 7;
-
-  for (const character of basis) {
-    hash = (hash * 31 + character.charCodeAt(0)) % 997;
-  }
-
-  return String(hash % 5);
 }
 
 export default async function DailyProfileOverlay() {

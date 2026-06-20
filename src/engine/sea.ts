@@ -1,4 +1,5 @@
 import { getCanvas2DContext } from "./canvas";
+import { createOffscreenCanvas } from "./offscreen";
 import {
   Dimensions,
   Palette,
@@ -98,9 +99,10 @@ function createSeaBaseCanvas(
   renderScale: number,
 ): HTMLCanvasElement {
   const { width, height } = dimensions;
-  const canvas = document.createElement("canvas");
-  canvas.width = Math.ceil(width * renderScale);
-  canvas.height = Math.ceil(height * renderScale);
+  const canvas = createOffscreenCanvas(
+    Math.ceil(width * renderScale),
+    Math.ceil(height * renderScale),
+  );
 
   const ctx = getCanvas2DContext(canvas);
   ctx.scale(renderScale, renderScale);
@@ -132,9 +134,10 @@ function createWaveTile(
   const centerY = radius + pad;
   const tileWidth = Math.ceil(radius * 2 + pad * 2);
   const tileHeight = Math.ceil(radius + spacing + pad * 2);
-  const tile = document.createElement("canvas");
-  tile.width = Math.ceil(tileWidth * renderScale);
-  tile.height = Math.ceil(tileHeight * renderScale);
+  const tile = createOffscreenCanvas(
+    Math.ceil(tileWidth * renderScale),
+    Math.ceil(tileHeight * renderScale),
+  );
 
   const ctx = getCanvas2DContext(tile);
   ctx.scale(renderScale, renderScale);

@@ -1,8 +1,13 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import PageHeader from "@/components/PageHeader";
 import PageShell from "@/components/PageShell";
-import { type Article, listArticles } from "../../../lib/data/content";
+import {
+  type Article,
+  listArticles,
+  resolveArticleFeatureImage,
+} from "../../../lib/data/content";
 
 export const metadata = {
   title: "Articles | Jason Makes",
@@ -55,7 +60,20 @@ function ArticleRow({ article, index }: { article: Article; index: number }) {
 
   return (
     <li>
-      <Link href={`/articles/${slug}`} className="index-row group" prefetch>
+      <Link
+        href={`/articles/${slug}`}
+        className="index-row index-row--thumb group"
+        prefetch
+      >
+        <span className="index-row__thumb">
+          <Image
+            src={resolveArticleFeatureImage(article)}
+            alt=""
+            fill
+            sizes="88px"
+            className="object-cover"
+          />
+        </span>
         <span className="index-row__index">
           {String(index + 1).padStart(2, "0")}
         </span>
