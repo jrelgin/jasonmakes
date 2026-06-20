@@ -17,9 +17,13 @@ function getKey(prefix: string) {
   return `${prefix}-${keyCounter}`;
 }
 
+function isExternalLink(href: string): boolean {
+  return /^(https?:)?\/\//i.test(href) || /^mailto:/i.test(href);
+}
+
 function parseInline(text: string): ReactNode[] {
   const nodes: ReactNode[] = [];
-  const pattern = /(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g;
+  const pattern = /(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`|\[[^\]]+\]\([^)]+\))/g;
   let lastIndex = 0;
 
   for (const match of text.matchAll(pattern)) {
@@ -35,10 +39,29 @@ function parseInline(text: string): ReactNode[] {
 
     if (token.startsWith("**")) {
       nodes.push(<strong key={getKey("strong")}>{token.slice(2, -2)}</strong>);
-    } else if (token.startsWith("*")) {
-      nodes.push(<em key={getKey("em")}>{token.slice(1, -1)}</em>);
     } else if (token.startsWith("`")) {
       nodes.push(<code key={getKey("code")}>{token.slice(1, -1)}</code>);
+    } else if (token.startsWith("[")) {
+      const linkMatch = token.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+      if (linkMatch) {
+        const [, label, href] = linkMatch;
+        const external = isExternalLink(href);
+        nodes.push(
+          <a
+            key={getKey("link")}
+            href={href}
+            {...(external
+              ? { target: "_blank", rel: "noopener noreferrer" }
+              : {})}
+          >
+            {parseInline(label)}
+          </a>,
+        );
+      } else {
+        nodes.push(token);
+      }
+    } else if (token.startsWith("*")) {
+      nodes.push(<em key={getKey("em")}>{token.slice(1, -1)}</em>);
     }
 
     lastIndex = match.index + token.length;
