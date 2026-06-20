@@ -1,6 +1,7 @@
 import { getCanvas2DContext } from "./canvas";
 import { DOT_EARTH_TONES } from "./dot-palette";
 import { createNoiseGenerators } from "./noise";
+import { createOffscreenCanvas } from "./offscreen";
 import { isMobileWidth } from "./responsive";
 import {
   Dimensions,
@@ -503,23 +504,26 @@ export function createDotSkyCache(
   const config = createDotSkyConfig(dimensions, horizonY, seed, skyMode);
 
   // Sky background canvas (base fill + dot field)
-  const offscreen = document.createElement("canvas");
-  offscreen.width = dimensions.width * dpr;
-  offscreen.height = canvasHeight * dpr;
+  const offscreen = createOffscreenCanvas(
+    dimensions.width * dpr,
+    canvasHeight * dpr,
+  );
   const ctx = getCanvas2DContext(offscreen);
   ctx.scale(dpr, dpr);
 
   // Sun canvas (transparent background, sun rings only — enables independent rotation)
-  const sunOffscreen = document.createElement("canvas");
-  sunOffscreen.width = dimensions.width * dpr;
-  sunOffscreen.height = canvasHeight * dpr;
+  const sunOffscreen = createOffscreenCanvas(
+    dimensions.width * dpr,
+    canvasHeight * dpr,
+  );
   const sunCtx = getCanvas2DContext(sunOffscreen);
   sunCtx.scale(dpr, dpr);
 
   // Moon canvas (transparent background, moon dots + glow — separate layer)
-  const moonOffscreen = document.createElement("canvas");
-  moonOffscreen.width = dimensions.width * dpr;
-  moonOffscreen.height = canvasHeight * dpr;
+  const moonOffscreen = createOffscreenCanvas(
+    dimensions.width * dpr,
+    canvasHeight * dpr,
+  );
   const moonCtx = getCanvas2DContext(moonOffscreen);
   moonCtx.scale(dpr, dpr);
 

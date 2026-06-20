@@ -6,6 +6,7 @@ import PageShell from "@/components/PageShell";
 import {
   type HobbyProject,
   listHobbyProjects,
+  resolveHobbyFeatureImage,
 } from "../../../lib/data/content";
 
 export const metadata = {
@@ -64,8 +65,9 @@ function FeaturedHobbyProject({
 }: {
   hobbyProject: HobbyProject;
 }) {
-  const { title, slug, excerpt, heroImage, projectType, status, highlights } =
+  const { title, slug, excerpt, projectType, status, highlights } =
     hobbyProject;
+  const featureImage = resolveHobbyFeatureImage(hobbyProject);
   const eyebrow = [projectType, status].filter(Boolean).join(" / ");
 
   return (
@@ -75,22 +77,16 @@ function FeaturedHobbyProject({
       prefetch
     >
       <div className="grid md:grid-cols-5">
-        {heroImage && (
-          <div className="relative aspect-[16/10] md:col-span-2 md:aspect-auto">
-            <Image
-              src={heroImage}
-              alt={title}
-              fill
-              sizes="(max-width: 768px) 100vw, 40vw"
-              className="object-cover transition-transform duration-700 group-hover:scale-105"
-            />
-          </div>
-        )}
-        <div
-          className={
-            heroImage ? "p-7 md:col-span-3 md:p-9" : "p-7 md:col-span-5 md:p-9"
-          }
-        >
+        <div className="relative aspect-[16/10] md:col-span-2 md:aspect-auto">
+          <Image
+            src={featureImage}
+            alt={title}
+            fill
+            sizes="(max-width: 768px) 100vw, 40vw"
+            className="object-cover transition-transform duration-700 group-hover:scale-105"
+          />
+        </div>
+        <div className="p-7 md:col-span-3 md:p-9">
           {eyebrow && <p className="u-eyebrow text-base">{eyebrow}</p>}
           <h2 className="u-title mt-2 text-3xl md:text-4xl">{title}</h2>
           {excerpt && (
@@ -137,7 +133,20 @@ function HobbyProjectRow({
 
   return (
     <li>
-      <Link href={`/hobbies/${slug}`} className="index-row group" prefetch>
+      <Link
+        href={`/hobbies/${slug}`}
+        className="index-row index-row--thumb group"
+        prefetch
+      >
+        <span className="index-row__thumb">
+          <Image
+            src={resolveHobbyFeatureImage(hobbyProject)}
+            alt=""
+            fill
+            sizes="88px"
+            className="object-cover"
+          />
+        </span>
         <span className="index-row__index">
           {String(index + 1).padStart(2, "0")}
         </span>

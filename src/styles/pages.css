@@ -191,6 +191,21 @@
   transition: padding-left 0.3s cubic-bezier(0, 0, 0.2, 1);
 }
 
+/* Listing rows with a generative feature-image thumbnail (articles, hobbies). */
+.index-row--thumb {
+  grid-template-columns: auto auto 1fr auto;
+}
+
+.index-row__thumb {
+  position: relative;
+  align-self: center;
+  width: clamp(3.5rem, 7vw, 5.25rem);
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--u-panel-border) 42%, transparent);
+  border-radius: 8px;
+}
+
 li:last-child > .index-row {
   border-bottom: 0;
 }

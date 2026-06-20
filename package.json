@@ -3,7 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "generate:feature-images": "tsx scripts/generate-feature-images.ts",
+    "predev": "tsx scripts/generate-feature-images.ts",
     "dev": "next dev --turbopack",
+    "prebuild": "tsx scripts/generate-feature-images.ts",
     "build": "next build",
     "start": "next start",
     "lint": "biome check .",
@@ -29,6 +32,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "1.5.3",
+    "@napi-rs/canvas": "^1.0.0",
     "@tailwindcss/postcss": "^4",
     "@testing-library/react": "^16.3.0",
     "@types/node": "^20.17.46",
@@ -39,6 +43,7 @@
     "happy-dom": "^17.4.7",
     "jiti": "2.4.2",
     "tailwindcss": "^4",
+    "tsx": "^4.22.4",
     "typescript": "^5",
     "vite": "4.5.14",
     "vitest": "^0.34.6",

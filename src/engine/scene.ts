@@ -1,6 +1,7 @@
 import { getCanvas2DContext } from "./canvas";
 import { createDotSkyCache } from "./dot-sky";
 import { createNoiseGenerators } from "./noise";
+import { createOffscreenCanvas } from "./offscreen";
 import { PALETTES } from "./palette";
 import { createSeaPatternCache } from "./sea";
 import {
@@ -21,9 +22,7 @@ function createPaperTextureCache(
   height: number,
   noise2D: (x: number, y: number) => number,
 ): HTMLCanvasElement {
-  const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
+  const canvas = createOffscreenCanvas(width, height);
   const ctx = getCanvas2DContext(canvas);
 
   ctx.globalAlpha = 0.03;
@@ -45,9 +44,7 @@ function createPaperTextureCache(
  * Pre-render vignette to an offscreen canvas (static — only depends on dimensions)
  */
 function createVignetteCache(width: number, height: number): HTMLCanvasElement {
-  const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
+  const canvas = createOffscreenCanvas(width, height);
   const ctx = getCanvas2DContext(canvas);
 
   const gradient = ctx.createRadialGradient(

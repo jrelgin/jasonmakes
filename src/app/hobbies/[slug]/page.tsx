@@ -8,6 +8,7 @@ import PageShell from "@/components/PageShell";
 import {
   getHobbyProject,
   listHobbyProjects,
+  resolveHobbyFeatureImage,
 } from "../../../../lib/data/content";
 import Markdown from "../../../components/Markdown";
 
@@ -124,18 +125,16 @@ export default async function Page({ params }: Params) {
             )}
           </header>
 
-          {hobbyProject.heroImage && (
-            <div className="u-rise u-rise-1 relative mt-10 aspect-video overflow-hidden rounded-xl border border-[var(--u-panel-border)]">
-              <Image
-                src={hobbyProject.heroImage}
-                alt={hobbyProject.title}
-                fill
-                priority
-                sizes="(max-width: 768px) 100vw, 896px"
-                className="object-cover"
-              />
-            </div>
-          )}
+          <div className="u-rise u-rise-1 relative mt-10 aspect-video overflow-hidden rounded-xl border border-[var(--u-panel-border)]">
+            <Image
+              src={resolveHobbyFeatureImage(hobbyProject)}
+              alt={hobbyProject.title}
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, 896px"
+              className="object-cover"
+            />
+          </div>
 
           <div className="ink-prose u-rise u-rise-2 mt-12">
             <Markdown source={hobbyProject.content} />
