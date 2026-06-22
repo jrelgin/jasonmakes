@@ -191,20 +191,22 @@
   transition: padding-left 0.3s cubic-bezier(0, 0, 0.2, 1);
 }
 
-/* Listing rows with a generative feature-image thumbnail (articles, hobbies). */
+/* Listing rows with a generative feature-image thumbnail (articles, hobbies).
+   Inherits the base 3-col grid (thumb | content | arrow); the row number now lives
+   inline in the content column. Slightly wider gap for the larger thumbnail. */
 .index-row--thumb {
-  grid-template-columns: auto auto 1fr auto;
+  gap: 1.5rem;
 }
 
 .index-row__thumb {
   position: relative;
   align-self: center;
-  width: 4rem;
-  height: 4rem;
+  width: clamp(5rem, 16vw, 8rem);
+  height: clamp(5rem, 16vw, 8rem);
   aspect-ratio: 1 / 1;
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--u-panel-border) 42%, transparent);
-  border-radius: 10px;
+  border-radius: 12px;
 }
 
 li:last-child > .index-row {
@@ -219,6 +221,7 @@ li:last-child > .index-row {
   font-family: var(--font-geist-mono), monospace;
   font-size: 0.78rem;
   color: var(--u-accent);
+  margin-right: 0.75rem;
 }
 
 .index-row__title {

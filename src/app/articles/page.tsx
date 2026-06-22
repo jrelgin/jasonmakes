@@ -70,15 +70,17 @@ function ArticleRow({ article, index }: { article: Article; index: number }) {
             src={resolveArticleFeatureImage(article)}
             alt=""
             fill
-            sizes="64px"
+            sizes="128px"
             className="object-cover"
           />
         </span>
-        <span className="index-row__index">
-          {String(index + 1).padStart(2, "0")}
-        </span>
         <div>
-          <p className="u-eyebrow text-base">{formattedDate}</p>
+          <p className="u-eyebrow text-base">
+            <span className="index-row__index">
+              {String(index + 1).padStart(2, "0")}
+            </span>
+            {formattedDate}
+          </p>
           <h2 className="index-row__title mt-1">{title}</h2>
           {excerpt && <p className="index-row__excerpt">{excerpt}</p>}
         </div>
