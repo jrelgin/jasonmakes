@@ -3,17 +3,19 @@ import Link from "next/link";
 
 import PageHeader from "@/components/PageHeader";
 import PageShell from "@/components/PageShell";
+import { buildListingMetadata } from "../../../lib/config/site";
 import {
   type HobbyProject,
   listHobbyProjects,
   resolveHobbyFeatureImage,
 } from "../../../lib/data/content";
 
-export const metadata = {
+export const metadata = buildListingMetadata({
   title: "Hobbies | Jason Makes",
   description:
     "Personal tools, games, plugins, and experiments built by Jason Elgin",
-};
+  path: "/hobbies",
+});
 
 export const dynamic = "force-static";
 
@@ -65,10 +67,10 @@ function FeaturedHobbyProject({
 }: {
   hobbyProject: HobbyProject;
 }) {
-  const { title, slug, excerpt, projectType, status, highlights } =
+  const { title, slug, excerpt, projectType, projectStatus, highlights } =
     hobbyProject;
   const featureImage = resolveHobbyFeatureImage(hobbyProject);
-  const eyebrow = [projectType, status].filter(Boolean).join(" / ");
+  const eyebrow = [projectType, projectStatus].filter(Boolean).join(" / ");
 
   return (
     <Link
@@ -128,8 +130,8 @@ function HobbyProjectRow({
   hobbyProject: HobbyProject;
   index: number;
 }) {
-  const { title, slug, excerpt, projectType, status } = hobbyProject;
-  const eyebrow = [projectType, status].filter(Boolean).join(" / ");
+  const { title, slug, excerpt, projectType, projectStatus } = hobbyProject;
+  const eyebrow = [projectType, projectStatus].filter(Boolean).join(" / ");
 
   return (
     <li>
