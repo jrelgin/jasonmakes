@@ -32,10 +32,11 @@ export default function Navigation() {
   const menuPanelRef = useRef<HTMLDivElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
-  // Headroom state for the logo + nav bar. `offset` is how far (px) the bar is
-  // shifted up from the top; `animated` toggles the glide transition so the
-  // scroll-linked motion near the top stays locked 1:1 while the reveal slides.
-  const [headroom, setHeadroom] = useState({ offset: 0, animated: false });
+  // How far (px) the logo + nav bar is currently tucked up out of view. Driven
+  // imperatively on scroll (see the effect below) rather than through React
+  // state, so scrolling never re-renders this component and the bar can ride
+  // the compositor smoothly.
+  const hiddenAmountRef = useRef(0);
 
   useEffect(() => {
     const initialTheme = resolveSiteTheme();
@@ -92,13 +93,24 @@ export default function Navigation() {
     setTheme(resolveSiteTheme());
   }, []);
 
-  // Reveal the bar whenever focus lands inside it (e.g. a keyboard user tabbing
-  // back up to the nav) so it can never be tucked away while in use.
-  const revealNav = useCallback(() => {
-    setHeadroom((current) =>
-      current.offset === 0 ? current : { offset: 0, animated: true },
-    );
+  // Position the bar imperatively. `animated` adds the glide transition, used
+  // only for the rest-state snap; live scrolling passes false so the bar tracks
+  // the page 1:1 with no transition fighting the motion.
+  const applyHeadroom = useCallback((amount: number, animated: boolean) => {
+    const bar = barRef.current;
+    if (!bar) return;
+    bar.style.transition = animated
+      ? "transform 420ms cubic-bezier(0.19, 1, 0.22, 1)"
+      : "none";
+    bar.style.transform = `translateY(${-amount}px)`;
   }, []);
+
+  // Reveal the bar (e.g. a keyboard user tabbing back up to it, or opening the
+  // mobile menu) so it can never be tucked away while in use.
+  const revealNav = useCallback(() => {
+    hiddenAmountRef.current = 0;
+    applyHeadroom(0, true);
+  }, [applyHeadroom]);
 
   // Close the mobile menu whenever the route changes so navigating always
   // dismisses it (even when the destination is the current page).
@@ -131,57 +143,64 @@ export default function Navigation() {
     };
   }, [menuOpen]);
 
-  // Hide-on-scroll-down, reveal-on-scroll-up. The bar scrolls away locked to
-  // the page for its own height, tucks fully out of view past that, and glides
-  // back in the moment the user scrolls up so navigation is always reachable.
-  // Under prefers-reduced-motion the bar simply stays put (no scroll motion).
+  // Hide-on-scroll-down, reveal-on-scroll-up. The bar is delta-coupled to the
+  // scroll: it slides up as you scroll down and back down as you scroll up,
+  // tracking the page 1:1 with no transition, so it reads as part of the
+  // document and never janks. When scrolling stops it snaps to a clean resting
+  // state — fully shown or fully hidden — so the nav is never left half on
+  // screen. Everything is applied imperatively (no React re-renders mid-scroll)
+  // for a smooth ride; prefers-reduced-motion keeps the bar fully visible.
   useEffect(() => {
     const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    let hideDistance = 0;
+    let hideDistance = (barRef.current?.offsetHeight ?? 0) + 32;
     const measure = () => {
       // +32px clears the bar's drop shadow so nothing peeks at the top edge.
       hideDistance = (barRef.current?.offsetHeight ?? 0) + 32;
     };
-    measure();
 
     let lastY = Math.max(0, window.scrollY);
-    let ticking = false;
-    const TOLERANCE = 4;
+    let lastDir = 0;
+    let rafId = 0;
+    let snapTimer = 0;
+
+    // After scrolling stops, settle to the nearest resting state, biased toward
+    // revealing when the last motion was upward so a small scroll-up brings the
+    // nav fully back ("pops in") without leaving it stranded part-way.
+    const settle = () => {
+      const amount = hiddenAmountRef.current;
+      if (amount <= 0 || amount >= hideDistance) return;
+      const reveal = lastDir < 0 || amount < hideDistance / 2;
+      hiddenAmountRef.current = reveal ? 0 : hideDistance;
+      applyHeadroom(hiddenAmountRef.current, true);
+    };
 
     const update = () => {
-      ticking = false;
+      rafId = 0;
       const y = Math.max(0, window.scrollY);
 
       if (motionQuery.matches) {
-        setHeadroom({ offset: 0, animated: false });
+        hiddenAmountRef.current = 0;
+        applyHeadroom(0, false);
         lastY = y;
         return;
       }
 
       const diff = y - lastY;
-
-      if (y <= 0) {
-        // Resting at the top: fully visible, in place.
-        setHeadroom({ offset: 0, animated: true });
-      } else if (y <= hideDistance && diff > 0) {
-        // Within the bar's own height while scrolling down: travel with the
-        // page 1:1 (no transition) so it reads as part of the document.
-        setHeadroom({ offset: -y, animated: false });
-      } else if (diff > TOLERANCE) {
-        // Decisively scrolling down: tuck the bar out of view.
-        setHeadroom({ offset: -hideDistance, animated: true });
-      } else if (diff < -TOLERANCE) {
-        // Scrolling back up: glide the bar back into view.
-        setHeadroom({ offset: 0, animated: true });
-      }
-
       lastY = y;
+      if (diff > 0) lastDir = 1;
+      else if (diff < 0) lastDir = -1;
+
+      const next = y <= 0 ? 0 : hiddenAmountRef.current + diff;
+      hiddenAmountRef.current = Math.min(hideDistance, Math.max(0, next));
+      applyHeadroom(hiddenAmountRef.current, false);
+
+      window.clearTimeout(snapTimer);
+      snapTimer = window.setTimeout(settle, 140);
     };
 
     const onScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(update);
+      if (rafId) return;
+      rafId = requestAnimationFrame(update);
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -193,16 +212,18 @@ export default function Navigation() {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", measure);
       motionQuery.removeEventListener("change", update);
+      window.clearTimeout(snapTimer);
+      if (rafId) cancelAnimationFrame(rafId);
     };
-  }, []);
+  }, [applyHeadroom]);
 
   // Keep the bar visible while the mobile menu is open (it hosts the close
   // button, and the open menu locks page scroll so nothing else moves it).
   useEffect(() => {
     if (menuOpen) {
-      setHeadroom({ offset: 0, animated: true });
+      revealNav();
     }
-  }, [menuOpen]);
+  }, [menuOpen, revealNav]);
 
   const isTwilight = theme === "twilight";
   const shouldInvertLogo = isTwilight && pathname !== "/";
@@ -212,13 +233,10 @@ export default function Navigation() {
       <div
         ref={barRef}
         onFocus={revealNav}
-        style={{
-          transform: `translateY(${headroom.offset}px)`,
-          transition: headroom.animated
-            ? "transform 420ms cubic-bezier(0.19, 1, 0.22, 1)"
-            : "none",
-          willChange: "transform",
-        }}
+        // `transform`/`transition` are owned by the scroll effect (imperative)
+        // and deliberately kept out of this style object so React re-renders
+        // never clobber the live bar position.
+        style={{ willChange: "transform" }}
         className="pointer-events-none fixed inset-x-0 top-0 z-50 px-4 pt-4 md:px-10 md:pt-10"
       >
         <div className="relative z-50 flex items-start justify-between gap-3">
