@@ -57,3 +57,37 @@ export function buildContentMetadata(input: {
     },
   };
 }
+
+/**
+ * Lighter metadata builder for listing/index pages (Articles, Case Studies,
+ * Hobbies, About). Adds a canonical URL and `website`-type OpenGraph/Twitter
+ * cards. `title` is the full page title (already suffixed with the site name).
+ */
+export function buildListingMetadata(input: {
+  title: string;
+  description: string;
+  path: string;
+  image?: string;
+}): Metadata {
+  const { title, description, path, image } = input;
+  const images = image ? [{ url: image }] : undefined;
+
+  return {
+    title,
+    description,
+    alternates: { canonical: path },
+    openGraph: {
+      type: "website",
+      title,
+      description,
+      url: path,
+      images,
+    },
+    twitter: {
+      card: image ? "summary_large_image" : "summary",
+      title,
+      description,
+      images: image ? [image] : undefined,
+    },
+  };
+}

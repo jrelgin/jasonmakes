@@ -3,16 +3,18 @@ import Link from "next/link";
 
 import PageHeader from "@/components/PageHeader";
 import PageShell from "@/components/PageShell";
+import { buildListingMetadata } from "../../../lib/config/site";
 import {
   type Article,
   listArticles,
   resolveArticleFeatureImage,
 } from "../../../lib/data/content";
 
-export const metadata = {
+export const metadata = buildListingMetadata({
   title: "Articles | Jason Makes",
   description: "Articles and thoughts on design, development, and creativity",
-};
+  path: "/articles",
+});
 
 export const dynamic = "force-static";
 

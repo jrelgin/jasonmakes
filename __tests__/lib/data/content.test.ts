@@ -31,9 +31,10 @@ describe("Keystatic content loader", () => {
     );
     expect(article).not.toBeNull();
     expect(article?.title).toBe(
-      "I built the perfect automated planner. I hate it.",
+      "I built the perfect automated planner and I hate it.",
     );
-    expect(article?.content).toContain("paper planner person");
+    // `content` is now a transformed Markdoc tree, not a raw string.
+    expect(JSON.stringify(article?.content)).toContain("paper planner person");
   });
 
   it("lists real case studies by sort order", async () => {

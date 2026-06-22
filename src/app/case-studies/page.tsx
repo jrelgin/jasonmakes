@@ -3,12 +3,14 @@ import Link from "next/link";
 
 import PageHeader from "@/components/PageHeader";
 import PageShell from "@/components/PageShell";
+import { buildListingMetadata } from "../../../lib/config/site";
 import { type CaseStudy, listCaseStudies } from "../../../lib/data/content";
 
-export const metadata = {
+export const metadata = buildListingMetadata({
   title: "Case Studies | Jason Makes",
   description: "Case studies showcasing design and development projects",
-};
+  path: "/case-studies",
+});
 
 export const dynamic = "force-static";
 
