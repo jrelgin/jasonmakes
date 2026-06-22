@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 
 import DriftingWave from "@/components/DriftingWave";
 import PageShell from "@/components/PageShell";
+import { buildContentMetadata } from "../../../../lib/config/site";
 import { getCaseStudy, listCaseStudies } from "../../../../lib/data/content";
 import Markdown from "../../../components/Markdown";
 
@@ -30,11 +31,13 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     };
   }
 
-  return {
-    title: `${caseStudy.title} | Jason Makes`,
+  return buildContentMetadata({
+    title: caseStudy.title,
     description:
       caseStudy.excerpt || `View case study: ${caseStudy.title} by Jason Elgin`,
-  };
+    path: `/case-studies/${slug}`,
+    image: caseStudy.heroImage ?? undefined,
+  });
 }
 
 export default async function Page({ params }: Params) {

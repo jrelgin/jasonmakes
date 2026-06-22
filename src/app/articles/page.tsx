@@ -70,7 +70,7 @@ function ArticleRow({ article, index }: { article: Article; index: number }) {
             src={resolveArticleFeatureImage(article)}
             alt=""
             fill
-            sizes="88px"
+            sizes="64px"
             className="object-cover"
           />
         </span>

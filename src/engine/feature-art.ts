@@ -17,9 +17,9 @@ import { createNoiseGenerators } from "./noise";
  * tune in preview is what ships.
  */
 
-/** Ship resolution — portrait (4:5). */
-export const FEATURE_ART_WIDTH = 1080;
-export const FEATURE_ART_HEIGHT = 1350;
+/** Ship resolution — landscape (1.91:1), doubles as the OG/social card. */
+export const FEATURE_ART_WIDTH = 1200;
+export const FEATURE_ART_HEIGHT = 630;
 
 type RNG = () => number;
 type Noise2D = (x: number, y: number) => number;

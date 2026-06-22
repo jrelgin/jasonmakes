@@ -143,7 +143,7 @@ function HobbyProjectRow({
             src={resolveHobbyFeatureImage(hobbyProject)}
             alt=""
             fill
-            sizes="88px"
+            sizes="64px"
             className="object-cover"
           />
         </span>

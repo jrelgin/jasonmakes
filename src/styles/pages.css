@@ -199,11 +199,12 @@
 .index-row__thumb {
   position: relative;
   align-self: center;
-  width: clamp(3.5rem, 7vw, 5.25rem);
-  aspect-ratio: 16 / 9;
+  width: 4rem;
+  height: 4rem;
+  aspect-ratio: 1 / 1;
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--u-panel-border) 42%, transparent);
-  border-radius: 8px;
+  border-radius: 10px;
 }
 
 li:last-child > .index-row {
