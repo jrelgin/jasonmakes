@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 
 import DriftingWave from "@/components/DriftingWave";
 import PageShell from "@/components/PageShell";
+import { buildContentMetadata } from "../../../../lib/config/site";
 import {
   getHobbyProject,
   listHobbyProjects,
@@ -34,12 +35,17 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     };
   }
 
-  return {
-    title: `${hobbyProject.title} | Jason Makes`,
+  return buildContentMetadata({
+    title: hobbyProject.title,
     description:
       hobbyProject.excerpt ||
       `View hobby project: ${hobbyProject.title} by Jason Elgin`,
-  };
+    path: `/hobbies/${slug}`,
+    image: resolveHobbyFeatureImage(hobbyProject),
+    imageDimensions: hobbyProject.heroImage
+      ? undefined
+      : { width: 1200, height: 630 },
+  });
 }
 
 export default async function Page({ params }: Params) {
@@ -125,7 +131,7 @@ export default async function Page({ params }: Params) {
             )}
           </header>
 
-          <div className="u-rise u-rise-1 relative mt-10 aspect-video overflow-hidden rounded-xl border border-[var(--u-panel-border)]">
+          <div className="u-rise u-rise-1 relative mt-10 aspect-[1200/630] overflow-hidden rounded-xl border border-[var(--u-panel-border)]">
             <Image
               src={resolveHobbyFeatureImage(hobbyProject)}
               alt={hobbyProject.title}

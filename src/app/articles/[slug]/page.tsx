@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 
 import DriftingWave from "@/components/DriftingWave";
 import PageShell from "@/components/PageShell";
+import { buildContentMetadata } from "../../../../lib/config/site";
 import {
   getArticle,
   listArticles,
@@ -34,10 +35,15 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     };
   }
 
-  return {
-    title: `${article.title} | Jason Makes`,
+  return buildContentMetadata({
+    title: article.title,
     description: article.excerpt || `Read ${article.title} by Jason Elgin`,
-  };
+    path: `/articles/${slug}`,
+    image: resolveArticleFeatureImage(article),
+    imageDimensions: article.heroImage
+      ? undefined
+      : { width: 1200, height: 630 },
+  });
 }
 
 export default async function Page({ params }: Params) {
@@ -78,7 +84,7 @@ export default async function Page({ params }: Params) {
             <DriftingWave className="mt-8 max-w-[14rem]" />
           </header>
 
-          <div className="u-rise u-rise-1 relative mt-10 aspect-video overflow-hidden rounded-xl border border-[var(--u-panel-border)]">
+          <div className="u-rise u-rise-1 relative mt-10 aspect-[1200/630] overflow-hidden rounded-xl border border-[var(--u-panel-border)]">
             <Image
               src={resolveArticleFeatureImage(article)}
               alt={article.title}

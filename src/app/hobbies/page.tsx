@@ -143,15 +143,17 @@ function HobbyProjectRow({
             src={resolveHobbyFeatureImage(hobbyProject)}
             alt=""
             fill
-            sizes="88px"
+            sizes="128px"
             className="object-cover"
           />
         </span>
-        <span className="index-row__index">
-          {String(index + 1).padStart(2, "0")}
-        </span>
         <div>
-          {eyebrow && <p className="u-eyebrow text-base">{eyebrow}</p>}
+          <p className="u-eyebrow text-base">
+            <span className="index-row__index">
+              {String(index + 1).padStart(2, "0")}
+            </span>
+            {eyebrow}
+          </p>
           <h3 className="index-row__title mt-1">{title}</h3>
           {excerpt && <p className="index-row__excerpt">{excerpt}</p>}
         </div>
