@@ -41,11 +41,11 @@ const DEFAULTS = {
   amplitude: 7.5,
   wavelength: 106,
   strokeWidth: 2,
-  lineOpacity: 0.85,
-  cycleSeconds: 12,
+  lineOpacity: 0.5,
+  cycleSeconds: 16,
   parallax: true,
-  parallaxOffset: 61,
-  bobAmplitude: 0.5,
+  parallaxOffset: 65,
+  bobAmplitude: 2,
   rowGap: 24,
   fieldIntensity: 0.5,
   applyToBackground: false,
@@ -53,7 +53,7 @@ const DEFAULTS = {
   // can differ in size, period, and phase (what reads as natural water).
   amplitude2: 7.5,
   wavelength2: 106,
-  phase2: 0,
+  phase2: 28,
 };
 
 // Build one period of the wave as an SVG path. "sine" is a clean, even curve;
