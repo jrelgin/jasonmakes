@@ -1,17 +1,21 @@
 import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import DriftingWave from "@/components/DriftingWave";
+import DetailPageHeader from "@/components/DetailPageHeader";
+import FeatureImage from "@/components/FeatureImage";
+import JsonLd from "@/components/JsonLd";
+import KeyPointsList from "@/components/KeyPointsList";
+import MetaGrid from "@/components/MetaGrid";
 import PageShell from "@/components/PageShell";
+import MarkdocContent from "@/components/markdoc/MarkdocContent";
 import { buildContentMetadata } from "../../../../lib/config/site";
 import {
   getHobbyProject,
   listHobbyProjects,
   resolveHobbyFeatureImage,
 } from "../../../../lib/data/content";
-import Markdown from "../../../components/Markdown";
+import { getSiteSettings } from "../../../../lib/data/settings";
+import { articleJsonLd } from "../../../../lib/seo/jsonLd";
 
 interface Params {
   params: Promise<{
@@ -19,6 +23,8 @@ interface Params {
   }>;
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }
+
+export const dynamicParams = false;
 
 export async function generateStaticParams() {
   const hobbyProjects = await listHobbyProjects();
@@ -56,9 +62,21 @@ export default async function Page({ params }: Params) {
     notFound();
   }
 
+  const settings = await getSiteSettings();
+  const jsonLd = articleJsonLd({
+    title: hobbyProject.title,
+    description:
+      hobbyProject.excerpt ||
+      `View hobby project: ${hobbyProject.title} by ${settings.authorName}`,
+    path: `/hobbies/${slug}`,
+    image: resolveHobbyFeatureImage(hobbyProject),
+    datePublished: hobbyProject.publishDate,
+    authorName: settings.authorName,
+  });
+
   const meta = [
     { label: "Type", value: hobbyProject.projectType },
-    { label: "Status", value: hobbyProject.status },
+    { label: "Status", value: hobbyProject.projectStatus },
     { label: "Built with", value: hobbyProject.builtWith.join(", ") },
   ].filter((item) => item.value);
 
@@ -69,25 +87,15 @@ export default async function Page({ params }: Params) {
 
   return (
     <PageShell>
+      <JsonLd data={jsonLd} />
       <article className="container mx-auto max-w-4xl px-4 py-16 md:py-24">
         <div className="read-veil">
-          <header className="u-rise">
-            <Link
-              href="/hobbies"
-              className="u-eyebrow inline-flex items-center gap-2 transition-opacity hover:opacity-70"
-            >
-              <span aria-hidden="true">&lt;-</span> Hobbies
-            </Link>
-            {hobbyProject.projectType && (
-              <p className="mt-5 font-mono text-sm uppercase tracking-wider text-[var(--u-ink-muted)]">
-                {hobbyProject.projectType}
-              </p>
-            )}
-            <h1 className="u-title mt-2 text-4xl md:text-5xl lg:text-6xl">
-              {hobbyProject.title}
-            </h1>
-            <DriftingWave className="mt-8" />
-
+          <DetailPageHeader
+            backHref="/hobbies"
+            backLabel="Hobbies"
+            eyebrow={hobbyProject.projectType}
+            title={hobbyProject.title}
+          >
             {actions.length > 0 && (
               <div className="mt-8 flex flex-wrap gap-3">
                 {actions.map((action) => (
@@ -104,46 +112,18 @@ export default async function Page({ params }: Params) {
               </div>
             )}
 
-            {meta.length > 0 && (
-              <dl className="frost-panel mt-8 grid gap-5 p-6 text-sm sm:grid-cols-3">
-                {meta.map((item) => (
-                  <div key={item.label}>
-                    <dt className="u-eyebrow text-sm">{item.label}</dt>
-                    <dd className="mt-1.5 text-[var(--u-ink-strong)]">
-                      {item.value}
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-            )}
+            <MetaGrid items={meta} />
+            <KeyPointsList items={hobbyProject.highlights} variant="detail" />
+          </DetailPageHeader>
 
-            {hobbyProject.highlights.length > 0 && (
-              <ul className="mt-6 grid gap-3 md:grid-cols-2">
-                {hobbyProject.highlights.map((highlight) => (
-                  <li
-                    key={highlight}
-                    className="border-l-2 border-[var(--u-accent)] pl-4 text-sm leading-relaxed text-[var(--u-ink)]"
-                  >
-                    {highlight}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </header>
-
-          <div className="u-rise u-rise-1 relative mt-10 aspect-[1200/630] overflow-hidden rounded-xl border border-[var(--u-panel-border)]">
-            <Image
-              src={resolveHobbyFeatureImage(hobbyProject)}
-              alt={hobbyProject.title}
-              fill
-              priority
-              sizes="(max-width: 768px) 100vw, 896px"
-              className="object-cover"
-            />
-          </div>
+          <FeatureImage
+            src={resolveHobbyFeatureImage(hobbyProject)}
+            alt={hobbyProject.title}
+            aspect="wide"
+          />
 
           <div className="ink-prose u-rise u-rise-2 mt-12">
-            <Markdown source={hobbyProject.content} />
+            <MarkdocContent content={hobbyProject.content} />
           </div>
         </div>
       </article>

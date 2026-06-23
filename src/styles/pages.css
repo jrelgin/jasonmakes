@@ -382,7 +382,7 @@ li:last-child > .index-row {
   margin: 2.2em 0;
 }
 
-.ink-prose figure img {
+.ink-prose img {
   display: block;
   width: 100%;
   height: auto;
@@ -421,6 +421,81 @@ li:last-child > .index-row {
   background: none;
   border: none;
   padding: 0;
+}
+
+/* GFM tables (now supported by the Markdoc renderer). */
+.ink-prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-instrument), sans-serif;
+  font-size: 0.95rem;
+}
+
+.ink-prose th,
+.ink-prose td {
+  border: 1px solid var(--u-panel-border);
+  padding: 0.5em 0.75em;
+  text-align: left;
+  vertical-align: top;
+}
+
+.ink-prose th {
+  background: var(--u-panel);
+  color: var(--u-ink-strong);
+  font-weight: 600;
+}
+
+/* Callout blocks ({% callout tone="…" %}). */
+.ink-callout {
+  --callout-accent: var(--u-accent);
+  margin: 2em 0;
+  padding: 1rem 1.25rem;
+  border-left: 3px solid var(--callout-accent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--callout-accent) 10%, var(--u-panel));
+}
+
+.ink-callout > :first-child {
+  margin-top: 0;
+}
+
+.ink-callout > * + * {
+  margin-top: 0.8em;
+}
+
+.ink-callout--info {
+  --callout-accent: #3b6ea5;
+}
+
+.ink-callout--success {
+  --callout-accent: #3f8f54;
+}
+
+.ink-callout--warning {
+  --callout-accent: var(--u-accent);
+}
+
+.ink-callout--danger {
+  --callout-accent: #b3403a;
+}
+
+/* Responsive video embeds ({% youtube … %}). */
+.ink-embed {
+  position: relative;
+  margin: 2.2em 0;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border: 1px solid var(--u-panel-border);
+  border-radius: 8px;
+  background: var(--u-panel);
+}
+
+.ink-embed iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
 }
 
 /* Drop cap: a large initial letter on the first paragraph of long-form copy.

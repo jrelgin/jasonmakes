@@ -3,8 +3,11 @@ import type { Metadata } from "next";
 import { Geist_Mono, Instrument_Sans } from "next/font/google";
 import localFont from "next/font/local";
 
-import { siteMetadata } from "#lib/config/site";
+import { SITE_URL, siteMetadata } from "#lib/config/site";
+import { getSiteSettings } from "#lib/data/settings";
+import { siteJsonLd } from "#lib/seo/jsonLd";
 
+import JsonLd from "@/components/JsonLd";
 import SiteShell from "@/components/SiteShell";
 import PostHogAnalytics from "@/components/posthog-analytics";
 import {
@@ -65,7 +68,29 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = siteMetadata;
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+  const title = `${settings.siteTitle} | Design & Development`;
+
+  return {
+    ...siteMetadata,
+    title,
+    description: settings.siteDescription,
+    alternates: {
+      types: { "application/rss+xml": `${SITE_URL}/feed.xml` },
+    },
+    openGraph: {
+      type: "website",
+      siteName: settings.siteTitle,
+      url: SITE_URL,
+      title,
+      description: settings.siteDescription,
+      ...(settings.shareImage
+        ? { images: [{ url: settings.shareImage }] }
+        : {}),
+    },
+  };
+}
 
 const themeInitScript = `
 (() => {
@@ -85,17 +110,26 @@ const themeInitScript = `
 })();
 `;
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const settings = await getSiteSettings();
+  const jsonLd = siteJsonLd({
+    siteTitle: settings.siteTitle,
+    siteDescription: settings.siteDescription,
+    authorName: settings.authorName,
+    sameAs: settings.socialLinks.map((link) => link.url),
+  });
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${apocFont.variable} ${gloockFont.variable} ${instrumentSerifFont.variable} ${instrumentSans.variable} ${geistMono.variable} antialiased`}
       >
         <script>{themeInitScript}</script>
+        <JsonLd data={jsonLd} />
         <SiteShell>{children}</SiteShell>
         <PostHogAnalytics />
         <Analytics />
