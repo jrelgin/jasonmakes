@@ -42,7 +42,7 @@ export default function DetailPageHeader({
       >
         {title}
       </h1>
-      <DriftingWave className="mt-8 max-w-[14rem]" />
+      <DriftingWave className="mt-8" />
       {children}
     </header>
   );

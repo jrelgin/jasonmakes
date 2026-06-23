@@ -27,7 +27,7 @@ export default async function AboutPage() {
               {settings.authorName}
             </h1>
             <p className="u-lede mt-5 text-2xl">{about.lede}</p>
-            <DriftingWave className="mt-8 max-w-[16rem]" />
+            <DriftingWave className="mt-8" />
           </div>
 
           {about.body && (
