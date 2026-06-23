@@ -3,7 +3,9 @@ import { notFound } from "next/navigation";
 
 import DetailPageHeader from "@/components/DetailPageHeader";
 import FeatureImage from "@/components/FeatureImage";
+import JsonLd from "@/components/JsonLd";
 import PageShell from "@/components/PageShell";
+import MarkdocContent from "@/components/markdoc/MarkdocContent";
 import { formatPublishDate } from "@/lib/date";
 import { buildContentMetadata } from "../../../../lib/config/site";
 import {
@@ -11,7 +13,8 @@ import {
   listArticles,
   resolveArticleFeatureImage,
 } from "../../../../lib/data/content";
-import Markdown from "../../../components/Markdown";
+import { getSiteSettings } from "../../../../lib/data/settings";
+import { articleJsonLd } from "../../../../lib/seo/jsonLd";
 
 interface Params {
   params: Promise<{
@@ -19,6 +22,8 @@ interface Params {
   }>;
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }
+
+export const dynamicParams = false;
 
 export async function generateStaticParams() {
   const articles = await listArticles();
@@ -54,10 +59,22 @@ export default async function Page({ params }: Params) {
     notFound();
   }
 
+  const settings = await getSiteSettings();
+  const jsonLd = articleJsonLd({
+    title: article.title,
+    description:
+      article.excerpt || `Read ${article.title} by ${settings.authorName}`,
+    path: `/articles/${slug}`,
+    image: resolveArticleFeatureImage(article),
+    datePublished: article.publishDate,
+    authorName: settings.authorName,
+  });
+
   const formattedDate = formatPublishDate(article.publishDate);
 
   return (
     <PageShell>
+      <JsonLd data={jsonLd} />
       <article className="container mx-auto max-w-3xl px-4 py-16 md:py-24">
         <div className="read-veil">
           <DetailPageHeader
@@ -75,7 +92,7 @@ export default async function Page({ params }: Params) {
           />
 
           <div className="ink-prose ink-prose--dropcap u-rise u-rise-2 mt-12">
-            <Markdown source={article.content} />
+            <MarkdocContent content={article.content} />
           </div>
         </div>
       </article>

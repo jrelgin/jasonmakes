@@ -1,18 +1,22 @@
 import DriftingWave from "@/components/DriftingWave";
 import PageShell from "@/components/PageShell";
+import MarkdocContent from "@/components/markdoc/MarkdocContent";
+import { buildListingMetadata } from "../../../lib/config/site";
+import { getAboutContent, getSiteSettings } from "../../../lib/data/settings";
 
-export const metadata = {
+export const metadata = buildListingMetadata({
   title: "About | Jason Makes",
   description:
     "About Jason Elgin, product leader and designer building tools for education, analytics, and creative work.",
-};
+  path: "/about",
+});
 
-const elsewhere = [
-  { label: "GitHub", href: "https://github.com/jrelgin" },
-  { label: "LinkedIn", href: "https://www.linkedin.com/in/jrelgin" },
-];
+export default async function AboutPage() {
+  const [about, settings] = await Promise.all([
+    getAboutContent(),
+    getSiteSettings(),
+  ]);
 
-export default function AboutPage() {
   return (
     <PageShell>
       <section className="container mx-auto max-w-4xl px-4 py-16 md:py-24">
@@ -20,81 +24,40 @@ export default function AboutPage() {
           <div className="u-rise max-w-3xl">
             <p className="u-eyebrow text-lg">Product builder</p>
             <h1 className="u-title mt-3 text-5xl md:text-6xl lg:text-7xl">
-              Jason Elgin
+              {settings.authorName}
             </h1>
-            <p className="u-lede mt-5 text-2xl">
-              Head of Product at Standard Education. Over 15 years of turning
-              messy problems into software that works.
-            </p>
+            <p className="u-lede mt-5 text-2xl">{about.lede}</p>
             <DriftingWave className="mt-8 max-w-[16rem]" />
           </div>
 
-          <div className="u-rise u-rise-1 mt-10 max-w-2xl space-y-6 text-lg leading-relaxed text-[var(--u-ink)]">
-            <p>
-              For most of that time, the making was the hard part. It isn't
-              anymore. What's hard now, and what I find myself caring about
-              most, is knowing what's worth making, getting it in front of real
-              people fast, and being honest about whether it actually helped.
-            </p>
-            <p>
-              The craft underneath still matters to me a lot. Heuristic
-              evaluation, information architecture, design systems, the quiet
-              scaffolding that makes the next decision easier. Good work doesn't
-              erase complexity so much as organize it, so the people I build for
-              can make confident choices.
-            </p>
-            <p>
-              That's the work at Standard Education, where we turn K-12
-              analytics into tools that help educators reach students before
-              they fall behind. Before that, I led design for product-led growth
-              and collaboration at{" "}
-              <a
-                href="https://fullstory.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[var(--u-accent)] underline decoration-1 underline-offset-4 transition-colors hover:text-[var(--u-accent-strong)]"
-              >
-                FullStory
-              </a>
-              , ran{" "}
-              <a
-                href="https://signallantern.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[var(--u-accent)] underline decoration-1 underline-offset-4 transition-colors hover:text-[var(--u-accent-strong)]"
-              >
-                Signal Lantern
-              </a>{" "}
-              where I rebuilt the survey-export experience at Glass for research
-              teams at brands like Unilever and Clorox, and led a development
-              team and facilitated Design Sprints at Three Five Two.
-            </p>
-            <p className="font-[family-name:var(--font-instrument-serif)] text-xl italic text-[var(--u-ink-strong)]">
-              This site is a small experiment in that idea: a calm surface over
-              a lot of moving water.
-            </p>
-          </div>
+          {about.body && (
+            <div className="ink-prose u-rise u-rise-1 mt-10 max-w-2xl">
+              <MarkdocContent content={about.body} />
+            </div>
+          )}
 
-          <ul className="u-rise u-rise-2 mt-10 flex flex-wrap gap-x-6 gap-y-2 font-mono text-xs uppercase tracking-wider">
-            {elsewhere.map((item) => (
-              <li key={item.label}>
-                <a
-                  href={item.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[var(--u-ink-muted)] transition-colors hover:text-[var(--u-accent)]"
-                >
-                  {item.label}
-                </a>
-              </li>
-            ))}
-          </ul>
+          {settings.socialLinks.length > 0 && (
+            <ul className="u-rise u-rise-2 mt-10 flex flex-wrap gap-x-6 gap-y-2 font-mono text-xs uppercase tracking-wider">
+              {settings.socialLinks.map((item) => (
+                <li key={item.label}>
+                  <a
+                    href={item.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[var(--u-ink-muted)] transition-colors hover:text-[var(--u-accent)]"
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </section>
 
       <footer className="container mx-auto max-w-4xl px-4 py-10">
         <p className="font-mono text-xs uppercase tracking-wider text-[var(--u-ink-muted)]">
-          © {new Date().getFullYear()} Jason Elgin
+          © {new Date().getFullYear()} {settings.authorName}
         </p>
       </footer>
     </PageShell>

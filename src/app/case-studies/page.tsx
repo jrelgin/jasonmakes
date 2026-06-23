@@ -3,12 +3,14 @@ import FeatureCard from "@/components/FeatureCard";
 import IndexRow from "@/components/IndexRow";
 import PageHeader from "@/components/PageHeader";
 import PageShell from "@/components/PageShell";
+import { buildListingMetadata } from "../../../lib/config/site";
 import { listCaseStudies } from "../../../lib/data/content";
 
-export const metadata = {
+export const metadata = buildListingMetadata({
   title: "Case Studies | Jason Makes",
   description: "Case studies showcasing design and development projects",
-};
+  path: "/case-studies",
+});
 
 export const dynamic = "force-static";
 

@@ -1,6 +1,8 @@
 import { createReader } from "@keystatic/core/reader";
+import Markdoc, { type RenderableTreeNode } from "@markdoc/markdoc";
 
 import config from "../../keystatic.config";
+import { markdocConfig } from "../../src/components/markdoc/config";
 
 const reader = createReader(process.cwd(), config);
 
@@ -21,7 +23,7 @@ type BaseContent = {
   publishDate: string;
   heroImage: string | null;
   tags: string[];
-  content: string;
+  content: RenderableTreeNode;
 };
 
 export type Article = BaseContent;
@@ -35,7 +37,7 @@ export type CaseStudy = BaseContent & {
 };
 export type HobbyProject = BaseContent & {
   projectType: string;
-  status: string;
+  projectStatus: string;
   builtWith: string[];
   highlights: string[];
   liveUrl: string;
@@ -43,28 +45,36 @@ export type HobbyProject = BaseContent & {
   sortOrder: number | null;
 };
 
+// Drafts are committed to the repo via Keystatic but hidden from the live site.
+// They remain visible in local development so they can be previewed before
+// flipping the status to "published".
+const isProduction = process.env.NODE_ENV === "production";
+function isVisible(entry: { status?: string }): boolean {
+  return !isProduction || entry.status === "published";
+}
+
 async function toContent<
   T extends ArticleEntry | CaseStudyEntry | HobbyProjectEntry,
 >(slug: string, entry: T): Promise<BaseContent> {
-  const resolvedContent =
-    typeof entry.content === "function"
-      ? await entry.content()
-      : typeof entry.content === "string"
-        ? entry.content
-        : "";
+  // `fields.markdoc` resolves to `{ node }` (a Markdoc AST). The reader types it
+  // as either the resolved value or a lazy function depending on options, so
+  // handle both. Transform into a JSON-serializable renderable tree here so
+  // pages can hand it straight to <MarkdocContent /> without re-parsing.
+  const resolved =
+    typeof entry.content === "function" ? await entry.content() : entry.content;
+  const content = Markdoc.transform(resolved.node, markdocConfig);
 
   return {
-    // Keystatic's `fields.slug` stores the human-readable *name* in the entry
-    // data and uses the slugified value as the filename/entry key. The entry
-    // key (passed in as `slug`) is the canonical URL slug — `entry.slug` would
-    // be the name (with spaces/capitals), which breaks routing.
+    // Keystatic stores the human-readable title in the entry data and uses the
+    // slugified value as the filename/entry key. The entry key (passed in as
+    // `slug`) is the canonical URL slug.
     slug,
     title: entry.title,
     excerpt: entry.excerpt ?? "",
     publishDate: entry.publishDate,
     heroImage: entry.heroImage ?? null,
     tags: entry.tags ? [...entry.tags] : [],
-    content: resolvedContent,
+    content,
   };
 }
 
@@ -87,7 +97,9 @@ export function resolveHobbyFeatureImage(project: HobbyProject): string {
 export async function listArticles(): Promise<Article[]> {
   const items = await reader.collections.articles.all();
   const mapped = await Promise.all(
-    items.map(({ slug, entry }) => toContent(slug, entry)),
+    items
+      .filter(({ entry }) => isVisible(entry))
+      .map(({ slug, entry }) => toContent(slug, entry)),
   );
   return mapped.sort((a, b) => (a.publishDate > b.publishDate ? -1 : 1));
 }
@@ -112,32 +124,34 @@ function sortFeaturedContent<
 
 export async function getArticle(slug: string): Promise<Article | null> {
   const entry = await reader.collections.articles.read(slug);
-  if (!entry) return null;
+  if (!entry || !isVisible(entry)) return null;
   return toContent(slug, entry);
 }
 
 export async function listCaseStudies(): Promise<CaseStudy[]> {
   const items = await reader.collections.caseStudies.all();
   const mapped = await Promise.all(
-    items.map(async ({ slug, entry }) => {
-      const baseContent = await toContent(slug, entry);
-      return {
-        ...baseContent,
-        client: entry.client ?? "",
-        role: entry.role ?? "",
-        scope: entry.scope ?? "",
-        industry: entry.industry ?? "",
-        outcomes: entry.outcomes ? [...entry.outcomes] : [],
-        sortOrder: entry.sortOrder ?? null,
-      };
-    }),
+    items
+      .filter(({ entry }) => isVisible(entry))
+      .map(async ({ slug, entry }) => {
+        const baseContent = await toContent(slug, entry);
+        return {
+          ...baseContent,
+          client: entry.client ?? "",
+          role: entry.role ?? "",
+          scope: entry.scope ?? "",
+          industry: entry.industry ?? "",
+          outcomes: entry.outcomes ? [...entry.outcomes] : [],
+          sortOrder: entry.sortOrder ?? null,
+        };
+      }),
   );
   return sortFeaturedContent(mapped);
 }
 
 export async function getCaseStudy(slug: string): Promise<CaseStudy | null> {
   const entry = await reader.collections.caseStudies.read(slug);
-  if (!entry) return null;
+  if (!entry || !isVisible(entry)) return null;
   const baseContent = await toContent(slug, entry);
   return {
     ...baseContent,
@@ -153,19 +167,21 @@ export async function getCaseStudy(slug: string): Promise<CaseStudy | null> {
 export async function listHobbyProjects(): Promise<HobbyProject[]> {
   const items = await reader.collections.hobbyProjects.all();
   const mapped = await Promise.all(
-    items.map(async ({ slug, entry }) => {
-      const baseContent = await toContent(slug, entry);
-      return {
-        ...baseContent,
-        projectType: entry.projectType ?? "",
-        status: entry.status ?? "",
-        builtWith: entry.builtWith ? [...entry.builtWith] : [],
-        highlights: entry.highlights ? [...entry.highlights] : [],
-        liveUrl: entry.liveUrl ?? "",
-        repoUrl: entry.repoUrl ?? "",
-        sortOrder: entry.sortOrder ?? null,
-      };
-    }),
+    items
+      .filter(({ entry }) => isVisible(entry))
+      .map(async ({ slug, entry }) => {
+        const baseContent = await toContent(slug, entry);
+        return {
+          ...baseContent,
+          projectType: entry.projectType ?? "",
+          projectStatus: entry.projectStatus ?? "",
+          builtWith: entry.builtWith ? [...entry.builtWith] : [],
+          highlights: entry.highlights ? [...entry.highlights] : [],
+          liveUrl: entry.liveUrl ?? "",
+          repoUrl: entry.repoUrl ?? "",
+          sortOrder: entry.sortOrder ?? null,
+        };
+      }),
   );
   return sortFeaturedContent(mapped);
 }
@@ -174,12 +190,12 @@ export async function getHobbyProject(
   slug: string,
 ): Promise<HobbyProject | null> {
   const entry = await reader.collections.hobbyProjects.read(slug);
-  if (!entry) return null;
+  if (!entry || !isVisible(entry)) return null;
   const baseContent = await toContent(slug, entry);
   return {
     ...baseContent,
     projectType: entry.projectType ?? "",
-    status: entry.status ?? "",
+    projectStatus: entry.projectStatus ?? "",
     builtWith: entry.builtWith ? [...entry.builtWith] : [],
     highlights: entry.highlights ? [...entry.highlights] : [],
     liveUrl: entry.liveUrl ?? "",

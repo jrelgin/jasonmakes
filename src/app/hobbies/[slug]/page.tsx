@@ -3,16 +3,19 @@ import { notFound } from "next/navigation";
 
 import DetailPageHeader from "@/components/DetailPageHeader";
 import FeatureImage from "@/components/FeatureImage";
+import JsonLd from "@/components/JsonLd";
 import KeyPointsList from "@/components/KeyPointsList";
 import MetaGrid from "@/components/MetaGrid";
 import PageShell from "@/components/PageShell";
+import MarkdocContent from "@/components/markdoc/MarkdocContent";
 import { buildContentMetadata } from "../../../../lib/config/site";
 import {
   getHobbyProject,
   listHobbyProjects,
   resolveHobbyFeatureImage,
 } from "../../../../lib/data/content";
-import Markdown from "../../../components/Markdown";
+import { getSiteSettings } from "../../../../lib/data/settings";
+import { articleJsonLd } from "../../../../lib/seo/jsonLd";
 
 interface Params {
   params: Promise<{
@@ -20,6 +23,8 @@ interface Params {
   }>;
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }
+
+export const dynamicParams = false;
 
 export async function generateStaticParams() {
   const hobbyProjects = await listHobbyProjects();
@@ -57,9 +62,21 @@ export default async function Page({ params }: Params) {
     notFound();
   }
 
+  const settings = await getSiteSettings();
+  const jsonLd = articleJsonLd({
+    title: hobbyProject.title,
+    description:
+      hobbyProject.excerpt ||
+      `View hobby project: ${hobbyProject.title} by ${settings.authorName}`,
+    path: `/hobbies/${slug}`,
+    image: resolveHobbyFeatureImage(hobbyProject),
+    datePublished: hobbyProject.publishDate,
+    authorName: settings.authorName,
+  });
+
   const meta = [
     { label: "Type", value: hobbyProject.projectType },
-    { label: "Status", value: hobbyProject.status },
+    { label: "Status", value: hobbyProject.projectStatus },
     { label: "Built with", value: hobbyProject.builtWith.join(", ") },
   ].filter((item) => item.value);
 
@@ -70,6 +87,7 @@ export default async function Page({ params }: Params) {
 
   return (
     <PageShell>
+      <JsonLd data={jsonLd} />
       <article className="container mx-auto max-w-4xl px-4 py-16 md:py-24">
         <div className="read-veil">
           <DetailPageHeader
@@ -105,7 +123,7 @@ export default async function Page({ params }: Params) {
           />
 
           <div className="ink-prose u-rise u-rise-2 mt-12">
-            <Markdown source={hobbyProject.content} />
+            <MarkdocContent content={hobbyProject.content} />
           </div>
         </div>
       </article>
