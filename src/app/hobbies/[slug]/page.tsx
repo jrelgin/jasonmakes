@@ -86,7 +86,7 @@ export default async function Page({ params }: Params) {
             <h1 className="u-title mt-2 text-4xl md:text-5xl lg:text-6xl">
               {hobbyProject.title}
             </h1>
-            <DriftingWave className="mt-8 max-w-[14rem]" />
+            <DriftingWave className="mt-8" />
 
             {actions.length > 0 && (
               <div className="mt-8 flex flex-wrap gap-3">

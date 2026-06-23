@@ -26,7 +26,7 @@ export default function AboutPage() {
               Head of Product at Standard Education. Over 15 years of turning
               messy problems into software that works.
             </p>
-            <DriftingWave className="mt-8 max-w-[16rem]" />
+            <DriftingWave className="mt-8" />
           </div>
 
           <div className="u-rise u-rise-1 mt-10 max-w-2xl space-y-6 text-lg leading-relaxed text-[var(--u-ink)]">

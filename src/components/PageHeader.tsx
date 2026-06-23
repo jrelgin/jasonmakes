@@ -24,7 +24,7 @@ export default function PageHeader({
       {subtitle ? (
         <p className="u-lede mt-5 max-w-2xl text-xl md:text-2xl">{subtitle}</p>
       ) : null}
-      <DriftingWave className="mt-8 max-w-[14rem]" />
+      <DriftingWave className="mt-8" />
     </header>
   );
 }

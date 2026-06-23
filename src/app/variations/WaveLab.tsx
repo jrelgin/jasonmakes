@@ -38,17 +38,22 @@ type Shape = "sine" | "plateau";
 
 const DEFAULTS = {
   shape: "sine" as Shape,
-  amplitude: 4.5,
-  wavelength: 64,
+  amplitude: 7.5,
+  wavelength: 106,
   strokeWidth: 2,
-  lineOpacity: 1,
-  cycleSeconds: 8,
+  lineOpacity: 0.85,
+  cycleSeconds: 9,
   parallax: true,
-  parallaxOffset: 35,
-  bobAmplitude: 3,
+  parallaxOffset: 61,
+  bobAmplitude: 0.5,
   rowGap: 24,
   fieldIntensity: 0.5,
   applyToBackground: false,
+  // Second (parallax) line — tuned independently of line 1 so the two trains
+  // can differ in size, period, and phase (what reads as natural water).
+  amplitude2: 7.5,
+  wavelength2: 106,
+  phase2: 0,
 };
 
 // Build one period of the wave as an SVG path. "sine" is a clean, even curve;
@@ -219,18 +224,37 @@ export default function WaveLab() {
 
   // Tunable line + field masks, regenerated whenever the inputs change.
   const tuned = useMemo(() => {
-    const lineHeight = Math.ceil(s.amplitude * 2 + s.strokeWidth * 2 + 6);
+    // Container is sized to the taller of the two lines so neither clips; both
+    // masks share one midline so they ride a common baseline.
+    const ampMax = Math.max(s.amplitude, s.amplitude2);
+    const lineHeight = Math.ceil(ampMax * 2 + s.strokeWidth * 2 + 6);
     const lineMid = lineHeight / 2;
     const linePath = buildPath(s.shape, s.amplitude, s.wavelength, lineMid);
     const lineUrl = svgUrl(linePath, s.wavelength, lineHeight, s.strokeWidth);
+
+    const line2Path = buildPath(s.shape, s.amplitude2, s.wavelength2, lineMid);
+    const line2Url = svgUrl(
+      line2Path,
+      s.wavelength2,
+      lineHeight,
+      s.strokeWidth,
+    );
 
     const fieldMid = s.rowGap / 2;
     const fieldAmp = Math.min(s.amplitude, s.rowGap / 2 - s.strokeWidth);
     const fieldPath = buildPath(s.shape, fieldAmp, s.wavelength, fieldMid);
     const fieldUrl = svgUrl(fieldPath, s.wavelength, s.rowGap, s.strokeWidth);
 
-    return { lineHeight, lineUrl, fieldUrl };
-  }, [s.shape, s.amplitude, s.wavelength, s.strokeWidth, s.rowGap]);
+    return { lineHeight, lineUrl, line2Url, fieldUrl };
+  }, [
+    s.shape,
+    s.amplitude,
+    s.amplitude2,
+    s.wavelength,
+    s.wavelength2,
+    s.strokeWidth,
+    s.rowGap,
+  ]);
 
   const baselineLineUrl = svgUrl(
     BASELINE_LINE.path,
@@ -318,7 +342,7 @@ export default function WaveLab() {
 
           <div className="space-y-4">
             <Slider
-              label="Amplitude"
+              label="Amplitude · line 1"
               unit="px"
               min={1}
               max={10}
@@ -327,7 +351,7 @@ export default function WaveLab() {
               onChange={(v) => set("amplitude", v)}
             />
             <Slider
-              label="Wavelength"
+              label="Wavelength · line 1"
               unit="px"
               min={24}
               max={160}
@@ -378,14 +402,43 @@ export default function WaveLab() {
               onChange={(v) => set("parallax", v)}
             />
             {s.parallax && (
-              <Slider
-                label="Parallax offset"
-                unit="%"
-                min={10}
-                max={80}
-                value={s.parallaxOffset}
-                onChange={(v) => set("parallaxOffset", v)}
-              />
+              <>
+                <Slider
+                  label="Parallax offset"
+                  unit="%"
+                  min={10}
+                  max={80}
+                  value={s.parallaxOffset}
+                  onChange={(v) => set("parallaxOffset", v)}
+                />
+                <Slider
+                  label="Amplitude · line 2"
+                  unit="px"
+                  min={0.5}
+                  max={10}
+                  step={0.5}
+                  value={s.amplitude2}
+                  onChange={(v) => set("amplitude2", v)}
+                />
+                <Slider
+                  label="Wavelength · line 2"
+                  unit="px"
+                  min={24}
+                  max={160}
+                  step={2}
+                  value={s.wavelength2}
+                  onChange={(v) => set("wavelength2", v)}
+                />
+                <Slider
+                  label="Phase · line 2"
+                  unit="%"
+                  min={0}
+                  max={100}
+                  step={1}
+                  value={s.phase2}
+                  onChange={(v) => set("phase2", v)}
+                />
+              </>
             )}
             <Slider
               label="Vertical bob"
@@ -502,13 +555,15 @@ export default function WaveLab() {
                   <div
                     className="wl-anim"
                     style={driftLayer(
-                      tuned.lineUrl,
-                      s.wavelength,
+                      tuned.line2Url,
+                      s.wavelength2,
                       tuned.lineHeight,
                       lineColor,
                       s.lineOpacity * 0.5,
                       parallaxCycle,
-                      "-2s",
+                      // Phase as a fraction of the cycle: drift covers one
+                      // wavelength2 per cycle, so N% delay shifts crests by N%.
+                      `-${((s.phase2 / 100) * parallaxCycle).toFixed(3)}s`,
                     )}
                   />
                 )}

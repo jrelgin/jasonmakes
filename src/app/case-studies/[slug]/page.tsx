@@ -73,7 +73,7 @@ export default async function Page({ params }: Params) {
             <h1 className="u-title mt-2 text-4xl md:text-5xl lg:text-6xl">
               {caseStudy.title}
             </h1>
-            <DriftingWave className="mt-8 max-w-[14rem]" />
+            <DriftingWave className="mt-8" />
 
             {meta.length > 0 && (
               <dl className="frost-panel mt-8 grid gap-5 p-6 text-sm sm:grid-cols-3">

@@ -81,7 +81,7 @@ export default async function Page({ params }: Params) {
                 {formattedDate}
               </p>
             )}
-            <DriftingWave className="mt-8 max-w-[14rem]" />
+            <DriftingWave className="mt-8" />
           </header>
 
           <div className="u-rise u-rise-1 relative mt-10 aspect-[1200/630] overflow-hidden rounded-xl border border-[var(--u-panel-border)]">
