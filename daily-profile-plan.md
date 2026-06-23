@@ -2,6 +2,8 @@
 *Next.js (App Router) / Vercel-native architecture*
 
 > **Current Status:** ✅ **Fully implemented and working** - Weather, Readwise Reader, Spotify, and OpenAI blurb generation with hourly updates via Vercel Cron.
+>
+> **Note (historical):** The standalone `AboutBlurb`/`WeatherWidget`/`LatestReadsWidget`/`SpotifyWidget` components below were later superseded by `DailyProfileOverlay.tsx`, which reads the same KV data and renders the signals internally inside `DailyProfilePanel.tsx`. The standalone files have been removed.
 
 ---
 
