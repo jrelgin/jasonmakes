@@ -171,7 +171,10 @@ export default config({
   },
   ui: {
     brand: {
-      name: "Jason Makes",
+      // The logo (mark) already shows the "Jason Makes" wordmark, so a separate
+      // text label is redundant. A single space hides it visually; an empty
+      // string is falsy and makes Keystatic fall back to showing the repo slug.
+      name: " ",
       mark: BrandMark,
     },
     navigation: {
