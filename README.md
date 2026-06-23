@@ -89,7 +89,7 @@ The homepage shows a daily profile built from external data sources. A Vercel Cr
 2. Stores the profile and a short blurb in Vercel KV using `lib/kv.ts`.
 3. Revalidates the homepage so new data appears quickly.
 
-Server components like `WeatherWidget`, `LatestReadsWidget`, and `AboutBlurb` read from KV on every request (with Next.js revalidation). Development mode offers `/api/debug/*` routes for inspecting provider output.
+The `DailyProfileOverlay` server component reads the blurb and profile from KV on every request (with Next.js revalidation) and renders the weather, music, and latest-reads signals inside `DailyProfilePanel`. Development mode offers `/api/debug/*` routes for inspecting provider output.
 ## Future Improvements
 
 The following improvements are planned for future development:

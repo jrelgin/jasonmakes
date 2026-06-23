@@ -68,11 +68,8 @@ The Daily Profile system runs via an hourly cron job (`/api/cron/update-profile`
 ### 3. Frontend Architecture
 
 #### Server Components
-All data-fetching components are React Server Components:
-- `WeatherWidget.tsx`: Displays current weather
-- `SpotifyWidget.tsx`: Shows recent tracks
-- `LatestReadsWidget.tsx`: Lists tagged Readwise Reader articles
-- `AboutBlurb.tsx`: Renders AI-generated summary
+The homepage profile is a React Server Component:
+- `DailyProfileOverlay.tsx`: Reads the blurb and aggregated profile from Vercel KV and renders the weather, recently-played track, and latest reads as internal signal sections inside `DailyProfilePanel.tsx` (the expandable card on the homepage).
 
 #### Routing Structure
 ```
