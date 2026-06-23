@@ -157,24 +157,58 @@
  * Drifting wave — the single animated flourish (CSS-masked, theme-aware)
  * ========================================================================= */
 .drift-wave {
+  position: relative;
   width: 100%;
-  height: 18px;
+  height: 25px;
+  --drift-tile: 106px;
+  animation: drift-bob 4.5s ease-in-out infinite;
+}
+
+/* Two foam lines drifting at different speeds — a parallax echo that makes the
+   motion visible (ported from the /variations lab). Both are masked copies of
+   one refined-sine tile, so the component stays a bare <div class="drift-wave">. */
+.drift-wave::before,
+.drift-wave::after {
+  content: "";
+  position: absolute;
+  inset: 0;
   background-color: var(--u-wave-line);
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='18'%3E%3Cpath d='M0 9 C 12 9 18 4 30 4 S 48 4 60 9 S 78 14 90 14 S 108 14 120 9' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E");
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='18'%3E%3Cpath d='M0 9 C 12 9 18 4 30 4 S 48 4 60 9 S 78 14 90 14 S 108 14 120 9' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E");
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'106'%20height%3D'25'%3E%3Cpath%20d%3D'M0.00%2012.50%20L2.00%2011.61%20L4.00%2010.74%20L6.00%209.89%20L8.00%209.08%20L10.00%208.31%20L12.00%207.60%20L14.00%206.97%20L16.00%206.41%20L18.00%205.93%20L20.00%205.55%20L22.00%205.27%20L24.00%205.08%20L26.00%205.00%20L28.00%205.03%20L30.00%205.16%20L32.00%205.40%20L34.00%205.73%20L36.00%206.16%20L38.00%206.68%20L40.00%207.28%20L42.00%207.95%20L44.00%208.69%20L46.00%209.48%20L48.00%2010.31%20L50.00%2011.17%20L52.00%2012.06%20L54.00%2012.94%20L56.00%2013.83%20L58.00%2014.69%20L60.00%2015.52%20L62.00%2016.31%20L64.00%2017.05%20L66.00%2017.72%20L68.00%2018.32%20L70.00%2018.84%20L72.00%2019.27%20L74.00%2019.60%20L76.00%2019.84%20L78.00%2019.97%20L80.00%2020.00%20L82.00%2019.92%20L84.00%2019.73%20L86.00%2019.45%20L88.00%2019.07%20L90.00%2018.59%20L92.00%2018.03%20L94.00%2017.40%20L96.00%2016.69%20L98.00%2015.92%20L100.00%2015.11%20L102.00%2014.26%20L104.00%2013.39%20L106.00%2012.50'%20fill%3D'none'%20stroke%3D'%23000'%20stroke-width%3D'2'%20stroke-linecap%3D'round'%20stroke-linejoin%3D'round'%2F%3E%3C%2Fsvg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'106'%20height%3D'25'%3E%3Cpath%20d%3D'M0.00%2012.50%20L2.00%2011.61%20L4.00%2010.74%20L6.00%209.89%20L8.00%209.08%20L10.00%208.31%20L12.00%207.60%20L14.00%206.97%20L16.00%206.41%20L18.00%205.93%20L20.00%205.55%20L22.00%205.27%20L24.00%205.08%20L26.00%205.00%20L28.00%205.03%20L30.00%205.16%20L32.00%205.40%20L34.00%205.73%20L36.00%206.16%20L38.00%206.68%20L40.00%207.28%20L42.00%207.95%20L44.00%208.69%20L46.00%209.48%20L48.00%2010.31%20L50.00%2011.17%20L52.00%2012.06%20L54.00%2012.94%20L56.00%2013.83%20L58.00%2014.69%20L60.00%2015.52%20L62.00%2016.31%20L64.00%2017.05%20L66.00%2017.72%20L68.00%2018.32%20L70.00%2018.84%20L72.00%2019.27%20L74.00%2019.60%20L76.00%2019.84%20L78.00%2019.97%20L80.00%2020.00%20L82.00%2019.92%20L84.00%2019.73%20L86.00%2019.45%20L88.00%2019.07%20L90.00%2018.59%20L92.00%2018.03%20L94.00%2017.40%20L96.00%2016.69%20L98.00%2015.92%20L100.00%2015.11%20L102.00%2014.26%20L104.00%2013.39%20L106.00%2012.50'%20fill%3D'none'%20stroke%3D'%23000'%20stroke-width%3D'2'%20stroke-linecap%3D'round'%20stroke-linejoin%3D'round'%2F%3E%3C%2Fsvg%3E");
   -webkit-mask-repeat: repeat-x;
   mask-repeat: repeat-x;
-  -webkit-mask-size: 120px 18px;
-  mask-size: 120px 18px;
+  -webkit-mask-size: var(--drift-tile) 25px;
+  mask-size: var(--drift-tile) 25px;
   -webkit-mask-position: 0 50%;
   mask-position: 0 50%;
-  animation: drift-wave 14s linear infinite;
+}
+
+/* Primary line — full look, 12s drift. */
+.drift-wave::before {
+  opacity: 0.85;
+  animation: drift-wave 12s linear infinite;
+}
+
+/* Parallax echo — fainter and faster (12s x (1 - 0.61) = 4.68s). */
+.drift-wave::after {
+  opacity: 0.425;
+  animation: drift-wave 4.68s linear infinite;
 }
 
 @keyframes drift-wave {
   to {
-    -webkit-mask-position: -120px 50%;
-    mask-position: -120px 50%;
+    -webkit-mask-position: calc(var(--drift-tile) * -1) 50%;
+    mask-position: calc(var(--drift-tile) * -1) 50%;
+  }
+}
+
+@keyframes drift-bob {
+  0%,
+  100% {
+    transform: translateY(-0.5px);
+  }
+  50% {
+    transform: translateY(0.5px);
   }
 }
 
@@ -466,7 +500,9 @@ li:last-child > .index-row {
   .u-rise-1,
   .u-rise-2,
   .u-rise-3,
-  .drift-wave {
+  .drift-wave,
+  .drift-wave::before,
+  .drift-wave::after {
     animation: none;
   }
 }

@@ -42,7 +42,7 @@ const DEFAULTS = {
   wavelength: 106,
   strokeWidth: 2,
   lineOpacity: 0.85,
-  cycleSeconds: 9,
+  cycleSeconds: 12,
   parallax: true,
   parallaxOffset: 61,
   bobAmplitude: 0.5,
