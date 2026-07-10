@@ -16,6 +16,7 @@ import type {
   SkyMode,
   SunAnimationParams,
 } from "@/engine/types";
+import { createWhaleState, loadWhaleImage } from "@/engine/whale";
 import {
   LEGACY_THEME_STORAGE_KEY,
   SITE_THEME_CHANGE_EVENT,
@@ -146,6 +147,7 @@ export function SeascapeCanvas() {
   );
   const skyModeRef = useRef<SkyMode>("day");
   const tentaclesImgRef = useRef<HTMLImageElement | null>(null);
+  const whaleImgRef = useRef<HTMLImageElement | null>(null);
   const glitchParamsRef = useRef<GlitchParams>(
     PRODUCTION_SETTINGS.hokusai.glitchParams,
   );
@@ -174,6 +176,19 @@ export function SeascapeCanvas() {
     const horizonBaseY = scene.config.horizonRatio * height;
     scene.tentacleGlitch = createGlitchState(img, width, height, horizonBaseY);
     scene.tentacleGlitch.params = glitchParamsRef.current;
+  }, []);
+
+  const attachWhale = useCallback(() => {
+    const scene = sceneRef.current;
+    const img = whaleImgRef.current;
+    if (!scene) return;
+
+    if (!img || scene.config.skyMode !== "day") {
+      scene.whale = null;
+      return;
+    }
+
+    scene.whale = createWhaleState(img, scene.config.dimensions.width);
   }, []);
 
   const preserveSunAnimations = useCallback(() => {
@@ -229,8 +244,9 @@ export function SeascapeCanvas() {
       );
       preserveSunAnimations();
       attachTentacleGlitch();
+      attachWhale();
     },
-    [attachTentacleGlitch, preserveSunAnimations],
+    [attachTentacleGlitch, attachWhale, preserveSunAnimations],
   );
 
   const initScene = useCallback(() => {
@@ -274,7 +290,8 @@ export function SeascapeCanvas() {
     }
     preserveSunAnimations();
     attachTentacleGlitch();
-  }, [attachTentacleGlitch, preserveSunAnimations]);
+    attachWhale();
+  }, [attachTentacleGlitch, attachWhale, preserveSunAnimations]);
 
   const handleThemeChange = useCallback((_palette: Palette, key: ThemeKey) => {
     setStoredSiteTheme(key);
@@ -319,6 +336,13 @@ export function SeascapeCanvas() {
       attachTentacleGlitch();
     });
   }, [attachTentacleGlitch]);
+
+  useEffect(() => {
+    loadWhaleImage().then((img) => {
+      whaleImgRef.current = img;
+      attachWhale();
+    });
+  }, [attachWhale]);
 
   useEffect(() => {
     const initialTheme = resolveSiteTheme();

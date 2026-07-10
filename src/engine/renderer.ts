@@ -5,6 +5,7 @@ import { renderSky } from "./sky";
 import { getSunRotationAngle, renderSunOverlays } from "./sun-overlay";
 import { renderGlitchTentacles } from "./tentacles";
 import { SceneState } from "./types";
+import { renderWhale } from "./whale";
 
 /**
  * Main renderer - draws the complete scene to a canvas context
@@ -85,9 +86,12 @@ export function renderScene(ctx: CanvasRenderingContext2D, state: SceneState) {
     renderSunOverlays(ctx, state.sunOverlayConfig, time, width);
   }
 
-  // Build glitch inter-row callback: fires after row 7 so foreground
-  // wave rows (8-11) paint on top, restoring depth layering.
+  // Build the inter-row callback. Both the night tentacles and the day whale
+  // draw between wave rows so the foreground rows paint on top, giving depth:
+  //   - tentacles fire after row 7 (rows 8-11 overlap),
+  //   - the whale fires after a mid row (later rows submerge its lower body).
   const GLITCH_AFTER_ROW = 7;
+  const WHALE_AFTER_ROW = 8;
   let interRowCallback: InterRowCallback | undefined;
 
   if (config.skyMode === "night" && state.tentacleGlitch) {
@@ -95,6 +99,12 @@ export function renderScene(ctx: CanvasRenderingContext2D, state: SceneState) {
     interRowCallback = (drawCtx, rowIndex) => {
       if (rowIndex !== GLITCH_AFTER_ROW) return;
       renderGlitchTentacles(drawCtx, glitchState, time, noise2D);
+    };
+  } else if (config.skyMode === "day" && state.whale) {
+    const whale = state.whale;
+    interRowCallback = (drawCtx, rowIndex, rowY) => {
+      if (rowIndex !== WHALE_AFTER_ROW) return;
+      renderWhale(drawCtx, whale, time, rowY);
     };
   }
 
